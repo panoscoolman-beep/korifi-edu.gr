@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export function Footer() {
@@ -7,8 +8,11 @@ export function Footer() {
     <footer className="mt-16 border-t border-slate-200 bg-slate-50">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 sm:grid-cols-3">
         <div>
-          <p className="text-lg font-semibold text-brand-700">Κορυφή</p>
-          <p className="mt-2 max-w-xs text-sm text-slate-600">
+          <div className="flex items-center gap-2">
+            <Image src="/logo-icon.png" alt="" width={32} height={62} className="h-8 w-auto" />
+            <p className="text-lg font-semibold text-brand-700">Κορυφή</p>
+          </div>
+          <p className="mt-3 max-w-xs text-sm text-slate-600">
             Φροντιστήριο μέσης εκπαίδευσης. Μαθήματα και υλικό για γυμνάσιο και λύκειο.
           </p>
         </div>
