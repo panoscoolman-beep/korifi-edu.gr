@@ -2,7 +2,7 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Φάση 3 (Auth) **scaffolded** στο `feature/phase-3-auth`. Login/Register/Forgot/Dashboard/proxy έτοιμα και verified. Λείπει: ο user πρέπει να κάνει Google Cloud OAuth setup (`docs/GOOGLE_OAUTH_SETUP.md`).
+> **Where we are now (latest):** Φάση 3 (Auth) **complete + verified end-to-end**. Email + Google OAuth + email verification όλα δουλεύουν. Owner λογαριασμός (`panoscoolman@gmail.com`) προήχθη σε admin. Επόμενο: Φάση 4 — Admin panel (`feature/phase-4-admin`).
 
 ---
 
@@ -43,10 +43,12 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 **Verification:** όλα 9 routes (incl. προστατευμένα) return σωστό status. Type-check clean.
 
-**⏭ Δράση από user:**
-1. Συμπλήρωση Google Cloud OAuth credentials → Supabase dashboard (βλ. `docs/GOOGLE_OAUTH_SETUP.md`)
-2. Enable email confirmations στο Supabase Auth settings
-3. Πρώτη εγγραφή με `panoscoolman@gmail.com` → SQL για promotion σε admin
+**✅ Verified end-to-end (2026-05-04 evening):**
+- Google Cloud OAuth credentials configured (Client ID `512604453780-...`)
+- Supabase Google provider enabled, email confirmations on
+- `panoscoolman@gmail.com` signed in via Google → profile auto-created
+- SQL promotion to `role='admin'` applied → user can see Admin link in navbar
+- Email signup + verification flow tested separately, works
 
 ### 💾 Backup pipeline — LIVE
 - `scripts/backup/backup.py` τρέχει κάθε μέρα στις 03:00 (Windows Task Scheduler)
