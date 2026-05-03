@@ -140,9 +140,17 @@ profiles          -- Επιπλέον στοιχεία χρήστη (πέρα α
 - [ ] `/courses/[slug]` — Σελίδα μαθήματος: περιγραφή, λίστα lessons, κουμπί εγγραφής
 
 #### 2.3 Lesson Viewer
-- [ ] `/lessons/[id]` — Viewer για PDF (embedded) και κείμενο
+- [ ] `/lessons/[id]` — Viewer για PDF (embedded), κείμενο, και **article (Markdown)**
 - [ ] Guard: αν το lesson είναι premium και ο χρήστης δεν έχει enrollment → redirect στο login
 - [ ] Navigation (προηγούμενο / επόμενο lesson)
+
+#### 2.4 Schema extension για άρθρα + media (NEW — από συζήτηση 2026-05-03)
+- [ ] Migration `0003_lessons_article_support.sql`:
+  - Επέκταση `lessons.content_type` με `'article'` (Markdown body αντί για plain text)
+  - Πρόσθεση `lessons.cover_image text`
+- [ ] Storage buckets: `images` (public), `pdfs` (private με signed URLs)
+- [ ] Markdown rendering στο viewer (με image embed από Supabase Storage + YouTube embed για βίντεο)
+- [ ] Στόχος Φάσης 4 admin: rich-text editor (TipTap ή παρόμοιο), drag-drop εικόνας → autoupload, paste YouTube link → autoembed
 
 **Deliverable:** Κάποιος μπορεί να περιηγηθεί στα μαθήματα και να δει τα δωρεάν
 
