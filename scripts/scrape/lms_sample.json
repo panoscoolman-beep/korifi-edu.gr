@@ -1,0 +1,318 @@
+{
+  "courses": [
+    {
+      "wp_id": 10447,
+      "title": "Άλγεβρα Α Λυκείου",
+      "slug": "%ce%ac%ce%bb%ce%b3%ce%b5%ce%b2%cf%81%ce%b1-%ce%b1-%ce%bb%cf%85%ce%ba%ce%b5%ce%af%ce%bf%cf%85",
+      "subject_slug": "alikeiou",
+      "description_html": "<img class=\"alignnone size-medium wp-image-10449\" src=\"https://test.itin.gr/wp-content/uploads/2021/03/εξώφυλλο-α-λυκείου-212x300.png\" alt=\"\" width=\"212\" height=\"300\" />",
+      "cover_image": null,
+      "is_free": true,
+      "lessons": [
+        {
+          "wp_id": 10451,
+          "order": 1,
+          "section_name": "Λογική-Σύνολα",
+          "title": "Λογική - Σύνολα",
+          "content_type": "pdf",
+          "pdf_url": "https://test.itin.gr/wp-content/uploads/2021/03/00-Λογική-Σύνολα.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 10462,
+          "order": 2,
+          "section_name": "Απόλυτα Ρίζες",
+          "title": "Απόλυτα Ρίζες",
+          "content_type": "pdf",
+          "pdf_url": "https://test.itin.gr/wp-content/uploads/2021/03/01-Απόλυτα-Ρίζες.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 10471,
+          "order": 3,
+          "section_name": "Εξισώσεις- Ανισώσεις",
+          "title": "Εξισώσεις- Ανισώσεις",
+          "content_type": "pdf",
+          "pdf_url": "https://test.itin.gr/wp-content/uploads/2021/03/02-Εξισώσεις-Ανισώσεις-Α-και-Β-βαθμού.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 10465,
+          "order": 4,
+          "section_name": "Συναρτήσεις",
+          "title": "Συναρτήσεις",
+          "content_type": "pdf",
+          "pdf_url": "https://test.itin.gr/wp-content/uploads/2021/03/04-Συναρτήσεις.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 10468,
+          "order": 5,
+          "section_name": "Πρόοδοι",
+          "title": "Πρόοδοι",
+          "content_type": "pdf",
+          "pdf_url": "https://test.itin.gr/wp-content/uploads/2021/03/03-Πρόοδοι.pdf",
+          "content": null,
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "wp_id": 10550,
+      "title": "Άλγεβρα Β Λυκείου",
+      "slug": "%ce%ac%ce%bb%ce%b3%ce%b5%ce%b2%cf%81%ce%b1-%ce%b2-%ce%bb%cf%85%ce%ba%ce%b5%ce%af%ce%bf%cf%85",
+      "subject_slug": "blikeiou",
+      "description_html": "<img class=\"alignnone size-medium wp-image-2935 alignleft\" src=\"https://test.itin.gr/wp-content/uploads/2015/11/bg-parallax-about-us-300x122.jpg\" alt=\"\" width=\"300\" height=\"122\" />",
+      "cover_image": "https://test.itin.gr/wp-content/uploads/2021/03/Algebra-Spanish-720x388-1.jpg",
+      "is_free": true,
+      "lessons": [
+        {
+          "wp_id": 10535,
+          "order": 1,
+          "section_name": "Συστήματα",
+          "title": "Συστήματα",
+          "content_type": "pdf",
+          "pdf_url": "https://test.itin.gr/wp-content/uploads/2021/03/ΚΕΦ.-1-2-Συστ-Συν.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 10538,
+          "order": 2,
+          "section_name": "Τριγωνομετρία",
+          "title": "Τριγωνομετρία Β Λυκείου",
+          "content_type": "pdf",
+          "pdf_url": "https://test.itin.gr/wp-content/uploads/2021/03/ΚΕΦ.-3-ΤΡΙΓΩΝΟΜΕΤΡΙΑ.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 10542,
+          "order": 3,
+          "section_name": "Πολυώνυμα",
+          "title": "Πολυώνυμα",
+          "content_type": "pdf",
+          "pdf_url": "https://test.itin.gr/wp-content/uploads/2021/03/ΚΕΦ.-4-ΠΟΛΥΩΝΥΜΑ.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 10545,
+          "order": 4,
+          "section_name": "Εκθετική-Λογαριθμική Συνάρτηση",
+          "title": "Εκθετική-Λογαριθμική Συνάρτηση",
+          "content_type": "pdf",
+          "pdf_url": "https://test.itin.gr/wp-content/uploads/2021/03/ΚΕΦ.-5-ΕΚΘΕΤΙΚΗ-ΛΟΓΑΡΙΘΜΙΚΗ.pdf",
+          "content": null,
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "wp_id": 10595,
+      "title": "Μαθηματικά Γ Γενικού Λυκείου",
+      "slug": "%ce%bc%ce%b1%ce%b8%ce%b7%ce%bc%ce%b1%cf%84%ce%b9%ce%ba%ce%ac-%ce%b3-%ce%b3%ce%b5%ce%bd%ce%b9%ce%ba%ce%bf%cf%8d-%ce%bb%cf%85%ce%ba%ce%b5%ce%af%ce%bf%cf%85",
+      "subject_slug": "glikeiou",
+      "description_html": "",
+      "cover_image": "https://test.itin.gr/wp-content/uploads/2021/03/Copy-of-Calculus-2-1-scaled-1.jpeg",
+      "is_free": true,
+      "lessons": [
+        {
+          "wp_id": 12374,
+          "order": 1,
+          "section_name": "Θεωρία",
+          "title": "θεωρια",
+          "content_type": "text",
+          "pdf_url": null,
+          "content": "",
+          "is_free": true
+        },
+        {
+          "wp_id": 12403,
+          "order": 2,
+          "section_name": "Θεωρία",
+          "title": "Οδηγός Μελέτης της Θεωρίας",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/001-ΟΔΗΓΟΣ-ΜΕΛΕΤΗΣ-ΤΗΣ-ΘΕΩΡΙΑΣ.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 12375,
+          "order": 3,
+          "section_name": "Θεωρία",
+          "title": "Ορισμοί και αποδείξεις",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/ΟΡΙΣΜΟΙ-Γ-ΛΥΚΕΙΟΥ_210823_123803.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 12383,
+          "order": 4,
+          "section_name": "Θεωρία",
+          "title": "Σημεία που θέλουν προσοχή στη θεωρία",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/ΣΗΜΕΙΑ-ΠΟΥ-ΘΕΛΟΥΝ-ΠΡΟΣΟΧΗ-ΣΤΗ-ΘΕΩΡΙΑ_210823_123630.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 12386,
+          "order": 5,
+          "section_name": "Θεωρία",
+          "title": "15 Σ-Λ με αιτιολόγηση",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/15-Ερωτήσεις-σωστού-λάθους-με-αιτιολογηση.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 12389,
+          "order": 6,
+          "section_name": "Θεωρία",
+          "title": "Αιτιολογήσεις Ψευδών προτάσεων",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/αιτιολογήσεις-του-ψευδούς_210428_142546.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 12392,
+          "order": 7,
+          "section_name": "Θεωρία",
+          "title": "Διαγώνισμα Σ-Λ",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/T_F_2021_teliko-xoris-apantiseis.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 12401,
+          "order": 8,
+          "section_name": "Θεωρία",
+          "title": "Quiz θεωρίας",
+          "content_type": "text",
+          "pdf_url": null,
+          "content": "https://docs.google.com/forms/d/e/1FAIpQLSfU1-fs4BAFI6a-P5i5xSNccaN3jKmQ138qqCaFvu1VwvUfDA/viewformEnter",
+          "is_free": true
+        },
+        {
+          "wp_id": 12395,
+          "order": 9,
+          "section_name": "Θεωρία",
+          "title": "Διαγώνισμα Σ-Λ 2000-2020 με απαντήσεις",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/Σλ-2000-2020με-απαντησεις.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 12398,
+          "order": 10,
+          "section_name": "Θεωρία",
+          "title": "Θέματα Α ανά κεφάλαιο",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/Θέματα-Α.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 12406,
+          "order": 11,
+          "section_name": "Γενικές οδηγίες και συμβουλές για τις πανελλαδικές",
+          "title": "Γενικές οδηγίες και συμβουλές για τις Πανελλαδικές",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/002-Γενικές-οδηγίες-και-συμβουλές-για-τις-Πανελλαδικές-1.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 12415,
+          "order": 12,
+          "section_name": "Θέματα και ασκήσεις",
+          "title": "ΕΡΓΑΣΙΕΣ-ΑΠΟ-ΤΟ-ΣΧΟΛΙΚΟ-2021.",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/006-ΕΡΓΑΣΙΕΣ-ΑΠΟ-ΤΟ-ΣΧΟΛΙΚΟ-2021.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 12412,
+          "order": 13,
+          "section_name": "Θέματα και ασκήσεις",
+          "title": "Βασικά-γενικάΘέματα-στην-Παράγωγο-2021",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/005-Βασικά-γενικάΘέματα-στην-Παράγωγο-2021-.pdf",
+          "content": null,
+          "is_free": true
+        },
+        {
+          "wp_id": 12409,
+          "order": 14,
+          "section_name": "Θέματα και ασκήσεις",
+          "title": "Μαθηματική-Συνάντηση 2021-ΘΕΜΑ-Γ.",
+          "content_type": "pdf",
+          "pdf_url": "https://korifi-edu.gr/wp-content/uploads/2021/08/004-Μαθηματική-Συνάντηση-ΘΕΜΑ-Γ.pdf",
+          "content": null,
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "wp_id": 10597,
+      "title": "Μαθηματικά Κατεύθυνσης Β λυκείου",
+      "slug": "%ce%bc%ce%b1%ce%b8%ce%b7%ce%bc%ce%b1%cf%84%ce%b9%ce%ba%ce%ac-%ce%ba%ce%b1%cf%84%ce%b5%cf%8d%ce%b8%cf%85%ce%bd%cf%83%ce%b7%cf%82-%ce%b2-%ce%bb%cf%85%ce%ba%ce%b5%ce%af%ce%bf%cf%85",
+      "subject_slug": "blikeiou",
+      "description_html": "",
+      "cover_image": null,
+      "is_free": true,
+      "lessons": [
+        {
+          "wp_id": 12422,
+          "order": 1,
+          "section_name": "Διανύσματα",
+          "title": "Διανύσματα",
+          "content_type": "text",
+          "pdf_url": null,
+          "content": "<a href=\"https://korifi-edu.gr/wp-content/uploads/2021/08/01-ΔΙΑΝΥΣΜΑΤΑ.docx\">01 - ΔΙΑΝΥΣΜΑΤΑ</a>",
+          "is_free": true
+        },
+        {
+          "wp_id": 12425,
+          "order": 2,
+          "section_name": "Ευθεία",
+          "title": "Ευθεία στο επίπεδο",
+          "content_type": "text",
+          "pdf_url": null,
+          "content": "<a href=\"https://korifi-edu.gr/wp-content/uploads/2021/08/02-ΕΥΘΕΙΑ-ΣΤΟ-ΕΠΙΠΕΔΟ.docx\">02 - ΕΥΘΕΙΑ ΣΤΟ ΕΠΙΠΕΔΟ</a>",
+          "is_free": true
+        },
+        {
+          "wp_id": 12428,
+          "order": 3,
+          "section_name": "Κωνικές τομές",
+          "title": "Κωνικές τομές",
+          "content_type": "text",
+          "pdf_url": null,
+          "content": "<a href=\"https://korifi-edu.gr/wp-content/uploads/2021/08/03-ΚΩΝΙΚΕΣ-ΤΟΜΕΣ.docx\">03 - ΚΩΝΙΚΕΣ ΤΟΜΕΣ</a>",
+          "is_free": true
+        }
+      ]
+    },
+    {
+      "wp_id": 10599,
+      "title": "Ανάπτυξη Εφαρμογών σε Προγραμματιστικό Περιβάλλον (ΑΕΠΠ) Γ Λυκείου",
+      "slug": "%ce%b1%ce%bd%ce%ac%cf%80%cf%84%cf%85%ce%be%ce%b7-%ce%b5%cf%86%ce%b1%cf%81%ce%bc%ce%bf%ce%b3%cf%8e%ce%bd-%cf%83%ce%b5-%cf%80%cf%81%ce%bf%ce%b3%cf%81%ce%b1%ce%bc%ce%bc%ce%b1%cf%84%ce%b9%cf%83%cf%84",
+      "subject_slug": "glikeiou",
+      "description_html": "",
+      "cover_image": "https://test.itin.gr/wp-content/uploads/2021/03/Ba_COMPUTER-SCIENCE_900X600.jpg",
+      "is_free": true,
+      "lessons": []
+    }
+  ]
+}

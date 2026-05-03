@@ -17,6 +17,27 @@ All notable changes to korifi-edu.gr are documented here, grouped by date.
 - TypeScript types for `subjects`, `courses`, `lessons`, `enrollments`, `profiles`
 - `.env.local` with Supabase keys (gitignored)
 
+### Phase 2.5 — Grade pages + backup pipeline
+
+**Grade pages (Πρόγραμμα Σπουδών):**
+- Scraped + imported 5 grade pages from live site as Markdown:
+  - Γυμνάσιο (`/gimnasio`), Α' Λυκείου (`/alikeiou`), Β' Λυκείου (`/blikeiou`),
+    Γ' Λυκείου & Πανελλήνιες (`/glikeiou`), ΕΠΑΛ (`/epal`)
+- Dynamic `/[slug]` page route serves any published page (gimnasio, alikeiou, … synergates …)
+- Markdown tables (κατάλογος μαθημάτων ανά τάξη) render via `remark-gfm`
+- Navbar: "Πρόγραμμα Σπουδών" hover-dropdown με 5 links + "Συνεργάτες" link
+
+**Team housekeeping:**
+- ΜΑΝΔΑΝΗ ΑΝΑΣΤΑΣΙΑ removed (left the staff)
+- ΠΑΠΑΤΡΙΑΝΤΑΦΥΛΛΟΥ ΔΗΜΗΤΡΗΣ photo set NULL (live site URL 404s — needs re-upload)
+
+**Backup pipeline (`scripts/backup/`):**
+- `backup.py` — dumps every public table as JSON + downloads every Storage bucket file
+- Bundles to `_backups/korifi-edu-backup-YYYY-MM-DD.zip`, prunes local snapshots after 7 days
+- `rclone.exe` (gitignored) ships separately; uploads zip to `gdrive:supabase backup/korifi-edu/`
+- `install_scheduled_task.ps1` — registers Windows Task Scheduler entry for daily run at 03:00
+- `SETUP.md` — one-time OAuth wizard instructions for Google Drive
+
 ### Phase 2.5 — Bug fixes + courses page
 - Fix: `is_admin()` was unable to be executed by anon, which broke every
   "read published OR admin" RLS policy. PostgreSQL evaluates both sides of OR
