@@ -1,74 +1,82 @@
 # Changelog
 
-All notable changes to korifi-edu.gr are documented here, grouped by date.
+Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
+
+> **Where we are now (latest):** Φάση 2.5 ολοκληρωμένη + merged. Backup pipeline live (καθημερινό auto-upload σε Google Drive). Επόμενο: Φάση 3 — Authentication (`feature/phase-3-auth`).
 
 ---
 
 ## 2026-05-03
 
-### Init
-- Created GitHub repository `korifi-edu.gr`
-- Established branching strategy: `main` = production-ready, feature work on `feature/<name>` branches
-- Stack decision: Next.js 15 (App Router) + Supabase + Vercel
+### 🔐 Φάση 3 — Authentication (`feature/phase-3-auth`) — ξεκίνημα
+- **Decisions:**
+  - Email + password auth + **Google OAuth** (μαθητές μπαίνουν με 1 κλικ)
+  - **Email verification υποχρεωτικό** στο signup
+  - 3 roles: `student` (default), `teacher` (μπορεί να ανεβάσει δικά του μαθήματα από admin), `admin` (full)
+- (work in progress)
 
-### Phase 1 — Foundation
-- Next.js 15 + TypeScript + Tailwind scaffolding (`src/app`)
-- Supabase clients (browser + server) under `src/lib/supabase/`
-- TypeScript types for `subjects`, `courses`, `lessons`, `enrollments`, `profiles`
-- `.env.local` with Supabase keys (gitignored)
+### 💾 Backup pipeline — LIVE
+- `scripts/backup/backup.py` τρέχει κάθε μέρα στις 03:00 (Windows Task Scheduler)
+- Upload σε Google Drive → `supabase backup/korifi-edu/korifi-edu-backup-YYYY-MM-DD.zip`
+- rclone OAuth setup ολοκληρώθηκε. Verified end-to-end (manual trigger → exit 0 → νέο zip στο Drive).
+- Local snapshots διατηρούνται 7 μέρες, στο Drive τίποτα δεν διαγράφεται.
 
-### Phase 2.5 — Grade pages + backup pipeline
+### 🏫 Φάση 2.5 — Grade pages + content types — MERGED στο `main`
+- **Νέοι πίνακες** (migration 0003): `articles`, `pages`, `page_sections`, `teachers`, `events`, `testimonials`, `partners` με RLS policies (public read for published, admin write).
+- **Storage buckets** (migration 0004): `images`, `pdfs` (public read, admin write).
+- **Lessons extension** (0004): `content_type` πια accepts `'article'` (Markdown body) + νέο `cover_image` column.
+- **RLS bug fix** (0005): re-grant `is_admin()` execute σε anon — διαφορετικά κάθε `select` σε pages/teachers επέστρεφε 0 rows λόγω OR evaluation.
 
-**Grade pages (Πρόγραμμα Σπουδών):**
-- Scraped + imported 5 grade pages from live site as Markdown:
-  - Γυμνάσιο (`/gimnasio`), Α' Λυκείου (`/alikeiou`), Β' Λυκείου (`/blikeiou`),
-    Γ' Λυκείου & Πανελλήνιες (`/glikeiou`), ΕΠΑΛ (`/epal`)
-- Dynamic `/[slug]` page route serves any published page (gimnasio, alikeiou, … synergates …)
-- Markdown tables (κατάλογος μαθημάτων ανά τάξη) render via `remark-gfm`
-- Navbar: "Πρόγραμμα Σπουδών" hover-dropdown με 5 links + "Συνεργάτες" link
+### 📦 Real data imported από korifi-edu.gr
+- **17 καθηγητές** με ονόματα, ειδικότητες, φωτό (URLs τοπικά στο live site — Φάση 5 θα τα μεταφέρει σε Supabase Storage)
+- **5 grade pages** scraped + converted to Markdown: `/gimnasio`, `/alikeiou`, `/blikeiou`, `/glikeiou`, `/epal`
+- **Page "Για εμάς"** με philosophy markdown
+- 2 placeholder pages: `/synergates`, `/epaggelmatikos-prosanatolismos` (κενές στο live)
+- 5 subjects (Γυμνάσιο, Α/Β/Γ Λυκείου, ΕΠΑΛ)
 
-**Team housekeeping:**
-- ΜΑΝΔΑΝΗ ΑΝΑΣΤΑΣΙΑ removed (left the staff)
-- ΠΑΠΑΤΡΙΑΝΤΑΦΥΛΛΟΥ ΔΗΜΗΤΡΗΣ photo set NULL (live site URL 404s — needs re-upload)
+### 🎨 Frontend
+- Dynamic `/[slug]` route serves οποιαδήποτε published page
+- Markdown tables (κατάλογος μαθημάτων) render με `remark-gfm`
+- Navbar dropdown "Πρόγραμμα Σπουδών" → 5 grade pages
+- Homepage: hero + κατηγορίες + 8 καθηγητές preview
+- `/courses` listing με filter chips (LMS data έρχεται στο μέλλον)
+- Verified: όλα 10+ routes return 200 με σωστό ελληνικό content
 
-**Backup pipeline (`scripts/backup/`):**
-- `backup.py` — dumps every public table as JSON + downloads every Storage bucket file
-- Bundles to `_backups/korifi-edu-backup-YYYY-MM-DD.zip`, prunes local snapshots after 7 days
-- `rclone.exe` (gitignored) ships separately; uploads zip to `gdrive:supabase backup/korifi-edu/`
-- `install_scheduled_task.ps1` — registers Windows Task Scheduler entry for daily run at 03:00
-- `SETUP.md` — one-time OAuth wizard instructions for Google Drive
+### 🐛 Πράγματα που χρειάζονται ακόμα
+- ΠΑΠΑΤΡΙΑΝΤΑΦΥΛΛΟΥ ΔΗΜΗΤΡΗΣ photo: το URL στο live (`/wp-content/uploads/2026/05/1000039612.jpg`) επιστρέφει 404 — owner χρειάζεται να ξανανεβάσει
+- LMS courses + lessons + 419 PDFs όχι ακόμα migrated (έχω ήδη τα data στο `scripts/scrape/lms_sample.json`)
+- 27 blog articles από SQL dump όχι ακόμα migrated
+- Pages `/online-mathimata`, `/epikoinonia`, `/epaggelmatikos-prosanatolismos` δεν έχουν content (κενές στο live ή χρειάζονται user input)
 
-### Phase 2.5 — Bug fixes + courses page
-- Fix: `is_admin()` was unable to be executed by anon, which broke every
-  "read published OR admin" RLS policy. PostgreSQL evaluates both sides of OR
-  in a policy, so lack of EXECUTE turned every public read into 0 rows
-  (manifesting as 404 on `/gia-emas`). Migration 0005 re-grants execute.
-- Added `/courses` page with subject filter (Όλα / Γυμνάσιο / Α-Γ Λυκείου / ΕΠΑΛ),
-  empty state messaging until LMS migration runs.
+---
 
-### Phase 2.5 — Content types + first real data
-- New tables: `articles`, `pages`, `page_sections`, `teachers`, `events`, `testimonials`, `partners` — all with RLS (public-read-published / admin-write)
-- `lessons` extended: `content_type` accepts `'article'` (Markdown), added `cover_image`
-- Storage buckets `images` + `pdfs` (public read, admin write)
-- Imported real content from existing korifi-edu.gr WordPress:
-  - **17 teachers** with names, ειδικότητες, photos (URLs point to live site temporarily; will move to Supabase Storage in Phase 5)
-  - **5 subjects**: Γυμνάσιο, Α΄/Β΄/Γ΄ Λυκείου, ΕΠΑΛ
-  - **Pages**: "Για εμάς" with full philosophy markdown; placeholder shells for "Συνεργάτες" + "Επαγγελματικός Προσανατολισμός"
-- New page `/gia-emas` rendering team grid + markdown
-- Homepage shows preview of 8 teachers
-- `next.config.ts`: remote image patterns for korifi-edu.gr + i0.wp.com + Supabase Storage
-- Tailwind v4 typography plugin for prose markdown styling
-- Scrape pipeline at `scripts/scrape/` (fetch_pages.py, extract_teachers.py, generate_teacher_insert.py)
+## 2026-05-03 (νωρίτερα την ίδια μέρα)
 
-### Phase 2.1–2.2 (partial) — Layout + Homepage
-- Brand palette (indigo `brand-*` + amber `accent-*`) defined as CSS custom properties + Tailwind v4 `@theme inline` tokens
-- Switched from Geist to Inter (Geist has no greek subset) + JetBrains Mono
-- Greek `<html lang="el">`, metadata template στα ελληνικά
-- `Navbar` + `Footer` shared layout components
-- Homepage: hero + κατηγορίες μαθημάτων (από `subjects` table) + νέα μαθήματα (από `courses`), με σωστά empty states
+### 🚀 Φάση 1 — Foundation
+- Created GitHub repo `korifi-edu.gr` (https://github.com/panoscoolman-beep/korifi-edu.gr)
+- Branching strategy: `main` = production, `feature/<name>` per feature
+- Stack: Next.js 16.2.4 + React 19.2.4 + Tailwind v4 + Supabase + Vercel
+- Supabase project `zasshnqnexnuzmplolnu` (eu-west-1, Postgres 17)
+- `.env.local` με Supabase keys (gitignored)
 
-### Phase 1.3 — Database schema
-- `0001_initial_schema.sql` applied to Supabase: 5 tables, FK, indexes, RLS policies, `is_admin()` helper, auto-create profile trigger on signup
-- `0002_restrict_definer_function_execute.sql`: revoked RPC execute on `handle_new_user`/`is_admin` from anon (kept `is_admin` for `authenticated` because RLS needs it)
-- `supabase/README.md`: migration log + admin promotion query
-- `.claude/` added to `.gitignore`
+### 🗄️ Φάση 1.3 — Database schema (migration 0001 + 0002)
+- 5 base tables: `subjects`, `courses`, `lessons`, `enrollments`, `profiles`
+- RLS policies, `is_admin()` helper, `handle_new_user()` trigger για auto-create profile
+- Locked down SECURITY DEFINER functions από anon (later partially reversed στο 0005)
+
+### 🎨 Φάση 2.1–2.2 — Brand + Layout + Homepage
+- Brand colors (indigo `brand-*` + amber `accent-*`) via Tailwind v4 `@theme inline`
+- Inter (greek subset) + JetBrains Mono fonts
+- Greek `<html lang="el">` + Greek metadata
+- Shared Navbar + Footer
+- Homepage scaffold
+
+---
+
+## Conventions για future entries
+
+- Κάθε commit → νέα γραμμή ή subsection στο entry της σημερινής μέρας
+- Κάθε φάση → καθαρό subsection (`### Φάση N — όνομα`)
+- Φύλαξε τις **decisions** (τι επιλέξαμε και γιατί) ώστε να μην ξανασυζητάμε
+- Στο τέλος κάθε section → ✅ τα completed, 🐛 τα γνωστά bugs, ⏭ τα επόμενα
+- Νέες μέρες πάνω, παλιές κάτω
