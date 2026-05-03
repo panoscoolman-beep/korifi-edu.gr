@@ -2,18 +2,53 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Φάση 2.5 ολοκληρωμένη + merged. Backup pipeline live (καθημερινό auto-upload σε Google Drive). Επόμενο: Φάση 3 — Authentication (`feature/phase-3-auth`).
+> **Where we are now (latest):** Φάση 3 (Auth) **complete + verified end-to-end**. Email + Google OAuth + email verification όλα δουλεύουν. Owner λογαριασμός (`panoscoolman@gmail.com`) προήχθη σε admin. Επόμενο: Φάση 4 — Admin panel (`feature/phase-4-admin`).
 
 ---
 
-## 2026-05-03
+## 2026-05-04
 
-### 🔐 Φάση 3 — Authentication (`feature/phase-3-auth`) — ξεκίνημα
-- **Decisions:**
-  - Email + password auth + **Google OAuth** (μαθητές μπαίνουν με 1 κλικ)
-  - **Email verification υποχρεωτικό** στο signup
-  - 3 roles: `student` (default), `teacher` (μπορεί να ανεβάσει δικά του μαθήματα από admin), `admin` (full)
-- (work in progress)
+### 🔐 Φάση 3 — Authentication scaffolded (`feature/phase-3-auth`)
+
+**Decisions:**
+- Email + password + **Google OAuth** support
+- **Email verification υποχρεωτικό** στο signup
+- 3 roles: `student` (default), `teacher` (μπορεί να αυθορίζει courses/lessons/articles), `admin` (full)
+
+**Migration 0006 — `add_teacher_role`:**
+- `profiles.role` enum extended με `'teacher'`
+- New helper `is_teacher_or_admin()`
+- `profiles update own` policy harden: user can edit `full_name` αλλά **όχι** το `role` του (no self-promotion)
+
+**Server actions** (`src/app/(auth)/actions.ts`):
+- `signInWithPassword`, `signUpWithPassword`, `signInWithGoogle`, `sendPasswordReset`, `signOut`
+- Validation στα ελληνικά error messages
+
+**Pages:**
+- `/login` (`(auth)/login/page.tsx` + client `LoginForm`) — email/password + Google button
+- `/register` με email verification flow
+- `/forgot-password` — reset email
+- `/dashboard` — student view με enrollments + admin link αν `role=admin`
+- `/auth/callback` route handler για Google OAuth + email verification redirect
+
+**Proxy** (`src/proxy.ts` — Next 16 renamed `middleware` → `proxy`):
+- Auto-refresh Supabase session cookies σε κάθε request
+- `/dashboard`, `/admin/*` redirect στο `/login?next=...` αν δεν είναι authenticated
+- `/admin/*` extra check: redirect στο `/dashboard` αν `role≠admin`
+- `/login`, `/register` redirect στο `/dashboard` αν ήδη logged in
+
+**Navbar:**
+- Logged-out: "Σύνδεση" button
+- Logged-in: dropdown με email + "Ο λογαριασμός μου" + "Διαχείριση" (αν admin) + "Αποσύνδεση"
+
+**Verification:** όλα 9 routes (incl. προστατευμένα) return σωστό status. Type-check clean.
+
+**✅ Verified end-to-end (2026-05-04 evening):**
+- Google Cloud OAuth credentials configured (Client ID `512604453780-...`)
+- Supabase Google provider enabled, email confirmations on
+- `panoscoolman@gmail.com` signed in via Google → profile auto-created
+- SQL promotion to `role='admin'` applied → user can see Admin link in navbar
+- Email signup + verification flow tested separately, works
 
 ### 💾 Backup pipeline — LIVE
 - `scripts/backup/backup.py` τρέχει κάθε μέρα στις 03:00 (Windows Task Scheduler)

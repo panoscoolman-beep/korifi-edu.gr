@@ -38,10 +38,12 @@ export type Enrollment = {
   enrolled_at: string
 }
 
+export type UserRole = 'student' | 'teacher' | 'admin'
+
 export type Profile = {
   id: string
   full_name: string | null
-  role: 'student' | 'admin'
+  role: UserRole
   created_at: string
 }
 
