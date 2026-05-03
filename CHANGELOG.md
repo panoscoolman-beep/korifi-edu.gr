@@ -2,7 +2,50 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Φάση 4 + public-facing routes complete & merged. Public site έχει πλέον: `/`, `/blog`, `/events`, `/gia-emas`, grade pages, `/synergates` με partners grid, `/courses`. Admin panel πλήρως λειτουργικός (όλα τα CRUDs + uploads + users + storage browser). Owner self-sufficient. Επόμενα: visual polish + photo migration για 17 teachers από τοπικό `_korifi-edu.gr/public_html/wp-content/uploads/` (όλο το media library του παλιού site).
+> **Where we are now (latest):** Site σχεδόν launch-ready τοπικά. Όλα τα core features δουλεύουν: public catalog (pages/blog/events/gallery/courses/lessons/teachers), full admin CRUD, auth (email + Google), 16/17 photos σε Storage, dark themed header + footer with real socials/Maps, 35 articles + 5 LMS courses migrated. Επόμενα μεγάλα steps: συμπλήρωση κενών pages content + Vercel deployment.
+
+---
+
+## 2026-05-04 (evening — visual polish + content migration)
+
+### 🎨 Branding + visual polish
+- **Logo**: το original (μαύρο "ΚΟΡΥΦΗ" wordmark με κόκκινη κορυφή στο "Υ", `/public/logo.png`) είναι default. Καλοκαιρινή ανανάς version σε `/public/logo-summer.png` standby.
+- **Dark themed header** (`#1f3a5f` matching footer): inverted-white logo + amber-300 hover/CTA → συμμετρικό με footer.
+- **Footer mirrors live korifi-edu.gr**: 3 columns (Επικοινωνία / Κορυφή tagline / Social), real contact info (tel:+302253025080, mailto:frontistiriokorifh@gmail.com), Instagram + Facebook + Maps icons. Maps points σε `https://maps.app.goo.gl/G3P3Bc8ync7s9arc8` (owner-provided).
+- **ResourcesStrip** πάνω από footer: 4 cards με τα **σωστά original images** από κορυφή-edu.gr (compass, exams, calculator, newspaper) που linkάρουν εξωτερικά στο Stadiodromia.gr platform με τον CID `FD7C31D3-576C-4DD7-8896-6FC03492112D`.
+
+### 📦 Content migration via service_role
+- **35 articles** upserted στο `articles` (HTML→Markdown, cover images, authors)
+- **16/17 teacher photos** ανέβηκαν σε Supabase Storage (`images/teachers/`) και η DB updated σε public URLs
+- **3 course covers** ανέβηκαν σε Storage
+- **6 teacher bios** scraped από grade pages και inserted στο `teachers.bio_md`
+- Service role key στο `.env.local` (gitignored). Owner can rotate anytime.
+
+### 👥 Teacher bio popups
+- **TeacherGrid** client component: click teacher card → modal with full Markdown bio + email
+- Esc + click-outside to close, body scroll locked
+- /gia-emas page αναβαθμισμένο
+
+### 📷 Photo gallery (NEW feature)
+- Schema (migration 0007): `gallery_albums` + `gallery_photos` με RLS
+- Admin: /admin/gallery list + form για άλμπουμ + **PhotoManager** (drag-drop multi-upload με per-file progress, hover delete)
+- Public: /gallery (album cards με photo count + date) + /gallery/[slug] (grid → fullscreen Lightbox με prev/next/Esc/arrow-keys)
+- Navbar entry "Φωτογραφίες"
+
+### 🔧 LMS public routes (από νωρίτερα την ίδια μέρα)
+- 5 courses + 21 lessons inserted (ASCII slugs για Next.js compatibility)
+- Public `/courses/[slug]` + `/lessons/[id]` με PDF iframe viewer + premium gate
+
+### 🔐 Memory updates
+- New feedback rule: **auto-save στο stop** (CHANGELOG + push χωρίς να ζητάει permission)
+- New feedback rule: **CHANGELOG.md = project memory** — διαβάζεται πρώτο σε κάθε νέα συνομιλία
+- New feedback rule: **end-to-end verification πριν "done"**
+- New project note: **team roster changes** (Μανδάνη left, Παπατριανταφύλλου photo broken)
+
+### 🐛 Γνωστά εκκρεμή
+- ΠΑΠΑΤΡΙΑΝΤΑΦΥΛΛΟΥ ΔΗΜΗΤΡΗΣ: photo_url = NULL, χρειάζεται upload
+- Empty pages content: /online-mathimata, /epikoinonia, /epaggelmatikos-prosanatolismos
+- Articles content_md έχει links σε `https://yourcareer.gr/...` και `https://korifi-edu.gr/wp-content/uploads/...` που θα ζήσουν όσο ζει το παλιό hosting
 
 ---
 
