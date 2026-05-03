@@ -135,3 +135,25 @@ export type Partner = {
   sort_order: number
   is_published: boolean
 }
+
+export type GalleryAlbum = {
+  id: string
+  slug: string
+  title: string
+  description: string | null
+  cover_image: string | null
+  event_date: string | null
+  sort_order: number
+  is_published: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type GalleryPhoto = {
+  id: string
+  album_id: string
+  image_url: string
+  caption: string | null
+  sort_order: number
+  created_at: string
+}

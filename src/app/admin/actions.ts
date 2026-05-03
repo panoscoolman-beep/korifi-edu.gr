@@ -10,7 +10,8 @@ import { createClient } from "@/lib/supabase/server";
 
 type Table =
   | "pages" | "articles" | "teachers" | "events"
-  | "testimonials" | "partners" | "subjects" | "courses" | "lessons";
+  | "testimonials" | "partners" | "subjects" | "courses" | "lessons"
+  | "gallery_albums";
 
 /* ------------------------------------------------------------------ */
 /*  Generic helpers                                                    */
@@ -100,7 +101,42 @@ const RESOURCE_CONFIG: Record<Table, {
     numbers:  ["order"],
     nullables:["pdf_url","content","cover_image"],
   },
+  gallery_albums: {
+    listPath: "/admin/gallery",
+    booleans: ["is_published"],
+    numbers:  ["sort_order"],
+    nullables:["description","cover_image","event_date"],
+  },
 };
+
+/* ------------------------------------------------------------------ */
+/*  Gallery photo management (bulk per album)                          */
+/* ------------------------------------------------------------------ */
+
+export async function addPhotoToAlbum(albumId: string, imageUrl: string, caption?: string) {
+  const supabase = await assertAdmin();
+  // Find next sort_order
+  const { data: max } = await supabase
+    .from("gallery_photos")
+    .select("sort_order")
+    .eq("album_id", albumId)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const nextOrder = (max?.sort_order ?? 0) + 1;
+  const { error } = await supabase
+    .from("gallery_photos")
+    .insert({ album_id: albumId, image_url: imageUrl, caption: caption ?? null, sort_order: nextOrder });
+  if (error) throw new Error(error.message);
+  revalidatePath(`/admin/gallery/${albumId}`, "page");
+}
+
+export async function deletePhoto(photoId: string, albumId: string) {
+  const supabase = await assertAdmin();
+  const { error } = await supabase.from("gallery_photos").delete().eq("id", photoId);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/admin/gallery/${albumId}`, "page");
+}
 
 export async function saveResource(table: Table, id: string | null, _prev: unknown, fd: FormData) {
   const cfg = RESOURCE_CONFIG[table];

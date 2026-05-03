@@ -13,6 +13,7 @@ const NAV: { href: string; label: string; group?: string }[] = [
   { href: "/admin/events",       label: "Εκδηλώσεις" },
   { href: "/admin/testimonials", label: "Μαρτυρίες" },
   { href: "/admin/partners",     label: "Συνεργάτες" },
+  { href: "/admin/gallery",      label: "Φωτογραφίες" },
   { href: "/admin/subjects",     label: "Τάξεις",      group: "Μαθήματα" },
   { href: "/admin/courses",      label: "Courses" },
   { href: "/admin/lessons",      label: "Lessons" },
