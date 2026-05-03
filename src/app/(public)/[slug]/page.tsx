@@ -8,7 +8,7 @@ type Params = Promise<{ slug: string }>;
 // Reserve slugs that have their own dedicated route file.
 const RESERVED = new Set([
   "gia-emas", "courses", "lessons",
-  "blog", "events", "synergates",
+  "blog", "events", "synergates", "gallery",
   "login", "register", "dashboard", "admin",
 ]);
 
