@@ -11,6 +11,7 @@ export function Navbar() {
 
         <nav className="flex items-center gap-1 sm:gap-2">
           <NavLink href="/courses">Μαθήματα</NavLink>
+          <NavLink href="/gia-emas">Για εμάς</NavLink>
           <NavLink href="/login">
             <span className="rounded-full bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700">
               Σύνδεση

@@ -17,6 +17,20 @@ All notable changes to korifi-edu.gr are documented here, grouped by date.
 - TypeScript types for `subjects`, `courses`, `lessons`, `enrollments`, `profiles`
 - `.env.local` with Supabase keys (gitignored)
 
+### Phase 2.5 — Content types + first real data
+- New tables: `articles`, `pages`, `page_sections`, `teachers`, `events`, `testimonials`, `partners` — all with RLS (public-read-published / admin-write)
+- `lessons` extended: `content_type` accepts `'article'` (Markdown), added `cover_image`
+- Storage buckets `images` + `pdfs` (public read, admin write)
+- Imported real content from existing korifi-edu.gr WordPress:
+  - **17 teachers** with names, ειδικότητες, photos (URLs point to live site temporarily; will move to Supabase Storage in Phase 5)
+  - **5 subjects**: Γυμνάσιο, Α΄/Β΄/Γ΄ Λυκείου, ΕΠΑΛ
+  - **Pages**: "Για εμάς" with full philosophy markdown; placeholder shells for "Συνεργάτες" + "Επαγγελματικός Προσανατολισμός"
+- New page `/gia-emas` rendering team grid + markdown
+- Homepage shows preview of 8 teachers
+- `next.config.ts`: remote image patterns for korifi-edu.gr + i0.wp.com + Supabase Storage
+- Tailwind v4 typography plugin for prose markdown styling
+- Scrape pipeline at `scripts/scrape/` (fetch_pages.py, extract_teachers.py, generate_teacher_insert.py)
+
 ### Phase 2.1–2.2 (partial) — Layout + Homepage
 - Brand palette (indigo `brand-*` + amber `accent-*`) defined as CSS custom properties + Tailwind v4 `@theme inline` tokens
 - Switched from Geist to Inter (Geist has no greek subset) + JetBrains Mono

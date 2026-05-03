@@ -1,11 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import type { Subject, Course } from "@/types/database";
+import type { Subject, Course, Teacher } from "@/types/database";
 
 export default async function HomePage() {
   const supabase = await createClient();
 
-  const [{ data: subjects }, { data: featured }] = await Promise.all([
+  const [{ data: subjects }, { data: featured }, { data: teachers }] = await Promise.all([
     supabase
       .from("subjects")
       .select("id, name, slug, icon, order, created_at")
@@ -15,6 +16,12 @@ export default async function HomePage() {
       .select("id, title, slug, description, subject_id, is_free, cover_image, created_at")
       .order("created_at", { ascending: false })
       .limit(6),
+    supabase
+      .from("teachers")
+      .select("*")
+      .eq("is_published", true)
+      .order("sort_order", { ascending: true })
+      .limit(8),
   ]);
 
   return (
@@ -22,7 +29,48 @@ export default async function HomePage() {
       <Hero />
       <SubjectsSection subjects={(subjects ?? []) as Subject[]} />
       <FeaturedCoursesSection courses={(featured ?? []) as Course[]} />
+      <TeamPreview teachers={(teachers ?? []) as Teacher[]} />
     </>
+  );
+}
+
+function TeamPreview({ teachers }: { teachers: Teacher[] }) {
+  if (teachers.length === 0) return null;
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <div className="flex items-end justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+            Η ομάδα μας
+          </h2>
+          <p className="mt-2 text-slate-600">Έμπειροι καθηγητές, εξειδικευμένοι ανά αντικείμενο.</p>
+        </div>
+        <Link href="/gia-emas" className="text-sm font-medium text-brand-700 hover:text-brand-900">
+          Όλοι οι καθηγητές →
+        </Link>
+      </div>
+      <ul className="mt-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {teachers.map((t) => (
+          <li key={t.id} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="relative aspect-square w-full bg-slate-100">
+              {t.photo_url && (
+                <Image
+                  src={t.photo_url}
+                  alt={t.full_name}
+                  fill
+                  sizes="(min-width: 1024px) 240px, (min-width: 640px) 33vw, 50vw"
+                  className="object-cover"
+                />
+              )}
+            </div>
+            <div className="p-3 text-center">
+              <p className="text-sm font-medium text-slate-900">{t.full_name}</p>
+              {t.role && <p className="mt-0.5 text-xs text-brand-700">{t.role}</p>}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
