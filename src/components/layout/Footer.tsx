@@ -12,7 +12,8 @@ const CONTACT = {
 const SOCIAL = {
   instagram: "https://www.instagram.com/frontistiriakorifh/",
   facebook:  "https://www.facebook.com/frontistiriokorifh",
-  google:    "https://www.google.com/maps/search/?api=1&query=Καλλονή+Λέσβου+81107",
+  // Συντεταγμένες του φροντιστηρίου (από embed στη σελίδα Επικοινωνία του παλιού site)
+  google:    "https://www.google.com/maps/search/?api=1&query=39.23176363584023%2C26.211938976686806",
 };
 
 export function Footer() {

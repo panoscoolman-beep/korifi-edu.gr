@@ -1,34 +1,37 @@
+import Image from "next/image";
+
 // External links to Stadiodromia.gr platform (same partnership account as the legacy korifi-edu.gr).
 // `cid` is the Κορυφή customer id at Stadiodromia.
 const STADIODROMIA_CID = "FD7C31D3-576C-4DD7-8896-6FC03492112D";
+const IMG_BASE = "https://i0.wp.com/korifi-edu.gr/wp-content/uploads/2021/04";
 
 const RESOURCES = [
   {
     href: `https://odigos.stadiodromia.gr/login.php?cid=${STADIODROMIA_CID}`,
     title: "Οδηγός Σταδιοδρομίας",
     description: "Επιλογή σχολών, επαγγέλματα, πεδία.",
-    icon: "🧭",
+    image: `${IMG_BASE}/1.png`,                          // πυξίδα + "ΟΣ"
     external: true,
   },
   {
     href: `https://public.stadiodromia.gr/8emata/index.php?cid=${STADIODROMIA_CID}`,
     title: "Θέματα Πανελλαδικών",
     description: "Αρχείο θεμάτων ανά έτος και μάθημα.",
-    icon: "📚",
+    image: `${IMG_BASE}/exams.png`,                      // exam papers
     external: true,
   },
   {
     href: `https://public.stadiodromia.gr/moria/index.php?cid=${STADIODROMIA_CID}`,
     title: "Υπολογισμός Μορίων",
     description: "Υπολόγισε τα μόριά σου για κάθε σχολή.",
-    icon: "🧮",
+    image: `${IMG_BASE}/calculator2.png`,                // calculator
     external: true,
   },
   {
     href: `https://public.stadiodromia.gr/load.php?cid=${STADIODROMIA_CID}`,
     title: "Τα τελευταία νέα των Πανελληνίων",
     description: "Ενημερώσεις, αλλαγές, ανακοινώσεις.",
-    icon: "📰",
+    image: `${IMG_BASE}/epikairotita2.png`,              // newspaper "ΝΕΑ"
     external: true,
   },
 ];
@@ -50,20 +53,28 @@ export function ResourcesStrip() {
                 href={r.href}
                 target={r.external ? "_blank" : undefined}
                 rel={r.external ? "noopener noreferrer" : undefined}
-                className="group block h-full rounded-xl border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-500 hover:shadow-md"
+                className="group block h-full overflow-hidden rounded-xl border border-slate-200 bg-white transition-all hover:-translate-y-0.5 hover:border-brand-500 hover:shadow-md"
               >
-                <div className="flex items-start justify-between">
-                  <span className="text-3xl" aria-hidden>{r.icon}</span>
+                <div className="relative aspect-[428/295] w-full overflow-hidden bg-gradient-to-br from-brand-50 to-amber-50">
+                  <Image
+                    src={r.image}
+                    alt={r.title}
+                    fill
+                    sizes="(min-width: 1024px) 280px, (min-width: 640px) 50vw, 100vw"
+                    className="object-contain p-4 transition-transform group-hover:scale-105"
+                  />
                   {r.external && (
-                    <svg className="h-4 w-4 text-slate-400 group-hover:text-brand-700" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <svg className="absolute right-3 top-3 h-4 w-4 text-slate-400 group-hover:text-brand-700" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                       <path d="M9 2h5v5M14 2L7 9M12 9.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3.5"/>
                     </svg>
                   )}
                 </div>
-                <h3 className="mt-3 text-base font-semibold text-slate-900 group-hover:text-brand-700">
-                  {r.title}
-                </h3>
-                <p className="mt-1 text-sm text-slate-600">{r.description}</p>
+                <div className="p-5">
+                  <h3 className="text-base font-semibold text-slate-900 group-hover:text-brand-700">
+                    {r.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-600">{r.description}</p>
+                </div>
               </a>
             </li>
           ))}
