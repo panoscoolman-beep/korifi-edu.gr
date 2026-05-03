@@ -2,7 +2,58 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Φάση 3 (Auth) **complete + verified end-to-end**. Email + Google OAuth + email verification όλα δουλεύουν. Owner λογαριασμός (`panoscoolman@gmail.com`) προήχθη σε admin. Επόμενο: Φάση 4 — Admin panel (`feature/phase-4-admin`).
+> **Where we are now (latest):** Φάση 4 (Admin panel) **scaffolded** στο `feature/phase-4-admin`. Πλήρες CRUD για 9 content types + Storage browser + Users management. Όλα protected (`/admin/*` only για `role=admin`). Owner self-sufficient: μπορεί να φτιάχνει teachers/pages/articles/events/testimonials/partners/courses/lessons/subjects μέσα από browser, με drag-drop εικόνες & PDFs.
+
+---
+
+## 2026-05-04 (later)
+
+### 🛠 Φάση 4 — Admin panel (`feature/phase-4-admin`)
+
+**Στόχος:** Self-sufficiency. Χωρίς admin = κάθε edit χρειάζεται SQL ή κώδικα. Με admin = ό,τι θες από browser.
+
+**Decisions:**
+- Markdown body παραμένει source of truth (`content_md`). Editor: textarea + toolbar + live preview + drag-drop εικόνας. Όχι TipTap (overkill).
+- Generic CRUD action `saveResource(table, id?, prev, fd)` που χρησιμοποιείται από ΟΛΑ τα forms (DRY).
+- Υπάρχει role gate και στο layout και στο proxy (defense in depth).
+- Image upload → `/api/admin/upload-image` → Supabase Storage `images` bucket → public URL επιστρέφεται.
+- PDF upload → `/api/admin/upload-pdf` → `pdfs` bucket → public URL.
+
+**New routes (όλα admin-only μέσω `/admin/layout.tsx` role gate):**
+- `/admin` — dashboard με stats per content type + quick actions
+- `/admin/pages` (list/new/edit) — με `MarkdownEditor`
+- `/admin/articles` (list/new/edit) — blog με `MarkdownEditor` + cover image
+- `/admin/teachers` (list/new/edit) — bio_md + photo upload
+- `/admin/events` (list/new/edit) — datetime fields + cover
+- `/admin/testimonials` (list/new/edit)
+- `/admin/partners` (list/new/edit) — logo upload
+- `/admin/subjects` (list/new/edit)
+- `/admin/courses` (list/new/edit) — με dropdown για subject
+- `/admin/lessons` (list/new/edit) — type=pdf|article|text + dropdown για course + PDF upload
+- `/admin/users` — list όλων + inline `<select>` για αλλαγή role
+- `/admin/storage` — read-only browser όλων των αρχείων
+
+**New API routes:**
+- `POST /api/admin/upload-image` — multipart upload, max 8MB, JPEG/PNG/WebP/GIF/SVG
+- `POST /api/admin/upload-pdf`   — multipart upload, max 50MB, application/pdf
+- `POST /api/admin/preview-markdown` — server-side rendering για preview tab του editor
+
+**New components:**
+- `<Field>`, `<TextArea>`, `<Toggle>`, `<Select>`, `<FormError>` — admin/Field.tsx
+- `<ImageUpload>` — drag-drop, paste, click-to-pick → `/api/admin/upload-image`
+- `<PdfUpload>` — ίδιο για PDFs
+- `<MarkdownEditor>` — textarea + toolbar (H1-H3, bold, italic, list, quote, link, image) + tabs Γραφή / Προεπισκόπηση
+- `<AdminTable>`, `<AdminListHeader>`, `<PublishedBadge>` — reusable list patterns
+
+**Proxy unchanged** — `/admin` redirect logic ήδη in place από Φάση 3.
+
+**Verification:** All 14 admin routes return 307 για anonymous (correct — proxy redirects σε `/login`). Type-check clean. Real auth flow τέσταρμένο στο /dashboard ήδη — admin layout χρησιμοποιεί ίδιο pattern.
+
+**⏭ User actions to test (ως admin `panoscoolman@gmail.com`):**
+1. Login → πάνω δεξιά → "Διαχείριση"
+2. **Πιο σημαντικό test:** /admin/teachers → click Παπατριανταφύλλου → upload σωστή φωτογραφία → Save → δες το /gia-emas
+3. Δοκίμασε νέο άρθρο, νέα σελίδα, αλλαγή role σε χρήστη
+4. Bug reports → next iteration
 
 ---
 
