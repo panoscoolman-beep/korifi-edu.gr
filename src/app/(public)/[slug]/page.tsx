@@ -6,7 +6,11 @@ import type { Page } from "@/types/database";
 type Params = Promise<{ slug: string }>;
 
 // Reserve slugs that have their own dedicated route file.
-const RESERVED = new Set(["gia-emas", "courses", "lessons", "login", "register", "dashboard", "admin"]);
+const RESERVED = new Set([
+  "gia-emas", "courses", "lessons",
+  "blog", "events", "synergates",
+  "login", "register", "dashboard", "admin",
+]);
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;

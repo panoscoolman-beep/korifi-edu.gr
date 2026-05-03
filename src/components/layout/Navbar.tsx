@@ -31,6 +31,8 @@ export async function Navbar() {
         <nav className="flex items-center gap-1 sm:gap-2">
           <ProgramDropdown />
           <NavLink href="/courses">Μαθήματα</NavLink>
+          <NavLink href="/blog">Blog</NavLink>
+          <NavLink href="/events">Εκδηλώσεις</NavLink>
           <NavLink href="/gia-emas">Για εμάς</NavLink>
           <NavLink href="/synergates">Συνεργάτες</NavLink>
 

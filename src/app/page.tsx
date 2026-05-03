@@ -1,27 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import type { Subject, Course, Teacher } from "@/types/database";
+import type { Subject, Course, Teacher, Article, Testimonial } from "@/types/database";
 
 export default async function HomePage() {
   const supabase = await createClient();
 
-  const [{ data: subjects }, { data: featured }, { data: teachers }] = await Promise.all([
-    supabase
-      .from("subjects")
-      .select("id, name, slug, icon, order, created_at")
-      .order("order", { ascending: true }),
-    supabase
-      .from("courses")
-      .select("id, title, slug, description, subject_id, is_free, cover_image, created_at")
-      .order("created_at", { ascending: false })
-      .limit(6),
-    supabase
-      .from("teachers")
-      .select("*")
-      .eq("is_published", true)
-      .order("sort_order", { ascending: true })
-      .limit(8),
+  const [
+    { data: subjects },
+    { data: featured },
+    { data: teachers },
+    { data: articles },
+    { data: testimonials },
+  ] = await Promise.all([
+    supabase.from("subjects").select("id, name, slug, icon, order, created_at").order("order", { ascending: true }),
+    supabase.from("courses").select("*").order("created_at", { ascending: false }).limit(6),
+    supabase.from("teachers").select("*").eq("is_published", true).order("sort_order", { ascending: true }).limit(8),
+    supabase.from("articles").select("*").eq("is_published", true).order("published_at", { ascending: false, nullsFirst: false }).limit(3),
+    supabase.from("testimonials").select("*").eq("is_published", true).order("sort_order", { ascending: true }).limit(6),
   ]);
 
   return (
@@ -30,7 +26,68 @@ export default async function HomePage() {
       <SubjectsSection subjects={(subjects ?? []) as Subject[]} />
       <FeaturedCoursesSection courses={(featured ?? []) as Course[]} />
       <TeamPreview teachers={(teachers ?? []) as Teacher[]} />
+      <TestimonialsSection items={(testimonials ?? []) as Testimonial[]} />
+      <LatestArticles items={(articles ?? []) as Article[]} />
     </>
+  );
+}
+
+function TestimonialsSection({ items }: { items: Testimonial[] }) {
+  if (items.length === 0) return null;
+  return (
+    <section className="bg-brand-50">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <h2 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+          Τι λένε για εμάς
+        </h2>
+        <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((t) => (
+            <li key={t.id} className="rounded-xl border border-brand-100 bg-white p-6 shadow-sm">
+              <p className="text-sm italic leading-relaxed text-slate-700">&ldquo;{t.quote}&rdquo;</p>
+              <div className="mt-4 flex items-center gap-3">
+                {t.photo_url && (
+                  <Image src={t.photo_url} alt={t.author_name} width={36} height={36} className="rounded-full object-cover" />
+                )}
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">{t.author_name}</p>
+                  {t.author_role && <p className="text-xs text-slate-500">{t.author_role}</p>}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function LatestArticles({ items }: { items: Article[] }) {
+  if (items.length === 0) return null;
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <div className="flex items-end justify-between">
+        <h2 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Από το blog</h2>
+        <Link href="/blog" className="text-sm font-medium text-brand-700 hover:text-brand-900">Όλα τα άρθρα →</Link>
+      </div>
+      <ul className="mt-8 grid gap-5 sm:grid-cols-3">
+        {items.map((a) => {
+          const date = a.published_at ? new Date(a.published_at).toLocaleDateString("el-GR", { day: "numeric", month: "short", year: "numeric" }) : null;
+          return (
+            <li key={a.id}>
+              <Link href={`/blog/${a.slug}`} className="group block overflow-hidden rounded-xl border border-slate-200 bg-white transition-shadow hover:shadow-md">
+                <div className="relative aspect-video bg-gradient-to-br from-brand-100 to-brand-50">
+                  {a.cover_image && <Image src={a.cover_image} alt={a.title} fill sizes="(min-width: 640px) 33vw, 100vw" className="object-cover" />}
+                </div>
+                <div className="p-5">
+                  {date && <p className="text-xs uppercase tracking-wider text-slate-500">{date}</p>}
+                  <h3 className="mt-1 line-clamp-2 text-base font-semibold text-slate-900 group-hover:text-brand-700">{a.title}</h3>
+                </div>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 

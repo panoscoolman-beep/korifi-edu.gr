@@ -2,7 +2,21 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Φάση 4 (Admin panel) **scaffolded** στο `feature/phase-4-admin`. Πλήρες CRUD για 9 content types + Storage browser + Users management. Όλα protected (`/admin/*` only για `role=admin`). Owner self-sufficient: μπορεί να φτιάχνει teachers/pages/articles/events/testimonials/partners/courses/lessons/subjects μέσα από browser, με drag-drop εικόνες & PDFs.
+> **Where we are now (latest):** Φάση 4 + public-facing routes complete & merged. Public site έχει πλέον: `/`, `/blog`, `/events`, `/gia-emas`, grade pages, `/synergates` με partners grid, `/courses`. Admin panel πλήρως λειτουργικός (όλα τα CRUDs + uploads + users + storage browser). Owner self-sufficient. Επόμενα: visual polish + photo migration για 17 teachers από τοπικό `_korifi-edu.gr/public_html/wp-content/uploads/` (όλο το media library του παλιού site).
+
+---
+
+## 2026-05-04 (continued — public routes)
+
+### 🌍 Public routes για νέους content types
+- `/blog` (list) + `/blog/[slug]` (article detail) με Markdown rendering, cover images
+- `/events` (list, χωρισμένο σε Επερχόμενες/Παρελθούσες) + `/events/[slug]` (detail με datetime, location, link)
+- `/synergates` (custom page) — overrides το generic `/[slug]` και προσθέτει grid με partners από DB
+- Homepage: νέα sections `Τι λένε για εμάς` (testimonials) + `Από το blog` (latest 3 articles)
+- Navbar: προστέθηκαν Blog + Εκδηλώσεις
+- `[slug]` route: ενημερωμένη RESERVED list (blog, events, synergates τώρα έχουν δικά τους routes)
+
+**Verification:** όλες οι public routes 200 με σωστό content. Empty states cleanly shown όπου δεν υπάρχει data ακόμα.
 
 ---
 
