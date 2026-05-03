@@ -17,6 +17,14 @@ All notable changes to korifi-edu.gr are documented here, grouped by date.
 - TypeScript types for `subjects`, `courses`, `lessons`, `enrollments`, `profiles`
 - `.env.local` with Supabase keys (gitignored)
 
+### Phase 2.5 — Bug fixes + courses page
+- Fix: `is_admin()` was unable to be executed by anon, which broke every
+  "read published OR admin" RLS policy. PostgreSQL evaluates both sides of OR
+  in a policy, so lack of EXECUTE turned every public read into 0 rows
+  (manifesting as 404 on `/gia-emas`). Migration 0005 re-grants execute.
+- Added `/courses` page with subject filter (Όλα / Γυμνάσιο / Α-Γ Λυκείου / ΕΠΑΛ),
+  empty state messaging until LMS migration runs.
+
 ### Phase 2.5 — Content types + first real data
 - New tables: `articles`, `pages`, `page_sections`, `teachers`, `events`, `testimonials`, `partners` — all with RLS (public-read-published / admin-write)
 - `lessons` extended: `content_type` accepts `'article'` (Markdown), added `cover_image`
