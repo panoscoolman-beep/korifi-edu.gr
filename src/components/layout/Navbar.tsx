@@ -24,9 +24,8 @@ export async function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <Image src="/logo-icon.png" alt="Κορυφή" width={36} height={68} priority className="h-9 w-auto" />
-          <span className="text-xl text-brand-700">Κορυφή</span>
+        <Link href="/" className="flex items-center" aria-label="Κορυφή — αρχική">
+          <Image src="/logo.png" alt="Κορυφή" width={511} height={135} priority className="h-9 w-auto" />
         </Link>
 
         <nav className="flex items-center gap-1 sm:gap-2">
