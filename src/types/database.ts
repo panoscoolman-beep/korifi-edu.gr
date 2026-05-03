@@ -23,9 +23,10 @@ export type Lesson = {
   title: string
   course_id: string
   order: number
-  content_type: 'pdf' | 'text'
+  content_type: 'pdf' | 'text' | 'article'
   pdf_url: string | null
   content: string | null
+  cover_image: string | null
   is_free: boolean
   created_at: string
 }
@@ -42,4 +43,93 @@ export type Profile = {
   full_name: string | null
   role: 'student' | 'admin'
   created_at: string
+}
+
+// ---------------------------------------------------------------------
+// Phase 2.5 content types
+// ---------------------------------------------------------------------
+
+export type Article = {
+  id: string
+  slug: string
+  title: string
+  excerpt: string | null
+  content_md: string
+  cover_image: string | null
+  author_name: string | null
+  published_at: string | null
+  is_published: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type Page = {
+  id: string
+  slug: string
+  title: string
+  content_md: string
+  cover_image: string | null
+  meta_description: string | null
+  sort_order: number
+  is_published: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type PageSection = {
+  id: string
+  page_id: string
+  kind: 'content' | 'modal' | 'cta' | 'accordion' | 'gallery'
+  title: string | null
+  body_md: string
+  sort_order: number
+  metadata: Record<string, unknown>
+}
+
+export type Teacher = {
+  id: string
+  slug: string
+  full_name: string
+  role: string | null
+  bio_md: string
+  photo_url: string | null
+  email: string | null
+  social_links: Record<string, string>
+  sort_order: number
+  is_published: boolean
+  created_at: string
+}
+
+export type Event = {
+  id: string
+  slug: string
+  title: string
+  description_md: string
+  cover_image: string | null
+  starts_at: string | null
+  ends_at: string | null
+  location: string | null
+  link_url: string | null
+  is_online: boolean
+  is_published: boolean
+  created_at: string
+}
+
+export type Testimonial = {
+  id: string
+  author_name: string
+  author_role: string | null
+  quote: string
+  photo_url: string | null
+  sort_order: number
+  is_published: boolean
+}
+
+export type Partner = {
+  id: string
+  name: string
+  logo_url: string | null
+  website_url: string | null
+  sort_order: number
+  is_published: boolean
 }
