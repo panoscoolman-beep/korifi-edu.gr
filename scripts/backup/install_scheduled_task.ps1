@@ -48,11 +48,11 @@ $task = New-ScheduledTask -Action $action -Trigger $trigger -Settings $settings 
 Register-ScheduledTask -TaskName $TaskName -InputObject $task -Force | Out-Null
 
 Write-Host ""
-Write-Host "✓ Scheduled task '$TaskName' installed."
+Write-Host "[OK] Scheduled task '$TaskName' installed."
 Write-Host "  Runs:    daily at $RunTime"
 Write-Host "  Script:  $scriptPath"
 Write-Host "  Logs:    $logsDir"
 Write-Host ""
-Write-Host "Verify:        Get-ScheduledTask -TaskName '$TaskName'"
-Write-Host "Trigger now:   Start-ScheduledTask -TaskName '$TaskName'"
-Write-Host "Remove:        Unregister-ScheduledTask -TaskName '$TaskName' -Confirm:`$false"
+Write-Host ('Verify:        Get-ScheduledTask -TaskName ''' + $TaskName + '''')
+Write-Host ('Trigger now:   Start-ScheduledTask -TaskName ''' + $TaskName + '''')
+Write-Host ('Remove:        Unregister-ScheduledTask -TaskName ''' + $TaskName + ''' -Confirm:$false')
