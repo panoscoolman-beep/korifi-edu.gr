@@ -143,6 +143,21 @@ def insert_testimonial(payload: dict) -> tuple[int, str]:
     )
     return code, body.decode("utf-8", errors="replace")[:200]
 
+def revalidate_site(tags: list[str], paths: list[str] | None = None) -> None:
+    """Tell the live site to bust its unstable_cache + CDN entries for these tags.
+    Best-effort — script doesn't fail if the site is down."""
+    site = env.get("NEXT_PUBLIC_SITE_URL", "https://korifi-edu.gr").rstrip("/")
+    body = json.dumps({"tags": tags, "paths": paths or []}).encode("utf-8")
+    req = urllib.request.Request(
+        f"{site}/api/internal/revalidate", data=body, method="POST",
+        headers={"Authorization": f"Bearer {SB_KEY}", "Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=15) as r:
+            print(f"  cache invalidated: {r.status} {r.read()[:120].decode()!r}")
+    except Exception as e:
+        print(f"  cache invalidate failed (non-fatal): {e}")
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -206,6 +221,8 @@ def main() -> None:
             else:
                 print(f"  ✗ insert HTTP {code}: {msg}")
 
+    # Bust live cache so the new testimonial is visible immediately on /martyries
+    revalidate_site(tags=["testimonials"], paths=["/martyries", "/"])
     print("\nDone.")
 
 if __name__ == "__main__":
