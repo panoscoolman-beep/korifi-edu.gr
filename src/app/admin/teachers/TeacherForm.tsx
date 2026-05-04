@@ -45,8 +45,8 @@ export function TeacherForm({ teacher }: { teacher: Teacher | null }) {
 function DeleteButton({ id, name }: { id: string; name: string }) {
   const action = deleteResource.bind(null, "teachers", id);
   return (
-    <form action={action} onSubmit={(e) => { if (!confirm(`Σίγουρα διαγραφή "${name}";`)) e.preventDefault(); }}>
-      <button type="submit" className="text-sm text-red-700 hover:text-red-900">Διαγραφή</button>
-    </form>
+    <button type="submit" formAction={action}
+        onClick={(e) => { if (!confirm(`Σίγουρα διαγραφή "${name}";`)) e.preventDefault(); }}
+        className="text-sm text-red-700 hover:text-red-900">Διαγραφή</button>
   );
 }

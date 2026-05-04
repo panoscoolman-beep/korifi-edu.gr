@@ -38,7 +38,8 @@ function fdToObject(fd: FormData, opts: {
   const out: Record<string, unknown> = {};
   for (const [k, v] of fd.entries()) {
     if (opts.ignore?.includes(k)) continue;
-    if (k.startsWith("__")) continue;
+    // Skip React/Next internal fields ($ACTION_*, $ACTION_REF_*, etc.) and our own __ markers.
+    if (k.startsWith("$") || k.startsWith("__")) continue;
     if (opts.booleans?.includes(k)) { out[k] = v === "on" || v === "true"; continue; }
     if (opts.numbers?.includes(k))  { out[k] = v === "" ? null : Number(v); continue; }
     const s = typeof v === "string" ? v : String(v);

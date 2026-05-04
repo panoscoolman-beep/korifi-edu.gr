@@ -36,8 +36,8 @@ export function TestimonialForm({ item }: { item: Testimonial | null }) {
 function DeleteButton({ id, title }: { id: string; title: string }) {
   const action = deleteResource.bind(null, "testimonials", id);
   return (
-    <form action={action} onSubmit={(e) => { if (!confirm(`Σίγουρα διαγραφή της μαρτυρίας από "${title}";`)) e.preventDefault(); }}>
-      <button type="submit" className="text-sm text-red-700 hover:text-red-900">Διαγραφή</button>
-    </form>
+    <button type="submit" formAction={action}
+        onClick={(e) => { if (!confirm(`Σίγουρα διαγραφή της μαρτυρίας από "${title}";`)) e.preventDefault(); }}
+        className="text-sm text-red-700 hover:text-red-900">Διαγραφή</button>
   );
 }
