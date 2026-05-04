@@ -33,19 +33,26 @@ export default async function CoursePage({ params }: { params: Params }) {
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
       <Link href="/courses" className="text-sm font-medium text-brand-700 hover:text-brand-900">← Όλα τα μαθήματα</Link>
 
-      <header className="mt-6">
-        <div className="flex items-center gap-2">
-          {sub && (
-            <Link href={`/courses?subject=${sub.slug}`} className="rounded-full bg-brand-100 px-3 py-1 text-xs font-medium text-brand-700 hover:bg-brand-200">
-              {sub.icon} {sub.name}
-            </Link>
-          )}
-          {c.is_free && (
-            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Δωρεάν</span>
-          )}
+      <header className="mt-6 flex items-start gap-5">
+        {c.icon && (
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-100 via-brand-50 to-amber-50/40 text-5xl shadow-sm ring-1 ring-brand-100 sm:h-24 sm:w-24 sm:text-6xl">
+            <span aria-hidden>{c.icon}</span>
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            {sub && (
+              <Link href={`/courses?subject=${sub.slug}`} className="rounded-full bg-brand-100 px-3 py-1 text-xs font-medium text-brand-700 hover:bg-brand-200">
+                {sub.icon} {sub.name}
+              </Link>
+            )}
+            {c.is_free && (
+              <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Δωρεάν</span>
+            )}
+          </div>
+          <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">{c.title}</h1>
+          {c.description && <p className="mt-4 text-lg text-slate-600">{c.description}</p>}
         </div>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">{c.title}</h1>
-        {c.description && <p className="mt-4 text-lg text-slate-600">{c.description}</p>}
       </header>
 
       <section className="mt-10">

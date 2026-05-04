@@ -1,22 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  getSubjects, getCourses, getPublishedTeachers,
+  getSubjects, getCourses,
   getPublishedArticles, getPublishedTestimonials,
 } from "@/lib/queries";
 import { JsonLd, KORIFI_LOCAL_BUSINESS_LD } from "@/components/JsonLd";
 import { SeasonalHero } from "@/components/SeasonalHero";
-import type { Subject, Course, Teacher, Article, Testimonial } from "@/types/database";
+import type { Subject, Course, Testimonial } from "@/types/database";
 import LatestArticles from "@/components/LatestArticles";
 
 // ISR: revalidate every hour. Admin mutations bust this via updateTag.
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const [subjects, featured, teachers, articles, testimonials] = await Promise.all([
+  const [subjects, featured, articles, testimonials] = await Promise.all([
     getSubjects(),
     getCourses(6),
-    getPublishedTeachers(8),
     getPublishedArticles(3),
     getPublishedTestimonials(6),
   ]);
@@ -27,7 +26,6 @@ export default async function HomePage() {
       <SeasonalHero />
       <SubjectsSection subjects={subjects} />
       <FeaturedCoursesSection courses={featured} />
-      <TeamPreview teachers={teachers} />
       <TestimonialsSection items={testimonials} />
       <LatestArticles items={articles} />
     </>
@@ -69,46 +67,6 @@ function TestimonialsSection({ items }: { items: Testimonial[] }) {
 }
 
 
-
-function TeamPreview({ teachers }: { teachers: Teacher[] }) {
-  if (teachers.length === 0) return null;
-  return (
-    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <div className="flex items-end justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-            Η ομάδα μας
-          </h2>
-          <p className="mt-2 text-slate-600">Έμπειροι καθηγητές, εξειδικευμένοι ανά αντικείμενο.</p>
-        </div>
-        <Link href="/gia-emas" className="text-sm font-medium text-brand-700 hover:text-brand-900">
-          Όλοι οι καθηγητές →
-        </Link>
-      </div>
-      <ul className="mt-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        {teachers.map((t) => (
-          <li key={t.id} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-            <div className="relative aspect-square w-full bg-slate-100">
-              {t.photo_url && (
-                <Image
-                  src={t.photo_url}
-                  alt={t.full_name}
-                  fill
-                  sizes="(min-width: 1024px) 240px, (min-width: 640px) 33vw, 50vw"
-                  className="object-cover"
-                />
-              )}
-            </div>
-            <div className="p-3 text-center">
-              <p className="text-sm font-medium text-slate-900">{t.full_name}</p>
-              {t.role && <p className="mt-0.5 text-xs text-brand-700">{t.role}</p>}
-            </div>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
 
 function SubjectsSection({ subjects }: { subjects: Subject[] }) {
   return (
@@ -171,9 +129,11 @@ function CourseCard({ course }: { course: Course }) {
   return (
     <Link
       href={`/courses/${course.slug}`}
-      className="group block overflow-hidden rounded-xl border border-slate-200 bg-white transition-shadow hover:shadow-md"
+      className="group block overflow-hidden rounded-xl border border-slate-200 bg-white transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
     >
-      <div className="aspect-video bg-gradient-to-br from-brand-100 to-brand-50" />
+      <div className="flex aspect-video items-center justify-center bg-gradient-to-br from-brand-100 via-brand-50 to-amber-50/40 text-7xl transition-transform group-hover:scale-105">
+        <span aria-hidden>{course.icon ?? "📘"}</span>
+      </div>
       <div className="p-5">
         <div className="flex items-center gap-2">
           {course.is_free ? (

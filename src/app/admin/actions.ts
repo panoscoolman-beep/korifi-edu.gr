@@ -100,7 +100,7 @@ const RESOURCE_CONFIG: Record<Table, {
   courses: {
     listPath: "/admin/courses",
     booleans: ["is_free"],
-    nullables:["description","cover_image"],
+    nullables:["description","cover_image","icon"],
   },
   lessons: {
     listPath: "/admin/lessons",

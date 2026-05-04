@@ -15,6 +15,7 @@ export type Course = {
   subject_id: string
   is_free: boolean
   cover_image: string | null
+  icon: string | null
   created_at: string
 }
 

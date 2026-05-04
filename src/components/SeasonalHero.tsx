@@ -34,7 +34,7 @@ const SEASONS: Record<SeasonKey, HeroSlide[]> = {
       kicker: "Πανελλήνιες — τελική ευθεία",
       headline: "Στοχεύουμε στην",
       highlight: "κορυφή",
-      sub: "Επαναληπτικά τμήματα, διαγωνίσματα και προσομοιώσεις. Φτάσε προετοιμασμένος στις εξετάσεις.",
+      sub: "Επαναλήψεις, διαγωνίσματα και προσομοιώσεις. Φτάσε προετοιμασμένος στις εξετάσεις.",
       cta: { href: "/glikeiou", label: "Πρόγραμμα Γ' Λυκείου" },
       secondaryCta: { href: "/epaggelmatikos-prosanatolismos", label: "Επαγγελματικός Προσανατολισμός" },
       overlayClass: OVERLAYS.panellinies,

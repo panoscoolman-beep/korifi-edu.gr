@@ -75,9 +75,11 @@ function FilterChip({ href, active, children }: { href: string; active: boolean;
 
 function CourseCard({ course }: { course: Course }) {
   return (
-    <li className="overflow-hidden rounded-xl border border-slate-200 bg-white transition-shadow hover:shadow-md">
+    <li className="overflow-hidden rounded-xl border border-slate-200 bg-white transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md">
       <Link href={`/courses/${course.slug}`} className="block">
-        <div className="aspect-video bg-gradient-to-br from-brand-100 to-brand-50" />
+        <div className="flex aspect-video items-center justify-center bg-gradient-to-br from-brand-100 via-brand-50 to-amber-50/40 text-7xl">
+          <span aria-hidden>{course.icon ?? "📘"}</span>
+        </div>
         <div className="p-5">
           <div className="flex items-center gap-2">
             {course.is_free ? (

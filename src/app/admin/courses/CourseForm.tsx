@@ -20,8 +20,9 @@ export function CourseForm({ course, subjects }: { course: Course | null; subjec
           { value: "", label: "— Επιλέξτε —" },
           ...subjects.map((s) => ({ value: s.id, label: s.name })),
         ]} />
-      <TextArea label="Περιγραφή" name="description" defaultValue={course?.description} rows={4} />
-      <ImageUpload name="cover_image" label="Cover image" defaultUrl={course?.cover_image} />
+      <Field label="Εικονίδιο (emoji)" name="icon" defaultValue={course?.icon} placeholder="π.χ. 🔢 ⚛️ 🧪 ✍️ 📜" hint="Ένα emoji που αντιπροσωπεύει το μάθημα — εμφανίζεται ως thumbnail στις λίστες." />
+      <TextArea label="Περίληψη" name="description" defaultValue={course?.description} rows={4} hint="Σύντομη περιγραφή — εμφανίζεται στις κάρτες και στην κορυφή της σελίδας του μαθήματος." />
+      <ImageUpload name="cover_image" label="Cover image (προαιρετικό)" defaultUrl={course?.cover_image} />
       <Toggle label="Δωρεάν" name="is_free" defaultChecked={course?.is_free ?? false} />
 
       <FormError message={state?.error} />
