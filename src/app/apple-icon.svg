@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" shape-rendering="geometricPrecision">
+  <!-- iOS auto-rounds corners; we fill the whole square -->
+  <rect width="180" height="180" fill="#1f3a5f"/>
+
+  <defs>
+    <linearGradient id="peak" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Larger triangle — apple touch icon is shown at full size in pinned tabs -->
+  <polygon points="90,38 145,142 35,142" fill="url(#peak)"/>
+  <polygon points="90,38 106,68 74,68" fill="#fff" opacity="0.18"/>
+
+  <!-- Subtle wordmark below for touch icon legibility -->
+  <text x="90" y="160" font-family="system-ui, -apple-system, sans-serif"
+        font-weight="800" font-size="14" letter-spacing="2" fill="#ffffff"
+        text-anchor="middle" opacity="0.85">ΚΟΡΥΦΗ</text>
+</svg>

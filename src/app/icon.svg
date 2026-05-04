@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="geometricPrecision">
+  <!-- Navy rounded square — matches navbar/footer brand color -->
+  <rect width="64" height="64" rx="14" fill="#1f3a5f"/>
+
+  <!-- Red mountain peak with subtle bevel highlight (the Κορυφή mark) -->
+  <defs>
+    <linearGradient id="peak" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Triangle slightly off-center upward, symbol of the peak -->
+  <polygon points="32,12 52,50 12,50" fill="url(#peak)"/>
+
+  <!-- Tiny snow cap glint to add definition at small sizes -->
+  <polygon points="32,12 38,24 26,24" fill="#fff" opacity="0.18"/>
+</svg>

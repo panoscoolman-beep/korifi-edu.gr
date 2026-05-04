@@ -114,17 +114,16 @@ def parse_caption(text: str) -> dict | None:
     if not name:
         return None
 
-    # Long-form caption — what's shown in the popup. Strip CTA boilerplate (📞/📩/🌐/✦)
-    # and the registration line so only the actual testimonial body remains.
+    # Long-form caption — what's shown in the popup. Strip CTA boilerplate
+    # (✦ separator, 📞/📩/🌐 contact lines, registration line) so only the
+    # student's actual testimonial body + signature remain.
     full_match = FULL_CAP_RE.search(text)
     full_quote: str | None = None
     if full_match:
         body = full_match.group(1).strip()
-        # Drop everything from the first emoji-bullet (✦/📞/📩/🌐) onward
-        cut = re.search(r"\n+(?:✦|📞|📩|🌐|Εγγραφές\s)", body)
+        cut = re.search(r"\n+(?:✦|📞|📩|🌐|Εγγραφές\s|Ευχαριστούμε\s)", body)
         if cut:
             body = body[: cut.start()].rstrip()
-        # Collapse 3+ blank lines into 2
         body = re.sub(r"\n{3,}", "\n\n", body).strip()
         full_quote = body or None
 
