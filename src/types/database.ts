@@ -135,6 +135,7 @@ export type Testimonial = {
   author_name: string
   author_role: string | null
   quote: string
+  full_quote: string | null
   photo_url: string | null
   sort_order: number
   is_published: boolean

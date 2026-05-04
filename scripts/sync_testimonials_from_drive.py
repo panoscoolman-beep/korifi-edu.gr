@@ -78,9 +78,14 @@ def rclone_download(folder_name: str, dest: Path) -> None:
 # ---------------------------------------------------------------------------
 # Caption parser
 # ---------------------------------------------------------------------------
-DATE_RE   = re.compile(r"^(\d{4}-\d{2}-\d{2})")
-QUOTE_RE  = re.compile(r"PULL QUOTE[^\n]*\n[─\-=]+\n+([«\"][\s\S]*?[»\"])")
-SIG_RE    = re.compile(r"^\s*[—–-]\s*([^,\n]+?)\s*(?:,\s*(.+?))?\s*$", re.M)
+DATE_RE     = re.compile(r"^(\d{4}-\d{2}-\d{2})")
+QUOTE_RE    = re.compile(r"PULL QUOTE[^\n]*\n[─\-=]+\n+([«\"][\s\S]*?[»\"])")
+SIG_RE      = re.compile(r"^\s*[—–-]\s*([^,\n]+?)\s*(?:,\s*(.+?))?\s*$", re.M)
+# Long-form caption between "CAPTION (copy-paste):" and "HASHTAGS:"
+FULL_CAP_RE = re.compile(
+    r"CAPTION[^\n]*\n[─\-=]+\n+([\s\S]*?)\n[─\-=]*\n*HASHTAGS",
+    re.IGNORECASE,
+)
 
 def parse_caption(text: str) -> dict | None:
     quote_match = QUOTE_RE.search(text)
@@ -109,7 +114,21 @@ def parse_caption(text: str) -> dict | None:
     if not name:
         return None
 
-    return {"quote": quote, "name": name, "role": role}
+    # Long-form caption — what's shown in the popup. Strip CTA boilerplate (📞/📩/🌐/✦)
+    # and the registration line so only the actual testimonial body remains.
+    full_match = FULL_CAP_RE.search(text)
+    full_quote: str | None = None
+    if full_match:
+        body = full_match.group(1).strip()
+        # Drop everything from the first emoji-bullet (✦/📞/📩/🌐) onward
+        cut = re.search(r"\n+(?:✦|📞|📩|🌐|Εγγραφές\s)", body)
+        if cut:
+            body = body[: cut.start()].rstrip()
+        # Collapse 3+ blank lines into 2
+        body = re.sub(r"\n{3,}", "\n\n", body).strip()
+        full_quote = body or None
+
+    return {"quote": quote, "name": name, "role": role, "full_quote": full_quote}
 
 # ---------------------------------------------------------------------------
 # Supabase REST
@@ -211,6 +230,7 @@ def main() -> None:
                 "author_name": parsed["name"],
                 "author_role": parsed["role"],
                 "quote":       parsed["quote"],
+                "full_quote":  parsed["full_quote"],
                 "is_published": True,
                 "source_ref":  f,
                 "sort_order":  0,

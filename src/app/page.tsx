@@ -6,6 +6,7 @@ import {
 } from "@/lib/queries";
 import { JsonLd, KORIFI_LOCAL_BUSINESS_LD } from "@/components/JsonLd";
 import { SeasonalHero } from "@/components/SeasonalHero";
+import { TestimonialsClient } from "@/components/TestimonialsClient";
 import type { Subject, Course, Testimonial } from "@/types/database";
 import LatestArticles from "@/components/LatestArticles";
 
@@ -45,22 +46,7 @@ function TestimonialsSection({ items }: { items: Testimonial[] }) {
             Όλες οι μαρτυρίες →
           </Link>
         </div>
-        <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((t) => (
-            <li key={t.id} className="rounded-xl border border-brand-100 bg-white p-6 shadow-sm">
-              <p className="text-sm italic leading-relaxed text-slate-700">&ldquo;{t.quote}&rdquo;</p>
-              <div className="mt-4 flex items-center gap-3">
-                {t.photo_url && (
-                  <Image src={t.photo_url} alt={t.author_name} width={36} height={36} className="rounded-full object-cover" />
-                )}
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">{t.author_name}</p>
-                  {t.author_role && <p className="text-xs text-slate-500">{t.author_role}</p>}
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <TestimonialsClient items={items} />
       </div>
     </section>
   );
