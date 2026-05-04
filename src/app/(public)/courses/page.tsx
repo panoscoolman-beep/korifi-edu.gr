@@ -81,14 +81,7 @@ function CourseCard({ course }: { course: Course }) {
           <span aria-hidden>{course.icon ?? "📘"}</span>
         </div>
         <div className="p-5">
-          <div className="flex items-center gap-2">
-            {course.is_free ? (
-              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">Δωρεάν</span>
-            ) : (
-              <span className="rounded-full bg-accent-500/10 px-2 py-0.5 text-xs font-medium text-accent-600">Premium</span>
-            )}
-          </div>
-          <h3 className="mt-2 text-lg font-semibold text-slate-900">{course.title}</h3>
+          <h3 className="text-lg font-semibold text-slate-900">{course.title}</h3>
           {course.description && <p className="mt-1 line-clamp-2 text-sm text-slate-600">{course.description}</p>}
         </div>
       </Link>

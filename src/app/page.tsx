@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  getSubjects, getCourses,
+  getSubjects, getCoursesWithLessons,
   getPublishedArticles, getPublishedTestimonials,
 } from "@/lib/queries";
 import { JsonLd, KORIFI_LOCAL_BUSINESS_LD } from "@/components/JsonLd";
@@ -15,7 +15,7 @@ export const revalidate = 3600;
 export default async function HomePage() {
   const [subjects, featured, articles, testimonials] = await Promise.all([
     getSubjects(),
-    getCourses(6),
+    getCoursesWithLessons(6),
     getPublishedArticles(3),
     getPublishedTestimonials(6),
   ]);
@@ -99,27 +99,24 @@ function SubjectsSection({ subjects }: { subjects: Subject[] }) {
 }
 
 function FeaturedCoursesSection({ courses }: { courses: Course[] }) {
+  if (courses.length === 0) return null;
   return (
     <section className="bg-slate-50">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="flex items-end justify-between">
           <h2 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-            Νέα μαθήματα
+            Διαθέσιμα μαθήματα
           </h2>
           <Link href="/courses" className="text-sm font-medium text-brand-700 hover:text-brand-900">
             Όλα τα μαθήματα →
           </Link>
         </div>
 
-        {courses.length === 0 ? (
-          <p className="mt-6 text-slate-500">Δεν έχουν δημοσιευθεί μαθήματα ακόμα.</p>
-        ) : (
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {courses.map((c) => (
-              <CourseCard key={c.id} course={c} />
-            ))}
-          </div>
-        )}
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {courses.map((c) => (
+            <CourseCard key={c.id} course={c} />
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -135,18 +132,7 @@ function CourseCard({ course }: { course: Course }) {
         <span aria-hidden>{course.icon ?? "📘"}</span>
       </div>
       <div className="p-5">
-        <div className="flex items-center gap-2">
-          {course.is_free ? (
-            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
-              Δωρεάν
-            </span>
-          ) : (
-            <span className="rounded-full bg-accent-500/10 px-2 py-0.5 text-xs font-medium text-accent-600">
-              Premium
-            </span>
-          )}
-        </div>
-        <h3 className="mt-2 text-lg font-semibold text-slate-900 group-hover:text-brand-700">
+        <h3 className="text-lg font-semibold text-slate-900 group-hover:text-brand-700">
           {course.title}
         </h3>
         {course.description && (

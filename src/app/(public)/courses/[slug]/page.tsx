@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCourseBySlug, getSubjectById, getLessonsByCourse, getCourses } from "@/lib/queries";
+import { createClient } from "@/lib/supabase/server";
+import { RedeemCodeForm } from "./RedeemCodeForm";
 
 type Params = Promise<{ slug: string }>;
 
+// Page is dynamic — auth check decides whether the lesson list shows.
+// Cached queries keep the DB load low.
 export const revalidate = 3600;
 export const dynamicParams = true;
 
@@ -29,6 +33,20 @@ export default async function CoursePage({ params }: { params: Params }) {
     getLessonsByCourse(c.id),
   ]);
 
+  // Auth + enrollment check (dynamic — uses cookies)
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  let enrolled = false;
+  if (user) {
+    const { data: e } = await supabase
+      .from("enrollments")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("course_id", c.id)
+      .maybeSingle();
+    enrolled = !!e;
+  }
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
       <Link href="/courses" className="text-sm font-medium text-brand-700 hover:text-brand-900">← Όλα τα μαθήματα</Link>
@@ -46,9 +64,6 @@ export default async function CoursePage({ params }: { params: Params }) {
                 {sub.icon} {sub.name}
               </Link>
             )}
-            {c.is_free && (
-              <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Δωρεάν</span>
-            )}
           </div>
           <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">{c.title}</h1>
           {c.description && <p className="mt-4 text-lg text-slate-600">{c.description}</p>}
@@ -60,7 +75,19 @@ export default async function CoursePage({ params }: { params: Params }) {
           Περιεχόμενα <span className="text-slate-400">({ls.length} {ls.length === 1 ? "ενότητα" : "ενότητες"})</span>
         </h2>
 
-        {ls.length === 0 ? (
+        {!user ? (
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-8 text-center">
+            <p className="text-sm text-slate-700">Για να δεις το υλικό του μαθήματος χρειάζεται να συνδεθείς.</p>
+            <Link
+              href={`/login?next=/courses/${slug}`}
+              className="mt-4 inline-block rounded-full bg-brand-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-700"
+            >
+              Σύνδεση
+            </Link>
+          </div>
+        ) : !enrolled ? (
+          <RedeemCodeForm courseId={c.id} />
+        ) : ls.length === 0 ? (
           <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
             <p className="text-sm text-slate-600">Δεν έχουν προστεθεί ενότητες ακόμα.</p>
           </div>
@@ -80,7 +107,6 @@ export default async function CoursePage({ params }: { params: Params }) {
                       {l.content_type === "text"    && "📃 Κείμενο"}
                     </p>
                   </div>
-                  {l.is_free && <span className="text-xs text-emerald-600">Δωρεάν</span>}
                   <span className="text-slate-400">→</span>
                 </Link>
               </li>

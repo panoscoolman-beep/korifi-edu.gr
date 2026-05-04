@@ -174,6 +174,30 @@ export const getCourses = unstable_cache(
   { tags: ["courses"], revalidate: HOUR }
 );
 
+/**
+ * Courses that already have at least one lesson published — i.e., have actual
+ * material the student can study. Used on the homepage so we don't promote
+ * empty placeholders.
+ */
+export const getCoursesWithLessons = unstable_cache(
+  async (limit?: number): Promise<Course[]> => {
+    const sb = createPublicClient();
+    // Inner-join trick: select courses where at least one lesson exists.
+    // PostgREST: `lessons!inner(id)` requires at least one matching row.
+    let q = sb
+      .from("courses")
+      .select("*, lessons!inner(id)")
+      .order("created_at", { ascending: false });
+    if (limit) q = q.limit(limit);
+    const { data } = await q;
+    if (!data) return [];
+    // Strip the joined `lessons` array — we only needed it for filtering.
+    return data.map(({ lessons: _l, ...rest }) => rest as Course);
+  },
+  ["courses-with-lessons"],
+  { tags: ["courses", "lessons"], revalidate: HOUR }
+);
+
 export const getCourseBySlug = unstable_cache(
   async (slug: string): Promise<Course | null> => {
     const sb = createPublicClient();
