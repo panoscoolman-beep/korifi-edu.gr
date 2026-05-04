@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Markdown } from "@/components/Markdown";
+import { JsonLd, eventLd, breadcrumbsLd } from "@/components/JsonLd";
 import { getEventBySlug, getPublishedEvents } from "@/lib/queries";
 
 type Params = Promise<{ slug: string }>;
@@ -32,6 +33,13 @@ export default async function EventPage({ params }: { params: Params }) {
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+      <JsonLd data={eventLd(e)} />
+      <JsonLd
+        data={breadcrumbsLd([
+          { name: "Εκδηλώσεις", url: "/events" },
+          { name: e.title, url: `/events/${e.slug}` },
+        ])}
+      />
       <Link href="/events" className="text-sm font-medium text-brand-700 hover:text-brand-900">← Όλες οι εκδηλώσεις</Link>
 
       <header className="mt-6">

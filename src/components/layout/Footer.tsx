@@ -94,10 +94,11 @@ export function Footer() {
               </li>
             </ul>
 
-            <div className="mt-8 flex w-full justify-start opacity-70">
+            <div className="mt-8 flex w-full justify-start opacity-90">
               <Image
-                src="/logo.png" alt="" width={511} height={135}
-                className="h-9 w-auto"
+                src="/logo-tagline.png" alt="Φροντιστήριο Κορυφή — Στοχεύοντας ψηλά, φτάνοντας στην Κορυφή"
+                width={1920} height={669}
+                className="h-20 w-auto sm:h-24"
                 style={{ filter: "brightness(0) invert(1)" }}
               />
             </div>

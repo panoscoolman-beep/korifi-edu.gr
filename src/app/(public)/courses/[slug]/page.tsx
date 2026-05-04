@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCourseBySlug, getSubjectById, getLessonsByCourse, getCourses } from "@/lib/queries";
 import { createClient } from "@/lib/supabase/server";
+import { JsonLd, courseLd, breadcrumbsLd } from "@/components/JsonLd";
 import { RedeemCodeForm } from "./RedeemCodeForm";
 
 type Params = Promise<{ slug: string }>;
@@ -49,6 +50,14 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+      <JsonLd data={courseLd({ ...c, subjectName: sub?.name ?? null })} />
+      <JsonLd
+        data={breadcrumbsLd([
+          { name: "Μαθήματα", url: "/courses" },
+          ...(sub ? [{ name: sub.name, url: `/courses?subject=${sub.slug}` }] : []),
+          { name: c.title, url: `/courses/${c.slug}` },
+        ])}
+      />
       <Link href="/courses" className="text-sm font-medium text-brand-700 hover:text-brand-900">← Όλα τα μαθήματα</Link>
 
       <header className="mt-6 flex items-start gap-5">

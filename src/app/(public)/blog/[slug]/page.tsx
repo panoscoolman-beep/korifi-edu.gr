@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Markdown } from "@/components/Markdown";
+import { JsonLd, articleLd, breadcrumbsLd } from "@/components/JsonLd";
 import { getArticleBySlug, getAllPublishedArticleSlugs } from "@/lib/queries";
 
 type Params = Promise<{ slug: string }>;
@@ -35,6 +36,13 @@ export default async function ArticlePage({ params }: { params: Params }) {
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+      <JsonLd data={articleLd(article)} />
+      <JsonLd
+        data={breadcrumbsLd([
+          { name: "Blog", url: "/blog" },
+          { name: article.title, url: `/blog/${article.slug}` },
+        ])}
+      />
       <Link href="/blog" className="text-sm font-medium text-brand-700 hover:text-brand-900">
         ← Όλα τα άρθρα
       </Link>
