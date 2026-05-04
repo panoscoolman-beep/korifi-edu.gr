@@ -56,7 +56,7 @@ export function Footer() {
           </div>
 
           {/* Ακολούθησέ μας */}
-          <div className="flex flex-col items-start">
+          <div className="flex flex-col items-center text-center">
             <h3 className="text-lg font-semibold text-amber-300">Ακολούθησέ μας</h3>
             <ul className="mt-4 flex items-center gap-3">
               <li>
@@ -94,7 +94,7 @@ export function Footer() {
               </li>
             </ul>
 
-            <div className="mt-8 flex w-full justify-start opacity-90">
+            <div className="mt-8 flex w-full justify-center opacity-90">
               <Image
                 src="/logo-tagline.png" alt="Φροντιστήριο Κορυφή — Στοχεύοντας ψηλά, φτάνοντας στην Κορυφή"
                 width={1920} height={669}
