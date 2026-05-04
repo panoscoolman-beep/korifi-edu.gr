@@ -66,6 +66,28 @@ export const getPublishedArticles = unstable_cache(
   { tags: ["articles"], revalidate: HOUR }
 );
 
+/**
+ * Articles with a cover image — used on the homepage so the "Από το blog"
+ * grid shows real photos, not gradient placeholders. Articles without a
+ * cover still appear in the full /blog list.
+ */
+export const getArticlesWithCovers = unstable_cache(
+  async (limit?: number): Promise<Article[]> => {
+    const sb = createPublicClient();
+    let q = sb
+      .from("articles")
+      .select("*")
+      .eq("is_published", true)
+      .not("cover_image", "is", null)
+      .order("published_at", { ascending: false, nullsFirst: false });
+    if (limit) q = q.limit(limit);
+    const { data } = await q;
+    return (data as Article[]) ?? [];
+  },
+  ["articles-with-covers"],
+  { tags: ["articles"], revalidate: HOUR }
+);
+
 export const getArticleBySlug = unstable_cache(
   async (slug: string): Promise<Article | null> => {
     const sb = createPublicClient();

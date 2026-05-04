@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   getSubjects, getCoursesWithLessons,
-  getPublishedArticles, getPublishedTestimonials,
+  getArticlesWithCovers, getPublishedTestimonials,
 } from "@/lib/queries";
 import { JsonLd, KORIFI_LOCAL_BUSINESS_LD } from "@/components/JsonLd";
 import { SeasonalHero } from "@/components/SeasonalHero";
@@ -16,7 +16,7 @@ export default async function HomePage() {
   const [subjects, featured, articles, testimonials] = await Promise.all([
     getSubjects(),
     getCoursesWithLessons(6),
-    getPublishedArticles(3),
+    getArticlesWithCovers(3),
     getPublishedTestimonials(6),
   ]);
 
