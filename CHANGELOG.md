@@ -2,11 +2,101 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Site is launch-ready feature-wise. Caching enabled (Next 16 ISR + tag invalidation), mobile menu, SEO (sitemap+robots+JSON-LD), seasonal hero, 3 empty pages filled. Επόμενο βήμα: Vercel deployment (docs έτοιμα στο `docs/DEPLOY-VERCEL.md`).
+> **Where we are now (latest):** Site is **LIVE in production** at [korifi-edu.gr](https://korifi-edu.gr) (Vercel hosting, custom domain, valid HTTPS). All major features shipped: bento-style content pages, hero carousel with seasonal slides, full admin CRUD with inline lessons + access codes, /martyries with weekly auto-sync from Drive, /epikoinonia with embedded Google Maps. SEO (per-content JSON-LD, sitemap, OG/Twitter), Vercel Analytics, security hardened. Κύριες εκκρεμότητες: Google Search Console verification (TXT record DNS), Google Business Profile setup, owner content updates.
 
 ---
 
-## 2026-05-05 (continued — caching + mobile + SEO + seasonal hero)
+## 2026-05-05 (full session — site polish + production hardening)
+
+### 🚀 Production deployment
+- **Vercel deployment ολοκληρώθηκε** μέσω Web UI Import. Project `korifi-edu-gr` linked στο GitHub repo.
+- **Custom domain** `korifi-edu.gr` + `www.korifi-edu.gr` aliased.
+- **Vercel CLI** installed + linked locally για future deploys/logs/env. PAT (Supabase Access Token) saved σε `.env.local`.
+- **Supabase Auth config pushed** μέσω `supabase config push`: Site URL = `https://korifi-edu.gr`, redirect URLs whitelist περιλαμβάνει korifi-edu.gr, www, *.vercel.app, localhost.
+- **Google OAuth credentials** ενημερωμένα από user (Authorized JS origins + redirect URIs).
+
+### 🎨 UI redesigns (bento layouts)
+Όλες οι content-driven σελίδες ξαναγράφτηκαν με rich HTML inside `content_md` (rendered via `rehype-raw`) — gradient banner + cards/grids + bottom CTA, ομοιόμορφο style με `/epaggelmatikos-prosanatolismos`:
+- **`/online-mathimata`** — feature cards + audience cards + requirements
+- **5 grade pages** (`/gimnasio`, `/alikeiou`, `/blikeiou`, `/glikeiou`, `/epal`) — per-class cards με στιλιζαρισμένους πίνακες μαθημάτων. Στο ΕΠΑΛ, 9 Τομέας grid με Ηλεκτρολογίας highlighted.
+- **`/epikoinonia`** — 4 contact cards (κλικ-ώστε-καλώ + click-to-email) + **embedded Google Maps iframe** για Καλλονή + Instagram/Facebook social cards + tel:/mailto: CTA pills
+- Implementation: `scripts/redesign_grade_pages.py` (re-runnable)
+
+### 🎬 Hero carousel με seasonal photos
+- **HeroCarousel** client component: autoplay 6s, prev/next buttons, dot indicators, keyboard arrows, pause-on-hover, ken-burns zoom, fade transitions
+- **SeasonalHero** με 4 seasons × 2-3 slides each. Auto-pick by month: spring-panellinies (Mar–May) / summer (Jun–Aug) / autumn-start (Sep–Oct) / winter-exams (Nov–Feb)
+- **Hero photos** uploaded στο Storage `images/hero/`: kalloni.png, hybrid.png, summer.jpg
+- Today (May): "Πανελλήνιες — τελική ευθεία" theme με 3 slides
+
+### 📊 Vercel Analytics
+- `@vercel/analytics` installed, `<Analytics />` mounted στο root layout.
+- Privacy-friendly anonymous page views, no cookie banner needed.
+- Δεδομένα στο [Vercel dashboard](https://vercel.com/panoscoolman-beeps-projects/korifi-edu-gr/analytics)
+
+### 🎓 Course system + access codes
+- **41 courses populated** ανά τάξη (Curriculum 2026):
+  - Γυμνάσιο (7), Α΄ Λυκείου (7), Β΄ Λυκείου (11), Γ΄ Λυκείου (10), ΕΠΑΛ (10)
+  - Per-grade math icons: 🔢→√→ƒ→∑→**∫** (Γ); Φυσική: ⚛️→🚀→🌊→⚡; Χημεία ⚗️ for organic Β
+  - Owner edits: removed Κοινωνιολογία Γ' (no longer in curriculum); added ΑΟΘ ΕΠΑΛ + Ηλεκτρολόγων ειδικότητα (4 courses)
+- **Access codes feature** (replaces free/premium tiers):
+  - Migration 0009: `course_access_codes` table + `redeem_course_access_code()` RPC (atomic validation + enrollment)
+  - Admin: `AccessCodesPanel` στο /admin/courses/[id] — generate, list, delete codes with optional max_uses + expires_at
+  - Public: `RedeemCodeForm` στο /courses/[slug] — gated lesson list, login + code → enrollment auto
+  - Code format: 8-char [A-Z2-9] (visually distinct, no I/O/0/1)
+- **LessonsPanel** inline στο /admin/courses/[id]: shows ενότητες με order/type badge, "+ Νέα ενότητα" pre-fills course_id + suggested order, smart return-to flow
+
+### 🗣 /martyries — student testimonials με auto-sync
+- New `/martyries` route + nav link + sitemap entry
+- Migration: `testimonials.source_ref unique` + `full_quote text`
+- **TestimonialsClient** client component: cards με pull-quote, click → modal με ολόκληρο το caption (multi-paragraph), Esc/click-outside close, body scroll lock
+- **Drive auto-sync** (`scripts/sync_testimonials_from_drive.py`):
+  - Reads from Google Drive folder ID via rclone
+  - Filters: `*testimonial*` folder names, date ≤ today
+  - Parses `caption.txt`: PULL QUOTE + signature + CAPTION block (CTA-stripped)
+  - Idempotent via `source_ref`
+  - **Windows Task Scheduler**: every Monday 09:00 (`Korifi Weekly Testimonials Sync`)
+- First testimonial synced: Στρατής Μ. (απόφοιτος 2023)
+
+### 🔍 SEO improvements
+- **Root layout metadata**: metadataBase, OG (locale `el_GR`, og:image), Twitter cards, Greek keywords, Robots directives
+- **Per-content JSON-LD** schemas in `src/components/JsonLd.tsx`:
+  - `articleLd()` on /blog/[slug]
+  - `courseLd()` on /courses/[slug] (subject as educationalLevel)
+  - `eventLd()` on /events/[slug] (online/offline attendance modes)
+  - `breadcrumbsLd()` on all detail pages
+- All include `inLanguage: el-GR`
+
+### 🎯 Favicon + branding
+- Removed `src/app/icon.png` (192×192 raster)
+- Added `src/app/icon.svg` + `src/app/apple-icon.svg` — vector mark of red mountain peak on navy. Crisp σε κάθε browser tab size
+- New `public/logo-tagline.png` (1920×669) με tagline "Στοχεύοντας ψηλά Φτάνοντας στην Κορυφή!"
+- Footer logo updated: tagline version, centered below social icons
+
+### 🐛 Major bug fixes
+- **Admin teacher save error** (`'$ACTION_3:0' column not found`): React 19 internal form fields leaked to Supabase. Fixed `fdToObject` to skip `$`-prefixed keys.
+- **Nested `<form>` hydration warning**: 10 admin forms had `DeleteButton` rendering inner `<form>`. Refactored to use `formAction` attribute on a sibling button (no nesting).
+- **PDF lessons broken (403)**: 21/21 PDFs pointed σε `korifi-edu.gr/wp-content/...` που πια είναι Vercel. `scripts/scrape/migrate_lesson_pdfs.py` τα μετέφερε όλα σε Storage `pdfs/lessons/`. Cache busted via `/api/internal/revalidate`.
+- **Article images broken**: Same root cause. 33 articles patched, 4 covers nulled (originals lost from i0.wp.com cache too — fallback gradient).
+- **Homepage articles section**: Latest 3 articles είχαν NULL covers → grey placeholders. Νέο `getArticlesWithCovers()` filter — εμφανίζονται μόνο όσα έχουν cover.
+
+### ⚡ Cache invalidation pipeline
+- `/api/internal/revalidate` endpoint: POST `{tags, paths}` με Bearer service-role key → calls `revalidateTag(tag, "max")` + `revalidatePath()`. Used by ALL background scripts (Drive sync, image migrations, etc.).
+
+### 🔒 Security hardening (today)
+- Migration: revoked EXECUTE on `is_admin()` / `is_teacher_or_admin()` / `rls_auto_enable()` from anon/authenticated roles (RLS policies still work — they run as postgres internal). 6 advisory warnings → 0.
+- Migration: dropped broad SELECT policies on `storage.objects` for images + pdfs buckets. Public URL access still works (Supabase short-circuits public buckets); listing endpoint `/storage/v1/object/list` now denies anon.
+- `redeem_course_access_code` stays callable by `authenticated` (intentional — students redeem codes).
+
+### ⏭ Open items (non-blocking)
+1. **Google Search Console verification** — user needs to add TXT record at DNS provider (instructions provided).
+2. **Google Business Profile** — local SEO impact 5–10× of all technical SEO. Owner action.
+3. **Leaked-password protection** + **MFA** — toggle in Supabase dashboard (Auth → Settings).
+4. **4 articles χωρίς cover** (originals από 2024 χάθηκαν παντού) — owner can upload via /admin/articles.
+5. **Παπατριανταφύλλου photo** — pre-existing, unchanged.
+
+---
+
+## 2026-05-05 (earlier — caching + mobile + SEO + seasonal hero)
 
 ### ⚡ Next 16 caching mechanisms enabled
 - **`src/lib/supabase/public.ts`** — cookieless server client για public reads. Δεν τρέχει `cookies()` → οι σελίδες που το χρησιμοποιούν είναι statically prerenderable.
