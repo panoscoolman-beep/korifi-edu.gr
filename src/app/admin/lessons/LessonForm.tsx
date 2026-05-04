@@ -9,15 +9,27 @@ import { PdfUpload } from "@/components/admin/PdfUpload";
 import { saveResource, deleteResource } from "@/app/admin/actions";
 import type { Lesson, Course } from "@/types/database";
 
-export function LessonForm({ lesson, courses }: { lesson: Lesson | null; courses: Course[] }) {
+export function LessonForm({
+  lesson, courses, returnTo,
+}: {
+  lesson: Lesson | null;
+  courses: Course[];
+  /** When set (e.g. /admin/courses/<id>), saveResource redirects there instead of /admin/lessons. */
+  returnTo?: string;
+}) {
   const action = saveResource.bind(null, "lessons", lesson?.id ?? null);
   const [state, formAction, pending] = useActionState(action, null);
   const [type, setType] = useState<Lesson["content_type"]>(lesson?.content_type ?? "pdf");
 
+  // Cancel-button destination defaults to the global lessons list, but goes
+  // back to the course edit page when arriving from there.
+  const cancelHref = returnTo ?? "/admin/lessons";
+
   return (
     <form action={formAction} className="space-y-5">
+      {returnTo && <input type="hidden" name="__return_to" value={returnTo} />}
       <Field label="Τίτλος" name="title" defaultValue={lesson?.title} required />
-      <Select label="Course" name="course_id" defaultValue={lesson?.course_id} required
+      <Select label="Μάθημα" name="course_id" defaultValue={lesson?.course_id} required
         options={[
           { value: "", label: "— Επιλέξτε —" },
           ...courses.map((c) => ({ value: c.id, label: c.title })),
@@ -59,7 +71,7 @@ export function LessonForm({ lesson, courses }: { lesson: Lesson | null; courses
       <div className="flex items-center justify-between border-t border-slate-200 pt-4">
         <div className="flex items-center gap-3">
           <button type="submit" disabled={pending} className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60">{pending ? "…" : "Αποθήκευση"}</button>
-          <Link href="/admin/lessons" className="text-sm text-slate-600 hover:text-slate-900">Άκυρο</Link>
+          <Link href={cancelHref} className="text-sm text-slate-600 hover:text-slate-900">Άκυρο</Link>
         </div>
         {lesson && <DeleteButton id={lesson.id} title={lesson.title} />}
       </div>

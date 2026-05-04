@@ -160,7 +160,14 @@ export async function saveResource(table: Table, id: string | null, _prev: unkno
 
   updateTag(table);
   revalidatePath(cfg.listPath, "page");
-  redirect(cfg.listPath);
+
+  // Optional: caller can pass `__return_to` (e.g. /admin/courses/<id>) so the
+  // admin lands back where they came from instead of the generic list page.
+  const returnTo = fd.get("__return_to");
+  const dest = typeof returnTo === "string" && returnTo.startsWith("/admin/")
+    ? returnTo
+    : cfg.listPath;
+  redirect(dest);
 }
 
 export async function deleteResource(table: Table, id: string) {
