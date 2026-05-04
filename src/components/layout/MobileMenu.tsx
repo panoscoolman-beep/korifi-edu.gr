@@ -34,6 +34,7 @@ const SECTIONS: Section[] = [
       { href: "/blog",        label: "Blog" },
       { href: "/events",      label: "Εκδηλώσεις" },
       { href: "/gallery",     label: "Φωτογραφίες" },
+      { href: "/martyries",   label: "Μαρτυρίες" },
       { href: "/gia-emas",    label: "Για εμάς" },
       { href: "/synergates",  label: "Συνεργάτες" },
       { href: "/epikoinonia", label: "Επικοινωνία" },

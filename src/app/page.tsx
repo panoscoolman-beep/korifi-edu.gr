@@ -38,9 +38,14 @@ function TestimonialsSection({ items }: { items: Testimonial[] }) {
   return (
     <section className="bg-brand-50">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <h2 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-          Τι λένε για εμάς
-        </h2>
+        <div className="flex items-end justify-between">
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+            Τι λένε για εμάς
+          </h2>
+          <Link href="/martyries" className="text-sm font-medium text-brand-700 hover:text-brand-900">
+            Όλες οι μαρτυρίες →
+          </Link>
+        </div>
         <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((t) => (
             <li key={t.id} className="rounded-xl border border-brand-100 bg-white p-6 shadow-sm">

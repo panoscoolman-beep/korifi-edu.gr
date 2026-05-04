@@ -9,7 +9,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://korifi-edu.gr";
 // Reserved by dedicated route files — exclude from /[slug] expansion.
 const RESERVED_SLUGS = new Set([
   "gia-emas", "courses", "lessons",
-  "blog", "events", "synergates", "gallery",
+  "blog", "events", "synergates", "gallery", "martyries",
   "login", "register", "dashboard", "admin",
 ]);
 
@@ -29,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/blog`,                           lastModified: now, changeFrequency: "daily",   priority: 0.7 },
     { url: `${BASE_URL}/events`,                         lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
     { url: `${BASE_URL}/gallery`,                        lastModified: now, changeFrequency: "weekly",  priority: 0.6 },
+    { url: `${BASE_URL}/martyries`,                      lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/synergates`,                     lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     // Grade pages (served via [slug])
     { url: `${BASE_URL}/gimnasio`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },

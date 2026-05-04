@@ -15,6 +15,7 @@ const PROGRAM_LINKS = [
 const MORE_LINKS = [
   { href: "/events",     label: "Εκδηλώσεις" },
   { href: "/gallery",    label: "Φωτογραφίες" },
+  { href: "/martyries",  label: "Μαρτυρίες" },
   { href: "/synergates", label: "Συνεργάτες" },
 ];
 
