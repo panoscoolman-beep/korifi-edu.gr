@@ -138,6 +138,7 @@ export type Testimonial = {
   photo_url: string | null
   sort_order: number
   is_published: boolean
+  source_ref: string | null
 }
 
 export type Partner = {
