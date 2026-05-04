@@ -1,26 +1,30 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { Markdown } from "@/components/Markdown";
-import type { Event as EventType } from "@/types/database";
+import { getEventBySlug, getPublishedEvents } from "@/lib/queries";
 
 type Params = Promise<{ slug: string }>;
 
+export const revalidate = 600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const events = await getPublishedEvents();
+  return events.map((e) => ({ slug: e.slug }));
+}
+
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data } = await supabase.from("events").select("title, description_md").eq("slug", slug).eq("is_published", true).maybeSingle();
-  if (!data) return {};
-  return { title: data.title, description: data.description_md.slice(0, 150) };
+  const e = await getEventBySlug(slug);
+  if (!e) return {};
+  return { title: e.title, description: e.description_md.slice(0, 150) };
 }
 
 export default async function EventPage({ params }: { params: Params }) {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data } = await supabase.from("events").select("*").eq("slug", slug).eq("is_published", true).maybeSingle();
-  if (!data) notFound();
-  const e = data as EventType;
+  const e = await getEventBySlug(slug);
+  if (!e) notFound();
 
   const date = e.starts_at ? new Date(e.starts_at).toLocaleString("el-GR", {
     weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit",

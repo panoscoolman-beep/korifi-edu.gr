@@ -2,7 +2,52 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Site σχεδόν launch-ready τοπικά. Όλα τα core features δουλεύουν: public catalog (pages/blog/events/gallery/courses/lessons/teachers), full admin CRUD, auth (email + Google), 16/17 photos σε Storage, dark themed header + footer with real socials/Maps, 35 articles + 5 LMS courses migrated. Επόμενα μεγάλα steps: συμπλήρωση κενών pages content + Vercel deployment.
+> **Where we are now (latest):** Site is launch-ready feature-wise. Caching enabled (Next 16 ISR + tag invalidation), mobile menu, SEO (sitemap+robots+JSON-LD), seasonal hero, 3 empty pages filled. Επόμενο βήμα: Vercel deployment (docs έτοιμα στο `docs/DEPLOY-VERCEL.md`).
+
+---
+
+## 2026-05-05 (continued — caching + mobile + SEO + seasonal hero)
+
+### ⚡ Next 16 caching mechanisms enabled
+- **`src/lib/supabase/public.ts`** — cookieless server client για public reads. Δεν τρέχει `cookies()` → οι σελίδες που το χρησιμοποιούν είναι statically prerenderable.
+- **`src/lib/queries.ts`** — centralized cached query functions με `unstable_cache` + tags. Ένα tag per resource (`articles`, `events`, `pages`, `teachers`, ...). Revalidate windows: hour for content, day for slow-moving (subjects/teachers), 10min for time-sensitive (events).
+- **All public pages migrated** (home, /blog, /blog/[slug], /events, /events/[slug], /[slug], /gallery, /gallery/[slug], /courses, /courses/[slug], /lessons/[id], /gia-emas, /synergates) σε:
+  - cached query functions (DB amortized)
+  - `export const revalidate = N` (ISR signal)
+  - `generateStaticParams()` για [slug] routes (build-time prerender όλων των δημοσιευμένων slugs)
+- **Admin actions** χρησιμοποιούν `updateTag(<resource>)` (το Next 16 server-action variant του revalidateTag) για surgical invalidation αντί για `revalidatePath("/", "layout")` που έσπαγε τα πάντα.
+
+### 📱 Mobile menu
+- **`MobileMenu.tsx`** client component: hamburger button visible κάτω από `lg` breakpoint, full-screen drawer με backdrop, body scroll lock, Esc-to-close, click-outside-to-close.
+- 3 ομαδοποιημένες sections: Πρόγραμμα Σπουδών / Υπηρεσίες / Πληροφορίες + bottom user section (login ή account info + admin link + logout).
+- Navbar refactored: όλα τα top-level links και τα 2 dropdowns hidden σε mobile, mobile menu παίρνει την σκυτάλη.
+
+### 🔍 SEO essentials
+- **`src/app/sitemap.ts`** — auto-generated από DB. 55 entries (static routes + όλα τα published pages, articles, events, courses, albums). `revalidate = 3600`.
+- **`src/app/robots.ts`** — επιτρέπει όλα εκτός `/admin/`, `/dashboard/`, `/api/`, `/auth/`, login/register.
+- **`<JsonLd>` component** + `KORIFI_LOCAL_BUSINESS_LD` schema: EducationalOrganization με διεύθυνση, geo coords (39.2305, 26.1989 Καλλονή), tel, email, social, foundingDate 2019. Mounted στην homepage.
+
+### ☀️ SeasonalHero
+- **`SeasonalHero.tsx`**: 4 themes που rotate με βάση το current month — `winter-exams` (Νοε–Φεβ), `spring-panellinies` (Μαρ–Μάι), `summer` (Ιουν–Αυγ), `autumn-start` (Σεπ–Οκτ).
+- Κάθε theme έχει: kicker badge, gradient bg, decorative emoji watermark, headline με highlight word, sub, primary + secondary CTA.
+- Replaced το static `Hero` στην homepage. Today (May) shows **"Πανελλήνιες — τελική ευθεία"** auto. Καλοκαιρινό theme θα αλλάξει αυτόματα 1η Ιουνίου.
+- Override-able via `season` prop αν θέλουμε admin manual control μελλοντικά.
+
+### 📝 Visual polish (από νωρίτερα την ίδια session)
+- /epaggelmatikos-prosanatolismos rewritten matching updated Your Career methodology (4 ονομαστικές συνεδρίες με Αριάδνη + SWOT, η 4η με γονείς), CTA box με 2 buttons → yourcareer.gr + /epikoinonia.
+- `[slug]` page header: 5xl→6xl με gradient text + amber border-bottom → εφαρμόζεται σε όλες τις dynamic pages.
+- Footer logo: aligned με social icons column, bumped h-7→h-9.
+- 3 navbar additions (Online μαθήματα, Προσανατολισμός, Επικοινωνία) + νέο "Περισσότερα ▾" dropdown για secondary items (Εκδηλώσεις/Φωτογραφίες/Συνεργάτες).
+- Markdown component έχει `rehype-raw` → admin μπορεί να κάνει inline HTML (π.χ. styled CTA buttons) σε pages/articles.
+
+### 📋 Vercel deployment docs
+- **`docs/DEPLOY-VERCEL.md`**: env vars, OAuth callback URL updates (Google Cloud + Supabase), custom domain steps, pre-launch checklist.
+
+### ⏭ Επόμενα steps (in order of priority)
+1. Vercel deploy → preview URL → end-to-end testing
+2. Custom domain `korifi-edu.gr` switch
+3. Παπατριανταφύλλου photo upload (owner action)
+4. Articles old-hosting links → migrate images σε Storage
 
 ---
 

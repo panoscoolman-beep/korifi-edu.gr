@@ -1,33 +1,33 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import type { Course, Lesson, Subject } from "@/types/database";
+import { getCourseBySlug, getSubjectById, getLessonsByCourse, getCourses } from "@/lib/queries";
 
 type Params = Promise<{ slug: string }>;
 
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const courses = await getCourses();
+  return courses.map((c) => ({ slug: c.slug }));
+}
+
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data } = await supabase.from("courses").select("title, description").eq("slug", slug).maybeSingle();
-  if (!data) return {};
-  return { title: data.title, description: data.description ?? undefined };
+  const c = await getCourseBySlug(slug);
+  if (!c) return {};
+  return { title: c.title, description: c.description ?? undefined };
 }
 
 export default async function CoursePage({ params }: { params: Params }) {
   const { slug } = await params;
-  const supabase = await createClient();
+  const c = await getCourseBySlug(slug);
+  if (!c) notFound();
 
-  const { data: course } = await supabase.from("courses").select("*").eq("slug", slug).maybeSingle();
-  if (!course) notFound();
-  const c = course as Course;
-
-  const [{ data: subject }, { data: lessons }] = await Promise.all([
-    supabase.from("subjects").select("*").eq("id", c.subject_id).maybeSingle(),
-    supabase.from("lessons").select("*").eq("course_id", c.id).order("order", { ascending: true }),
+  const [sub, ls] = await Promise.all([
+    getSubjectById(c.subject_id),
+    getLessonsByCourse(c.id),
   ]);
-
-  const sub = subject as Subject | null;
-  const ls  = (lessons ?? []) as Lesson[];
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/server";
+import { getPublishedArticles } from "@/lib/queries";
 import type { Article } from "@/types/database";
 
 export const metadata = {
@@ -8,15 +8,10 @@ export const metadata = {
   description: "Άρθρα, σεμινάρια και συμβουλές από το Φροντιστήριο Κορυφή.",
 };
 
-export default async function BlogPage() {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("articles")
-    .select("*")
-    .eq("is_published", true)
-    .order("published_at", { ascending: false, nullsFirst: false });
+export const revalidate = 3600;
 
-  const articles = (data ?? []) as Article[];
+export default async function BlogPage() {
+  const articles = await getPublishedArticles();
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">

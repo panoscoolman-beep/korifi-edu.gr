@@ -1,23 +1,21 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { Markdown } from "@/components/Markdown";
-import type { Page, Partner } from "@/types/database";
+import { getPageBySlug, getPublishedPartners } from "@/lib/queries";
 
 export const metadata = {
   title: "Συνεργάτες",
   description: "Οι φορείς και οι ομάδες με τις οποίες συνεργάζεται η Κορυφή.",
 };
 
+export const revalidate = 3600;
+
 export default async function SynergatesPage() {
-  const supabase = await createClient();
-  const [{ data: page }, { data: partners }] = await Promise.all([
-    supabase.from("pages").select("*").eq("slug", "synergates").eq("is_published", true).maybeSingle(),
-    supabase.from("partners").select("*").eq("is_published", true).order("sort_order"),
+  const [p, ps] = await Promise.all([
+    getPageBySlug("synergates"),
+    getPublishedPartners(),
   ]);
 
-  if (!page) notFound();
-  const p  = page as Page;
-  const ps = (partners ?? []) as Partner[];
+  if (!p) notFound();
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">

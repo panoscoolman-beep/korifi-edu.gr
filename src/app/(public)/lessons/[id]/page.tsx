@@ -2,27 +2,27 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Markdown } from "@/components/Markdown";
-import type { Lesson, Course } from "@/types/database";
+import { getLessonById, getCourseById, getLessonsByCourse } from "@/lib/queries";
 
 type Params = Promise<{ id: string }>;
 
+// Page is dynamic due to auth gate; cached queries keep DB load low.
+export const revalidate = 600;
+
 export async function generateMetadata({ params }: { params: Params }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data } = await supabase.from("lessons").select("title").eq("id", id).maybeSingle();
-  return { title: data?.title ? data.title : "Lesson" };
+  const l = await getLessonById(id);
+  return { title: l?.title ?? "Lesson" };
 }
 
 export default async function LessonPage({ params }: { params: Params }) {
   const { id } = await params;
-  const supabase = await createClient();
-
-  const { data: lesson } = await supabase.from("lessons").select("*").eq("id", id).maybeSingle();
-  if (!lesson) notFound();
-  const l = lesson as Lesson;
+  const l = await getLessonById(id);
+  if (!l) notFound();
 
   // Premium-only check: if lesson is not free and user is not enrolled, redirect
   if (!l.is_free) {
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect(`/login?next=/lessons/${id}`);
     const { data: enrollment } = await supabase
@@ -32,19 +32,15 @@ export default async function LessonPage({ params }: { params: Params }) {
       .eq("course_id", l.course_id)
       .maybeSingle();
     if (!enrollment) {
-      // not enrolled — show upgrade prompt
       return <PremiumGate lessonTitle={l.title} courseId={l.course_id} />;
     }
   }
 
-  // Fetch course + sibling lessons for navigation
-  const [{ data: course }, { data: siblings }] = await Promise.all([
-    supabase.from("courses").select("title, slug").eq("id", l.course_id).maybeSingle(),
-    supabase.from("lessons").select("id, title, order").eq("course_id", l.course_id).order("order"),
+  const [c, sibs] = await Promise.all([
+    getCourseById(l.course_id),
+    getLessonsByCourse(l.course_id),
   ]);
 
-  const c = course as { title: string; slug: string } | null;
-  const sibs = (siblings ?? []) as { id: string; title: string; order: number }[];
   const idx  = sibs.findIndex((s) => s.id === l.id);
   const prev = idx > 0 ? sibs[idx - 1] : null;
   const next = idx >= 0 && idx < sibs.length - 1 ? sibs[idx + 1] : null;

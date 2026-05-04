@@ -1,44 +1,31 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { Lightbox } from "./Lightbox";
-import type { GalleryAlbum, GalleryPhoto } from "@/types/database";
+import { getAlbumBySlug, getPhotosByAlbum, getPublishedAlbums } from "@/lib/queries";
 
 type Params = Promise<{ slug: string }>;
 
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const albums = await getPublishedAlbums();
+  return albums.map((a) => ({ slug: a.slug }));
+}
+
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("gallery_albums")
-    .select("title, description")
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .maybeSingle();
-  if (!data) return {};
-  return { title: data.title, description: data.description ?? undefined };
+  const a = await getAlbumBySlug(slug);
+  if (!a) return {};
+  return { title: a.title, description: a.description ?? undefined };
 }
 
 export default async function AlbumPage({ params }: { params: Params }) {
   const { slug } = await params;
-  const supabase = await createClient();
+  const a = await getAlbumBySlug(slug);
+  if (!a) notFound();
 
-  const { data: album } = await supabase
-    .from("gallery_albums")
-    .select("*")
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .maybeSingle();
-  if (!album) notFound();
-
-  const { data: photos } = await supabase
-    .from("gallery_photos")
-    .select("*")
-    .eq("album_id", album.id)
-    .order("sort_order");
-
-  const a  = album as GalleryAlbum;
-  const ps = (photos ?? []) as GalleryPhoto[];
+  const ps = await getPhotosByAlbum(a.id);
 
   return (
     <article className="mx-auto max-w-6xl px-4 py-12 sm:px-6">

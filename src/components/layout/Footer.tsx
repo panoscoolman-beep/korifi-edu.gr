@@ -56,7 +56,7 @@ export function Footer() {
           </div>
 
           {/* Ακολούθησέ μας */}
-          <div>
+          <div className="flex flex-col items-start">
             <h3 className="text-lg font-semibold text-amber-300">Ακολούθησέ μας</h3>
             <ul className="mt-4 flex items-center gap-3">
               <li>
@@ -94,10 +94,10 @@ export function Footer() {
               </li>
             </ul>
 
-            <div className="mt-8 opacity-70">
+            <div className="mt-8 flex w-full justify-start opacity-70">
               <Image
                 src="/logo.png" alt="" width={511} height={135}
-                className="h-7 w-auto"
+                className="h-9 w-auto"
                 style={{ filter: "brightness(0) invert(1)" }}
               />
             </div>

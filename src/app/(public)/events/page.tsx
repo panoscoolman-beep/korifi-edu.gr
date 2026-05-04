@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/server";
+import { getPublishedEvents } from "@/lib/queries";
 import type { Event as EventType } from "@/types/database";
 
 export const metadata = {
@@ -8,17 +8,11 @@ export const metadata = {
   description: "Σεμινάρια, διαδικτυακές εκδηλώσεις και συναντήσεις του Φροντιστηρίου Κορυφή.",
 };
 
+export const revalidate = 600;
+
 export default async function EventsPage() {
-  const supabase = await createClient();
-  const now = new Date().toISOString();
-
-  const { data } = await supabase
-    .from("events")
-    .select("*")
-    .eq("is_published", true)
-    .order("starts_at", { ascending: true, nullsFirst: false });
-
-  const all      = (data ?? []) as EventType[];
+  const all      = await getPublishedEvents();
+  const now      = new Date().toISOString();
   const upcoming = all.filter((e) => !e.starts_at || e.starts_at >= now);
   const past     = all.filter((e) => e.starts_at && e.starts_at <  now).reverse();
 

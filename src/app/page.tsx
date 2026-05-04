@@ -1,33 +1,34 @@
 import Image from "next/image";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import {
+  getSubjects, getCourses, getPublishedTeachers,
+  getPublishedArticles, getPublishedTestimonials,
+} from "@/lib/queries";
+import { JsonLd, KORIFI_LOCAL_BUSINESS_LD } from "@/components/JsonLd";
+import { SeasonalHero } from "@/components/SeasonalHero";
 import type { Subject, Course, Teacher, Article, Testimonial } from "@/types/database";
 
-export default async function HomePage() {
-  const supabase = await createClient();
+// ISR: revalidate every hour. Admin mutations bust this via updateTag.
+export const revalidate = 3600;
 
-  const [
-    { data: subjects },
-    { data: featured },
-    { data: teachers },
-    { data: articles },
-    { data: testimonials },
-  ] = await Promise.all([
-    supabase.from("subjects").select("id, name, slug, icon, order, created_at").order("order", { ascending: true }),
-    supabase.from("courses").select("*").order("created_at", { ascending: false }).limit(6),
-    supabase.from("teachers").select("*").eq("is_published", true).order("sort_order", { ascending: true }).limit(8),
-    supabase.from("articles").select("*").eq("is_published", true).order("published_at", { ascending: false, nullsFirst: false }).limit(3),
-    supabase.from("testimonials").select("*").eq("is_published", true).order("sort_order", { ascending: true }).limit(6),
+export default async function HomePage() {
+  const [subjects, featured, teachers, articles, testimonials] = await Promise.all([
+    getSubjects(),
+    getCourses(6),
+    getPublishedTeachers(8),
+    getPublishedArticles(3),
+    getPublishedTestimonials(6),
   ]);
 
   return (
     <>
-      <Hero />
-      <SubjectsSection subjects={(subjects ?? []) as Subject[]} />
-      <FeaturedCoursesSection courses={(featured ?? []) as Course[]} />
-      <TeamPreview teachers={(teachers ?? []) as Teacher[]} />
-      <TestimonialsSection items={(testimonials ?? []) as Testimonial[]} />
-      <LatestArticles items={(articles ?? []) as Article[]} />
+      <JsonLd data={KORIFI_LOCAL_BUSINESS_LD} />
+      <SeasonalHero />
+      <SubjectsSection subjects={subjects} />
+      <FeaturedCoursesSection courses={featured} />
+      <TeamPreview teachers={teachers} />
+      <TestimonialsSection items={testimonials} />
+      <LatestArticles items={articles} />
     </>
   );
 }
@@ -127,39 +128,6 @@ function TeamPreview({ teachers }: { teachers: Teacher[] }) {
           </li>
         ))}
       </ul>
-    </section>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="bg-gradient-to-b from-brand-50 to-white">
-      <div className="mx-auto max-w-6xl px-4 py-20 text-center sm:px-6 sm:py-28">
-        <p className="mb-4 text-sm font-medium uppercase tracking-wider text-brand-700">
-          Φροντιστήριο Μέσης Εκπαίδευσης
-        </p>
-        <h1 className="mx-auto max-w-3xl text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-          Φτάσε στην <span className="text-brand-600">κορυφή</span>.
-        </h1>
-        <p className="mx-auto mt-6 max-w-xl text-lg text-slate-600">
-          Online μαθήματα, σημειώσεις και υλικό για γυμνάσιο και λύκειο — με τους
-          δασκάλους που εμπιστεύεσαι.
-        </p>
-        <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
-            href="/courses"
-            className="rounded-full bg-brand-600 px-6 py-3 text-base font-medium text-white shadow-sm transition-colors hover:bg-brand-700"
-          >
-            Δες τα μαθήματα
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-full border border-slate-300 bg-white px-6 py-3 text-base font-medium text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50"
-          >
-            Δημιουργία λογαριασμού
-          </Link>
-        </div>
-      </div>
     </section>
   );
 }

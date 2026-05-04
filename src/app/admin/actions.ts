@@ -3,8 +3,14 @@
 /**
  * Shared admin server actions: generic create / update / delete by table name.
  * All operations route through Supabase with the admin's session — RLS allows admin writes.
+ *
+ * After every mutation we call `updateTag(<resource>)` so the cached queries
+ * in `@/lib/queries` are surgically invalidated with read-your-own-writes
+ * semantics. Tag names match the `unstable_cache(..., { tags: [...] })` ones.
+ *
+ * (Next 16: `updateTag` is the server-action-friendly variant of `revalidateTag`.)
  */
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -128,6 +134,7 @@ export async function addPhotoToAlbum(albumId: string, imageUrl: string, caption
     .from("gallery_photos")
     .insert({ album_id: albumId, image_url: imageUrl, caption: caption ?? null, sort_order: nextOrder });
   if (error) throw new Error(error.message);
+  updateTag("gallery_photos");
   revalidatePath(`/admin/gallery/${albumId}`, "page");
 }
 
@@ -135,6 +142,7 @@ export async function deletePhoto(photoId: string, albumId: string) {
   const supabase = await assertAdmin();
   const { error } = await supabase.from("gallery_photos").delete().eq("id", photoId);
   if (error) throw new Error(error.message);
+  updateTag("gallery_photos");
   revalidatePath(`/admin/gallery/${albumId}`, "page");
 }
 
@@ -149,8 +157,8 @@ export async function saveResource(table: Table, id: string | null, _prev: unkno
 
   if (error) return { error: error.message };
 
+  updateTag(table);
   revalidatePath(cfg.listPath, "page");
-  revalidatePath("/", "layout");
   redirect(cfg.listPath);
 }
 
@@ -159,8 +167,8 @@ export async function deleteResource(table: Table, id: string) {
   const supabase = await assertAdmin();
   const { error } = await supabase.from(table).delete().eq("id", id);
   if (error) throw new Error(error.message);
+  updateTag(table);
   revalidatePath(cfg.listPath, "page");
-  revalidatePath("/", "layout");
   redirect(cfg.listPath);
 }
 

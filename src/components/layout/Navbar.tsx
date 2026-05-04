@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/(auth)/actions";
+import { MobileMenu } from "./MobileMenu";
 
 const PROGRAM_LINKS = [
   { href: "/gimnasio", label: "Γυμνάσιο" },
@@ -9,6 +10,12 @@ const PROGRAM_LINKS = [
   { href: "/blikeiou", label: "Β' Λυκείου" },
   { href: "/glikeiou", label: "Γ' Λυκείου & Πανελλήνιες" },
   { href: "/epal",     label: "ΕΠΑΛ" },
+];
+
+const MORE_LINKS = [
+  { href: "/events",     label: "Εκδηλώσεις" },
+  { href: "/gallery",    label: "Φωτογραφίες" },
+  { href: "/synergates", label: "Συνεργάτες" },
 ];
 
 export async function Navbar() {
@@ -23,7 +30,7 @@ export async function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-[#1f3a5f] text-slate-100 shadow-sm">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link
           href="/"
           className="flex items-center transition-opacity hover:opacity-90"
@@ -40,25 +47,28 @@ export async function Navbar() {
           />
         </Link>
 
-        <nav className="flex items-center gap-1 sm:gap-2">
+        <nav className="flex items-center gap-0.5">
           <ProgramDropdown />
+          <NavLink href="/online-mathimata">Online μαθήματα</NavLink>
           <NavLink href="/courses">Μαθήματα</NavLink>
+          <NavLink href="/epaggelmatikos-prosanatolismos">Προσανατολισμός</NavLink>
           <NavLink href="/blog">Blog</NavLink>
-          <NavLink href="/events">Εκδηλώσεις</NavLink>
-          <NavLink href="/gallery">Φωτογραφίες</NavLink>
           <NavLink href="/gia-emas">Για εμάς</NavLink>
-          <NavLink href="/synergates">Συνεργάτες</NavLink>
+          <NavLink href="/epikoinonia">Επικοινωνία</NavLink>
+          <MoreDropdown />
 
           {user ? (
             <UserMenu email={user.email ?? ""} role={role} />
           ) : (
             <Link
               href="/login"
-              className="ml-2 rounded-full bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-400"
+              className="ml-2 hidden rounded-full bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-400 lg:inline-block"
             >
               Σύνδεση
             </Link>
           )}
+
+          <MobileMenu user={user ? { email: user.email ?? "" } : null} role={role} />
         </nav>
       </div>
     </header>
@@ -69,7 +79,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className="hidden rounded-md px-3 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10 hover:text-amber-300 md:inline-block"
+      className="hidden rounded-md px-2.5 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10 hover:text-amber-300 lg:inline-block"
     >
       {children}
     </Link>
@@ -78,10 +88,10 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 
 function ProgramDropdown() {
   return (
-    <div className="group relative hidden md:block">
+    <div className="group relative hidden lg:block">
       <button
         type="button"
-        className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10 hover:text-amber-300"
+        className="flex items-center gap-1 rounded-md px-2.5 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10 hover:text-amber-300"
       >
         Πρόγραμμα Σπουδών
         <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
@@ -103,9 +113,36 @@ function ProgramDropdown() {
   );
 }
 
+function MoreDropdown() {
+  return (
+    <div className="group relative hidden lg:block">
+      <button
+        type="button"
+        className="flex items-center gap-1 rounded-md px-2.5 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10 hover:text-amber-300"
+      >
+        Περισσότερα
+        <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 5l3 3 3-3" />
+        </svg>
+      </button>
+      <div className="invisible absolute right-0 top-full mt-1 w-48 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100">
+        {MORE_LINKS.map((l) => (
+          <Link
+            key={l.href}
+            href={l.href}
+            className="block px-4 py-2 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700"
+          >
+            {l.label}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function UserMenu({ email, role }: { email: string; role: string | null }) {
   return (
-    <div className="group relative ml-2">
+    <div className="group relative ml-2 hidden lg:block">
       <button
         type="button"
         className="flex items-center gap-1.5 rounded-full bg-amber-300 px-3 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-400"

@@ -1,41 +1,33 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { Markdown } from "@/components/Markdown";
-import type { Article } from "@/types/database";
+import { getArticleBySlug, getAllPublishedArticleSlugs } from "@/lib/queries";
 
 type Params = Promise<{ slug: string }>;
 
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const slugs = await getAllPublishedArticleSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("articles")
-    .select("title, excerpt")
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .maybeSingle();
-
-  if (!data) return {};
+  const article = await getArticleBySlug(slug);
+  if (!article) return {};
   return {
-    title: data.title,
-    description: data.excerpt ?? undefined,
+    title: article.title,
+    description: article.excerpt ?? undefined,
   };
 }
 
 export default async function ArticlePage({ params }: { params: Params }) {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("articles")
-    .select("*")
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .maybeSingle();
-
-  if (!data) notFound();
-  const article = data as Article;
+  const article = await getArticleBySlug(slug);
+  if (!article) notFound();
 
   const date = article.published_at ? new Date(article.published_at).toLocaleDateString("el-GR", {
     day: "numeric", month: "long", year: "numeric",

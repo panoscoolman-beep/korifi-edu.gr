@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
-import type { Subject, Course } from "@/types/database";
+import { getSubjects, getCourses } from "@/lib/queries";
+import type { Course } from "@/types/database";
 
 export const metadata = {
   title: "Μαθήματα",
@@ -9,28 +9,21 @@ export const metadata = {
 
 type SearchParams = Promise<{ subject?: string }>;
 
+// Page is dynamic due to searchParams, but DB queries are cached.
+export const revalidate = 3600;
+
 export default async function CoursesPage({ searchParams }: { searchParams: SearchParams }) {
   const { subject: subjectFilter } = await searchParams;
-  const supabase = await createClient();
 
-  const [{ data: subjects }, { data: courses }] = await Promise.all([
-    supabase
-      .from("subjects")
-      .select("*")
-      .order("order", { ascending: true }),
-    (async () => {
-      let q = supabase.from("courses").select("*").order("created_at", { ascending: false });
-      if (subjectFilter) {
-        const { data: s } = await supabase.from("subjects").select("id").eq("slug", subjectFilter).maybeSingle();
-        if (s) q = q.eq("subject_id", s.id);
-      }
-      return q;
-    })(),
+  const [subjectList, allCourses] = await Promise.all([
+    getSubjects(),
+    getCourses(),
   ]);
 
-  const subjectList = (subjects ?? []) as Subject[];
-  const courseList = (courses ?? []) as Course[];
   const activeSubject = subjectList.find((s) => s.slug === subjectFilter) ?? null;
+  const courseList = activeSubject
+    ? allCourses.filter((c) => c.subject_id === activeSubject.id)
+    : allCourses;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">

@@ -1,35 +1,22 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { Markdown } from "@/components/Markdown";
 import { TeacherGrid } from "@/components/TeacherGrid";
-import type { Page, Teacher } from "@/types/database";
+import { getPageBySlug, getPublishedTeachers } from "@/lib/queries";
 
 export const metadata = {
   title: "Για εμάς",
   description: "Η φιλοσοφία και η ομάδα του Φροντιστηρίου Κορυφή.",
 };
 
-export default async function GiaEmasPage() {
-  const supabase = await createClient();
+export const revalidate = 3600;
 
-  const [{ data: page }, { data: teachers }] = await Promise.all([
-    supabase
-      .from("pages")
-      .select("*")
-      .eq("slug", "gia-emas")
-      .eq("is_published", true)
-      .maybeSingle(),
-    supabase
-      .from("teachers")
-      .select("*")
-      .eq("is_published", true)
-      .order("sort_order", { ascending: true }),
+export default async function GiaEmasPage() {
+  const [p, team] = await Promise.all([
+    getPageBySlug("gia-emas"),
+    getPublishedTeachers(),
   ]);
 
-  if (!page) notFound();
-
-  const team = (teachers ?? []) as Teacher[];
-  const p = page as Page;
+  if (!p) notFound();
 
   return (
     <article className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">

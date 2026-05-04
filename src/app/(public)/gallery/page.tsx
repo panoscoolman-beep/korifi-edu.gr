@@ -1,33 +1,19 @@
 import Link from "next/link";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/server";
-import type { GalleryAlbum } from "@/types/database";
+import { getPublishedAlbums, getPhotoCountsByAlbum } from "@/lib/queries";
 
 export const metadata = {
   title: "Φωτογραφίες",
   description: "Δράσεις, εκδηλώσεις και στιγμές από το φροντιστήριο Κορυφή.",
 };
 
+export const revalidate = 3600;
+
 export default async function GalleryPage() {
-  const supabase = await createClient();
-  const { data: albums } = await supabase
-    .from("gallery_albums")
-    .select("*")
-    .eq("is_published", true)
-    .order("event_date", { ascending: false, nullsFirst: false });
-
-  const list = (albums ?? []) as GalleryAlbum[];
-
-  // photo counts
-  const counts: Record<string, number> = {};
-  if (list.length) {
-    const ids = list.map((a) => a.id);
-    const { data: photos } = await supabase
-      .from("gallery_photos")
-      .select("album_id")
-      .in("album_id", ids);
-    for (const p of photos ?? []) counts[p.album_id] = (counts[p.album_id] ?? 0) + 1;
-  }
+  const [list, counts] = await Promise.all([
+    getPublishedAlbums(),
+    getPhotoCountsByAlbum(),
+  ]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
