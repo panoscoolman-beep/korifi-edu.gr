@@ -176,8 +176,8 @@ export const KORIFI_LOCAL_BUSINESS_LD = {
   },
   geo: {
     "@type": "GeoCoordinates",
-    latitude: 39.2305,
-    longitude: 26.1989,
+    latitude: 39.2317168,
+    longitude: 26.2119776,
   },
   sameAs: [
     "https://www.instagram.com/frontistiriakorifh/",
