@@ -5,6 +5,9 @@ import type { Course } from "@/types/database";
 export const metadata = {
   title: "Μαθήματα",
   description: "Όλα τα μαθήματα του φροντιστηρίου Κορυφή — γυμνάσιο, λύκειο, ΕΠΑΛ.",
+  // The ?subject= filter variants are duplicates from Google's POV — point
+  // them all back to the unfiltered list so SEO weight consolidates here.
+  alternates: { canonical: "/courses" },
 };
 
 type SearchParams = Promise<{ subject?: string }>;
