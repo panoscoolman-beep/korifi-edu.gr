@@ -81,6 +81,55 @@ Just `git push`. Vercel auto-deploys in ~40s. To deploy without git: `vercel dep
 2. `vercel logs --follow` — live deployment logs
 3. `mcp__supabase__execute_sql` — check DB row state directly
 
+## ⚠️ Pitfalls — μην ξανακάνεις αυτά
+
+### 1. ΜΗΝ revoke EXECUTE από `is_admin()` / `is_teacher_or_admin()`
+
+Το Supabase security advisor flags αυτές τις SECURITY DEFINER functions ως
+"callable by anon/authenticated". **Είναι by-design** και πρέπει να μείνει.
+
+**Γιατί:** Οι RLS policies σε όλα τα content tables (`pages`, `articles`,
+`events`, `courses`, `lessons`, `gallery_*`, κλπ.) τις χρησιμοποιούν μέσα
+στα `USING` expressions:
+
+```sql
+create policy "pages read published" on pages
+  for select using (is_published OR is_admin());
+```
+
+Αν αφαιρέσεις το EXECUTE από `anon`, οι anon SELECT αποτυγχάνουν με 401
+και ολόκληρο το public site σπάει (404 dev / 500 prod).
+
+**Επίσης ασφαλές να μείνει**: η `is_admin()` επιστρέφει `false` για
+unauthenticated callers και τον πραγματικό admin status για logged-in.
+Δεν leak-άρει δεδομένα.
+
+**Αν ξαναδείς το advisory: skip it.** Όχι revoke. Είδη `migrations/0010_*`
+είναι το rollback που χρησιμοποιήθηκε όταν έγινε η αρχική λάθος αλλαγή.
+
+### 2. Cache invalidation μετά από direct DB writes
+
+Κάθε φορά που γράφεις στη DB ΧΩΡΙΣ admin server action (π.χ. via
+`mcp__supabase__execute_sql` ή service-role REST), **πρέπει** να καλέσεις
+`/api/internal/revalidate` για να δουν οι μαθητές την αλλαγή. Αλλιώς
+περιμένουν 1h–24h να expire-άρει το `unstable_cache`.
+
+```bash
+PAT=$(grep "^SUPABASE_SERVICE_ROLE_KEY=" .env.local | cut -d= -f2-)
+curl -s -X POST "https://korifi-edu.gr/api/internal/revalidate" \
+  -H "Authorization: Bearer $PAT" -H "Content-Type: application/json" \
+  -d '{"tags":["<resource>"],"paths":["/<route>"]}'
+```
+
+### 3. Production cache busting μετά από schema αλλαγή
+
+Όταν αλλάξεις πολιτικές RLS ή GRANTs, το `unstable_cache` μπορεί να σερβίρει
+παγωμένα error results. Λύσεις:
+1. Empty commit + push για redeploy: `git commit --allow-empty -m "force redeploy" && git push`
+2. POST στο `/api/internal/revalidate` με τα affected tags
+3. Restart local dev (`taskkill //F //IM node.exe`) — η in-memory cache δεν
+   καθαρίζει με `rm -rf .next/cache`.
+
 ## End-to-end verification rule
 
 Before saying "done", curl the live URL OR start `npm run dev` and check the

@@ -6,6 +6,33 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-05-05 (incident — RLS over-tightening broke public reads)
+
+### 🔥 Incident: ALL public pages 404/500
+
+**Symptom:** /epikoinonia + όλες οι bento pages + /blog εμφάνιζαν empty/error.
+
+**Root cause:** Το χθεσινό migration `tighten_security_definer_grants` revoked
+`EXECUTE on is_admin()` από anon + authenticated. Όλα τα RLS policies στα
+public content tables (`pages`, `articles`, etc.) χρησιμοποιούν `is_admin()`
+στο `USING (is_published OR is_admin())`. Anon SELECT → permission denied →
+PostgREST 401 → Next page handler → `notFound()` (dev: 404 / prod: 500 με
+stale cache).
+
+**Fix** (migration `restore_is_admin_execute_for_rls`):
+- Re-granted EXECUTE on `is_admin()` + `is_teacher_or_admin()` to anon + authenticated.
+- `rls_auto_enable()` stays revoked (DDL utility, not used in policies).
+- Force redeploy via empty commit + cache bust via `/api/internal/revalidate`.
+
+**Lesson** (saved in CLAUDE.md):
+- Supabase advisor's "anon callable SECURITY DEFINER" warning is **wrong** for
+  helper functions used inside RLS USING expressions. Skip it.
+- Direct DB writes need explicit cache invalidation via `/api/internal/revalidate`.
+- Production stale errors require `git commit --allow-empty && git push` to
+  force a clean redeploy.
+
+---
+
 ## 2026-05-05 (full session — site polish + production hardening)
 
 ### 🚀 Production deployment
