@@ -17,7 +17,7 @@ Configure once:
       NEXT_PUBLIC_SUPABASE_URL
       SUPABASE_SERVICE_ROLE_KEY
     Hard-coded in this script:
-      DRIVE_FOLDER_ID = "1Zy1T3NKuLTZ0n1Ei2KQVfHVlgyX-gFc5"
+      DRIVE_FOLDER_ID = "1TIrOlcMd9K9ufbA2hc0SDN-1tkwWfwkA"   # "instagram-assets"
 
 Run manually:
     python scripts/sync_testimonials_from_drive.py
@@ -35,7 +35,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 # ---------------------------------------------------------------------------
 ROOT             = Path(__file__).resolve().parents[1]
 RCLONE           = ROOT / "scripts" / "backup" / "rclone.exe"
-DRIVE_FOLDER_ID  = "1Zy1T3NKuLTZ0n1Ei2KQVfHVlgyX-gFc5"
+DRIVE_FOLDER_ID  = "1TIrOlcMd9K9ufbA2hc0SDN-1tkwWfwkA"
 DRIVE_REMOTE     = "gdrive:"
 TESTIMONIAL_KEY  = "testimonial"     # case-insensitive substring in folder name
 
@@ -182,6 +182,16 @@ def revalidate_site(tags: list[str], paths: list[str] | None = None) -> None:
 def main() -> None:
     today      = datetime.date.today()
     folders    = rclone_lsd_root()
+    if not folders:
+        # Silent-failure guard: if the Drive folder was moved/deleted or rclone
+        # auth expired, rclone returns 0 folders with exit code 0. Without this
+        # check, Task Scheduler would mark the task "successful" while nothing
+        # gets imported — a bug we shipped through for ~1 week before noticing.
+        raise RuntimeError(
+            f"rclone returned 0 folders for DRIVE_FOLDER_ID={DRIVE_FOLDER_ID!r}. "
+            "Folder may have been moved/deleted, or rclone auth expired. "
+            "Verify the ID in Google Drive and re-run `rclone config` if needed."
+        )
     candidates = []
     for f in folders:
         if TESTIMONIAL_KEY not in f.lower(): continue
