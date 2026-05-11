@@ -1,0 +1,66 @@
+name: Sync testimonials from Drive
+
+# Replaces the legacy Windows Task Scheduler entry of the same purpose.
+# Runs unattended on GitHub-hosted runners — no dependence on local PC uptime.
+#
+# Schedule: Monday 06:00 UTC = 09:00 Athens (EEST, summer) / 08:00 (EET, winter).
+# DST handling: GitHub Actions cron is UTC-only with no native TZ support, so
+# in winter the run fires 1 hour earlier than the user's mental "Δευτέρα 09:00".
+# This is harmless — the Drive folder for Sunday's post already exists by then.
+# Manual `workflow_dispatch` trigger is wired up for ad-hoc runs (debugging,
+# adding a testimonial outside the weekly cadence).
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install rclone + symlink to script's expected path
+        # The script is hard-coded to scripts/backup/rclone.exe (Windows convention
+        # from when it ran on the user's PC). Symlinking the apt-installed Linux
+        # rclone there means we don't have to touch the script.
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq rclone
+          mkdir -p scripts/backup
+          rm -f scripts/backup/rclone.exe
+          ln -s "$(command -v rclone)" scripts/backup/rclone.exe
+
+      - name: Restore rclone config from secret
+        env:
+          RCLONE_CONFIG_CONTENTS: ${{ secrets.RCLONE_CONFIG }}
+        run: |
+          mkdir -p ~/.config/rclone
+          printf '%s' "$RCLONE_CONFIG_CONTENTS" > ~/.config/rclone/rclone.conf
+          chmod 600 ~/.config/rclone/rclone.conf
+          rclone listremotes
+
+      - name: Compose .env.local from secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_URL"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY"
+          } > .env.local
+
+      - name: Run sync script
+        run: python scripts/sync_testimonials_from_drive.py
