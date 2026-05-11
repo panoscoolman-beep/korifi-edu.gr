@@ -277,7 +277,7 @@ export const getPublishedTestimonials = unstable_cache(
     const { data } = await q;
     return (data as Testimonial[]) ?? [];
   },
-  ["testimonials-list"],
+  ["testimonials-list-v2"],
   { tags: ["testimonials"], revalidate: DAY }
 );
 
