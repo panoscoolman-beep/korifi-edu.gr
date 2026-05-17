@@ -116,7 +116,7 @@ function TeacherModal({ teacher, onClose }: { teacher: Teacher; onClose: () => v
             <div className="mt-5 border-t border-slate-200 pt-5">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Βιογραφικό</p>
               {teacher.bio_md && teacher.bio_md.trim() ? (
-                <div className="prose prose-sm prose-slate mt-3 max-w-none">
+                <div className="prose prose-base prose-slate mt-3 max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{teacher.bio_md}</ReactMarkdown>
                 </div>
               ) : (
