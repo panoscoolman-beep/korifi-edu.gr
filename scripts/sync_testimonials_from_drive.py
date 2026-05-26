@@ -78,20 +78,33 @@ def rclone_download(folder_name: str, dest: Path) -> None:
 # ---------------------------------------------------------------------------
 # Caption parser
 # ---------------------------------------------------------------------------
-DATE_RE     = re.compile(r"^(\d{4}-\d{2}-\d{2})")
-QUOTE_RE    = re.compile(r"PULL QUOTE[^\n]*\n[─\-=]+\n+([«\"][\s\S]*?[»\"])")
-SIG_RE      = re.compile(r"^\s*[—–-]\s*([^,\n]+?)\s*(?:,\s*(.+?))?\s*$", re.M)
+DATE_RE      = re.compile(r"^(\d{4}-\d{2}-\d{2})")
+# Pull quote — earlier captions had an explicit "PULL QUOTE" header section
+# above the post body; newer ones inline the quote directly inside CAPTION.
+# Both separator styles (light ─ and heavy ═) appear in the wild.
+PULL_HDR_RE  = re.compile(r"PULL QUOTE[^\n]*\n[─═\-=]+\n+([«\"][\s\S]*?[»\"])")
+INLINE_Q_RE  = re.compile(r"[«\"][\s\S]*?[»\"]")
+SIG_RE       = re.compile(r"^\s*[—–-]\s*([^,\n]+?)\s*(?:,\s*(.+?))?\s*$", re.M)
 # Long-form caption between "CAPTION (copy-paste):" and "HASHTAGS:"
-FULL_CAP_RE = re.compile(
-    r"CAPTION[^\n]*\n[─\-=]+\n+([\s\S]*?)\n[─\-=]*\n*HASHTAGS",
+FULL_CAP_RE  = re.compile(
+    r"CAPTION[^\n]*\n[─═\-=]+\n+([\s\S]*?)\n[─═\-=]*\n*HASHTAGS",
     re.IGNORECASE,
 )
 
 def parse_caption(text: str) -> dict | None:
-    quote_match = QUOTE_RE.search(text)
-    if not quote_match:
-        return None
-    raw_quote = quote_match.group(1)
+    # Pull quote: prefer the explicit "PULL QUOTE" section; fall back to the
+    # first « ... » block inside the CAPTION section (new format from 2026-05-24
+    # onwards dropped the standalone header).
+    pull = PULL_HDR_RE.search(text)
+    if pull:
+        raw_quote = pull.group(1)
+    else:
+        cap = FULL_CAP_RE.search(text)
+        scope = cap.group(1) if cap else text
+        inline = INLINE_Q_RE.search(scope)
+        if not inline:
+            return None
+        raw_quote = inline.group(0)
     # Normalize whitespace + strip surrounding quotes
     quote = re.sub(r"\s+", " ", raw_quote).strip()
     quote = quote.strip("«»\"' ").strip()
@@ -115,13 +128,14 @@ def parse_caption(text: str) -> dict | None:
         return None
 
     # Long-form caption — what's shown in the popup. Strip CTA boilerplate
-    # (✦ separator, 📞/📩/🌐 contact lines, registration line) so only the
-    # student's actual testimonial body + signature remain.
+    # (✦ separator, 📞/📩/🌐 contact lines, registration line, and the
+    # ────/════ continuation separators that mark "rest of post" sections in
+    # the newer template) so only the student's testimonial body + signature remain.
     full_match = FULL_CAP_RE.search(text)
     full_quote: str | None = None
     if full_match:
         body = full_match.group(1).strip()
-        cut = re.search(r"\n+(?:✦|📞|📩|🌐|Εγγραφές\s|Ευχαριστούμε\s)", body)
+        cut = re.search(r"\n+(?:✦|📞|📩|🌐|────|════|Εγγραφές\s|Ευχαριστούμε\s)", body)
         if cut:
             body = body[: cut.start()].rstrip()
         body = re.sub(r"\n{3,}", "\n\n", body).strip()
