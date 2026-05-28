@@ -8,9 +8,20 @@ How it works:
        - Contain the keyword ``testimonial`` in their name
        - Have a date <= today (skips upcoming/scheduled posts)
        - Have not already been imported (checked via ``testimonials.source_ref``).
-  3. For each remaining folder, downloads ``caption.txt``, parses out the
-     pull-quote + author name + role, and inserts a row in ``testimonials``
-     with ``source_ref`` = folder name (so re-runs are idempotent).
+  3. For each remaining folder, downloads ``caption.txt`` + optional
+     ``testimonial.txt`` and inserts a row in ``testimonials`` with
+     ``source_ref`` = folder name (so re-runs are idempotent — existing rows are
+     never touched).
+
+Where the full testimonial comes from:
+    The student's full testimonial lives in the ``story-<name>-FULL-*.png``
+    image, NOT in caption.txt (which only carries the Instagram caption). So:
+      • If a folder has a ``testimonial.txt`` (structured: NAME/ROLE/PULL/FULL —
+        see parse_testimonial_txt), it is used and the row is PUBLISHED.
+      • If not, the row is inserted as an UNPUBLISHED DRAFT from caption.txt for
+        manual review in /admin — never a wrong guess going live.
+    Author workflow: when you create the FULL graphic, copy its text into a
+    ``testimonial.txt`` in the same Drive folder. That's the only manual step.
 
 Configure once:
     .env.local must already contain
@@ -22,9 +33,8 @@ Configure once:
 Run manually:
     python scripts/sync_testimonials_from_drive.py
 
-Schedule (suggested): Windows Task Scheduler — every Monday 09:00, after the
-weekly Sunday post is up. See scripts/backup/install_scheduled_task.ps1 for
-the pattern; mirror it for this script.
+Schedule: GitHub Actions cron (.github/workflows/sync-testimonials.yml),
+every Monday 06:00 UTC (09:00 Athens summer). Runs unattended on a hosted runner.
 """
 from __future__ import annotations
 import sys, os, json, re, datetime, subprocess, urllib.request, urllib.error, urllib.parse, tempfile
@@ -65,14 +75,16 @@ def rclone_lsd_root() -> list[str]:
 
 def rclone_download(folder_name: str, dest: Path) -> None:
     dest.mkdir(parents=True, exist_ok=True)
-    # Only download caption.txt — image graphics are text-based assets we don't
-    # need on the website (the testimonial card has its own design).
+    # Pull both text sources: caption.txt (name/role/pull-quote) and the optional
+    # testimonial.txt (structured override with the full testimonial). We skip the
+    # image graphics — they're not needed for the website card.
     subprocess.check_call([
         str(RCLONE), "copy",
         DRIVE_REMOTE,
         str(dest),
         "--drive-root-folder-id", DRIVE_FOLDER_ID,
         "--include", f"{folder_name}/caption.txt",
+        "--include", f"{folder_name}/testimonial.txt",
     ])
 
 # ---------------------------------------------------------------------------
@@ -89,6 +101,12 @@ SIG_RE       = re.compile(r"^\s*[—–-]\s*([^,\n]+?)\s*(?:,\s*(.+?))?\s*$", re
 FULL_CAP_RE  = re.compile(
     r"CAPTION[^\n]*\n[─═\-=]+\n+([\s\S]*?)\n[─═\-=]*\n*HASHTAGS",
     re.IGNORECASE,
+)
+# Header line, present in every template: "... Testimonial #4 — Άσπα Π. (απόφοιτη 2025)"
+# Most reliable source of name + role across all caption variants.
+HEADER_RE    = re.compile(
+    r"Testimonial\s*#?\s*\d*\s*[—–-]\s*([^(\n]+?)\s*(?:\(\s*([^)\n]+?)\s*\))?\s*$",
+    re.IGNORECASE | re.MULTILINE,
 )
 
 def parse_caption(text: str) -> dict | None:
@@ -109,20 +127,29 @@ def parse_caption(text: str) -> dict | None:
     quote = re.sub(r"\s+", " ", raw_quote).strip()
     quote = quote.strip("«»\"' ").strip()
 
-    # Look for signature line in the CAPTION block (not the header / hashtags)
-    # The signature is usually inside the long caption: "— Στρατής Μ., απόφοιτος 2023"
-    name = None
-    role = None
-    for m in SIG_RE.finditer(text):
-        candidate_name = m.group(1).strip()
-        # Skip lines that are clearly not signatures (e.g. the header "ΚΟΡΥΦΗ · Testimonial")
-        if "korifi" in candidate_name.lower() or "κορυφη" in candidate_name.lower():
-            continue
-        if len(candidate_name) > 60:
-            continue
-        name = candidate_name
-        role = (m.group(2) or "").strip() or None
-        break
+    # Name + role: prefer the header line "Testimonial #N — Name (role)", which is
+    # consistent across every template variant. Fall back to a signature line
+    # ("— Name, Role") searched ONLY inside the CAPTION body, so we never pick up an
+    # ASSETS bullet like "- post-aspa-FULL-navy.png ..." (that bug shipped once).
+    name = role = None
+    hdr = HEADER_RE.search(text)
+    if hdr:
+        name = hdr.group(1).strip() or None
+        role = (hdr.group(2) or "").strip() or None
+    # Older headers ("Testimonial #1 — Στρατής Μ.") carry no role; fill missing
+    # name/role from a signature line inside the CAPTION body.
+    if not name or not role:
+        cap_m = FULL_CAP_RE.search(text)
+        sig_scope = cap_m.group(1) if cap_m else text
+        for m in SIG_RE.finditer(sig_scope):
+            cand = m.group(1).strip()
+            if "korifi" in cand.lower() or "κορυφη" in cand.lower():
+                continue
+            if len(cand) > 60 or any(ext in cand.lower() for ext in (".png", ".jpg", ".jpeg")):
+                continue
+            name = name or cand
+            role = role or ((m.group(2) or "").strip() or None)
+            break
 
     if not name:
         return None
@@ -142,6 +169,47 @@ def parse_caption(text: str) -> dict | None:
         full_quote = body or None
 
     return {"quote": quote, "name": name, "role": role, "full_quote": full_quote}
+
+# ---------------------------------------------------------------------------
+# testimonial.txt — optional structured override (the reliable path)
+# ---------------------------------------------------------------------------
+# The full testimonial lives in the story-<name>-FULL-*.png image, NOT in
+# caption.txt (which only carries the Instagram caption). Rather than OCR a
+# styled graphic in CI, the author drops a plain testimonial.txt in the folder:
+#
+#     NAME: Άσπα Π.            (optional — falls back to caption header)
+#     ROLE: απόφοιτη 2025      (optional — falls back to caption header)
+#     PULL: Δεν είχα απλά καθηγητές — είχα ανθρώπους που στάθηκαν δίπλα μου.
+#     FULL:
+#     <the full testimonial text, one or more paragraphs, copied from the image>
+#
+# PULL + FULL are required for a clean auto-publish. If testimonial.txt is
+# absent, main() falls back to caption.txt parsing and inserts as an UNPUBLISHED
+# draft for manual review — so a missing/ambiguous source never goes live wrong.
+TX_FIELD_RE = re.compile(r"^(NAME|ROLE|PULL|FULL)\s*:\s*(.*)$", re.IGNORECASE)
+
+def parse_testimonial_txt(text: str) -> dict | None:
+    name = role = pull = None
+    full_lines: list[str] = []
+    in_full = False
+    for line in text.splitlines():
+        if in_full:
+            full_lines.append(line)
+            continue
+        m = TX_FIELD_RE.match(line.strip())
+        if not m:
+            continue
+        key, val = m.group(1).upper(), m.group(2).strip()
+        if   key == "NAME": name = val or None
+        elif key == "ROLE": role = val or None
+        elif key == "PULL": pull = val or None
+        elif key == "FULL":
+            in_full = True
+            if val: full_lines.append(val)
+    full = re.sub(r"\n{3,}", "\n\n", "\n".join(full_lines)).strip() or None
+    if not pull or not full:
+        return None
+    return {"name": name, "role": role, "quote": pull, "full_quote": full}
 
 # ---------------------------------------------------------------------------
 # Supabase REST
@@ -229,6 +297,8 @@ def main() -> None:
         print("\nNothing to do.")
         return
 
+    published_count = 0
+    draft_count = 0
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         for d, f in new_ones:
@@ -239,33 +309,62 @@ def main() -> None:
                 print(f"  ✗ rclone failed: {e}")
                 continue
 
-            cap = tmp_path / f / "caption.txt"
-            if not cap.exists():
-                print(f"  ✗ caption.txt missing")
+            cap_file = tmp_path / f / "caption.txt"
+            tx_file  = tmp_path / f / "testimonial.txt"
+            cap_parsed = parse_caption(cap_file.read_text(encoding="utf-8", errors="replace")) if cap_file.exists() else None
+            tx_parsed  = parse_testimonial_txt(tx_file.read_text(encoding="utf-8", errors="replace")) if tx_file.exists() else None
+
+            if tx_parsed:
+                # Reliable path: structured testimonial.txt → auto-publish.
+                name  = tx_parsed["name"] or (cap_parsed or {}).get("name")
+                role  = tx_parsed["role"] or (cap_parsed or {}).get("role")
+                quote = tx_parsed["quote"]
+                full  = tx_parsed["full_quote"]
+                published = True
+                src = "testimonial.txt"
+            elif cap_parsed:
+                # Fallback: caption only. caption.txt rarely holds the student's
+                # full testimonial verbatim (that's in the FULL image), so insert
+                # as an UNPUBLISHED draft for manual review instead of guessing.
+                name  = cap_parsed["name"]
+                role  = cap_parsed["role"]
+                quote = cap_parsed["quote"]
+                full  = cap_parsed["full_quote"]
+                published = False
+                src = "caption.txt (DRAFT)"
+            else:
+                print("  ✗ no usable testimonial.txt or caption.txt — skipped")
                 continue
-            text = cap.read_text(encoding="utf-8", errors="replace")
-            parsed = parse_caption(text)
-            if not parsed:
-                print(f"  ✗ couldn't parse caption (no pull-quote or signature)")
+
+            if not name or not quote:
+                print("  ✗ missing name or pull-quote — skipped")
                 continue
 
             payload = {
-                "author_name": parsed["name"],
-                "author_role": parsed["role"],
-                "quote":       parsed["quote"],
-                "full_quote":  parsed["full_quote"],
-                "is_published": True,
-                "source_ref":  f,
-                "sort_order":  0,
+                "author_name":  name,
+                "author_role":  role,
+                "quote":        quote,
+                "full_quote":   full,
+                "is_published": published,
+                "source_ref":   f,
+                "sort_order":   0,
             }
             code, msg = insert_testimonial(payload)
             if 200 <= code < 300:
-                print(f"  ✓ {parsed['name']} — {parsed['quote'][:60]}…")
+                flag = "✓ published" if published else "⚠ DRAFT (review in admin)"
+                print(f"  {flag} [{src}] {name} — {quote[:55]}…")
+                if published: published_count += 1
+                else:         draft_count += 1
             else:
                 print(f"  ✗ insert HTTP {code}: {msg}")
 
-    # Bust live cache so the new testimonial is visible immediately on /martyries
-    revalidate_site(tags=["testimonials"], paths=["/martyries", "/"])
+    print(f"\nImported: {published_count} published, {draft_count} draft(s).")
+    if draft_count:
+        print("  ⚠ Draft(s) are hidden until reviewed. Add a testimonial.txt with")
+        print("    the full text (from the *-FULL-*.png image) and publish from /admin.")
+    # Only bust the live cache if something actually went public.
+    if published_count:
+        revalidate_site(tags=["testimonials"], paths=["/martyries", "/"])
     print("\nDone.")
 
 if __name__ == "__main__":
