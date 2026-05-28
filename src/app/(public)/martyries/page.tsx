@@ -33,7 +33,7 @@ export default async function MartyriesPage() {
       )}
 
       <div className="mt-16 rounded-2xl bg-gradient-to-r from-brand-50 via-amber-50 to-brand-50 p-8 text-center">
-        <p className="text-lg font-medium text-slate-800">Θέλεις κι εσύ να ανήκεις στην ομάδα μας;</p>
+        <p className="text-lg font-medium text-slate-800">Θέλεις κι εσύ να γίνεις μέλος της ομάδας μας;</p>
         <p className="mt-1 text-sm text-slate-600">
           Έλα να μας γνωρίσεις από κοντά ή να συζητήσουμε τις ανάγκες σου.
         </p>
