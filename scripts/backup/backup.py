@@ -99,14 +99,8 @@ def fetch_table_rows(table: str) -> list:
         offset += page_size
     return rows
 
-def list_bucket_files(bucket: str) -> list[dict]:
-    body = supa_get(f"/storage/v1/object/list/{bucket}",
-                    headers={"Content-Type": "application/json"})
-    # Storage list endpoint expects POST with prefix; some Supabase versions use GET — try POST
-    return json.loads(body.decode("utf-8")) if body else []
-
-def list_bucket_files_post(bucket: str, prefix: str = "") -> list[dict]:
-    payload = json.dumps({"prefix": prefix, "limit": 1000, "offset": 0,
+def _list_page(bucket: str, prefix: str, offset: int, limit: int = 100) -> list[dict]:
+    payload = json.dumps({"prefix": prefix, "limit": limit, "offset": offset,
                           "sortBy": {"column": "name", "order": "asc"}}).encode("utf-8")
     req = urllib.request.Request(
         f"{SUPA_URL}/storage/v1/object/list/{bucket}",
@@ -116,6 +110,36 @@ def list_bucket_files_post(bucket: str, prefix: str = "") -> list[dict]:
     )
     with urllib.request.urlopen(req, timeout=60) as r:
         return json.loads(r.read().decode("utf-8"))
+
+def list_all_objects(bucket: str, prefix: str = "") -> list[str]:
+    """Recursively list every object path in a bucket. The Storage list API is
+    one level deep: entries with an `id` are files, entries without are folders
+    we must recurse into. (The old flat list returned only top-level folders,
+    so nothing actually got downloaded — that's why media was missing.)
+
+    Listing needs a key that can SELECT storage.objects: the service-role key
+    works (bypasses RLS); the anon/publishable key returns [] unless an RLS
+    SELECT policy exists. Download itself is public for public buckets."""
+    out: list[str] = []
+    offset = 0
+    limit = 100
+    while True:
+        page = _list_page(bucket, prefix, offset, limit)
+        if not page:
+            break
+        for e in page:
+            name = e.get("name")
+            if not name:
+                continue
+            full = f"{prefix}{name}"
+            if e.get("id"):          # a real object
+                out.append(full)
+            else:                    # a folder → recurse
+                out.extend(list_all_objects(bucket, f"{full}/"))
+        if len(page) < limit:
+            break
+        offset += limit
+    return out
 
 def download_file(bucket: str, name: str, out: Path):
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -161,14 +185,18 @@ def main():
     for b in BUCKETS:
         bdir = storage_dir / b
         try:
-            files = list_bucket_files_post(b)
+            names = list_all_objects(b)
             count = 0
-            for f in files:
-                if f.get("name"):  # skip folder entries
-                    download_file(b, f["name"], bdir / f["name"])
-                    count += 1
+            for name in names:
+                download_file(b, name, bdir / name)
+                count += 1
             manifest["buckets"][b] = count
             print(f"  ✓ {b:<8} {count} file(s)")
+            if count == 0:
+                msg = ("0 files listed — the list API needs a service-role key "
+                       "(anon/publishable returns [] under RLS); media NOT captured.")
+                manifest["buckets"][b] = f"WARNING: {msg}"
+                print(f"    ⚠ {b}: {msg}")
         except Exception as e:
             manifest["buckets"][b] = f"ERROR: {e}"
             print(f"  ✗ {b:<8} ERROR: {e}")
