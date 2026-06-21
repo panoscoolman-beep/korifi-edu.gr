@@ -2,7 +2,7 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Site is **LIVE in production** at [korifi-edu.gr](https://korifi-edu.gr) (Vercel hosting, custom domain, valid HTTPS). All major features shipped: bento-style content pages, hero carousel with seasonal slides, full admin CRUD with inline lessons + access codes, /martyries with weekly auto-sync from Drive, /epikoinonia with embedded Google Maps. SEO (per-content JSON-LD, sitemap, OG/Twitter), Vercel Analytics, security hardened. Κύριες εκκρεμότητες: Google Search Console verification (TXT record DNS), Google Business Profile setup, owner content updates.
+> **Where we are now (latest):** Site is **LIVE in production** at [korifi-edu.gr](https://korifi-edu.gr) (Vercel hosting, custom domain, valid HTTPS). All major features shipped: bento-style content pages, hero carousel with seasonal slides, full admin CRUD with inline lessons + access codes, /martyries with weekly auto-sync from Drive, /epikoinonia with embedded Google Maps, **νέα ενότητα `/ergaleia` (Διαδραστικά Εργαλεία)**. SEO (per-content JSON-LD, sitemap, OG/Twitter), Vercel Analytics, security hardened. Κύριες εκκρεμότητες: Google Search Console verification (TXT record DNS), Google Business Profile setup, owner content updates, περισσότερα εργαλεία στο `/ergaleia` (βλ. λίστα προτάσεων στο entry 2026-06-21).
 
 ---
 
@@ -35,9 +35,38 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 factorial, domain errors, special-angle signs)· `tsc --noEmit` + `eslint` καθαρά·
 `next dev` σερβίρει `/ergaleia` (200) + 4 εργαλεία (200) + sitemap.
 
-> Επόμενα πιθανά εργαλεία: υπολογισμός μορίων Πανελληνίων, μετατροπέας μονάδων,
-> flashcards/quiz χημείας. Πρόσθεσε αρχείο στο `public/ergaleia/` + εγγραφή στο
-> `src/lib/ergaleia.ts` και εμφανίζεται αυτόματα.
+**✅ SHIPPED:** PR [#1](https://github.com/panoscoolman-beep/korifi-edu.gr/pull/1)
+squash-merged στο `main`, Vercel production build PASS, **LIVE**. Επαληθεύτηκε
+end-to-end στο live: `korifi-edu.gr/ergaleia` 200 (4 κάρτες + JSON-LD), και τα 4
+εργαλεία 200, link «Εργαλεία» στο menu, `/ergaleia` στο sitemap.
+
+> **Σημείωση backup:** τα εργαλεία είναι καθαρά στατικά αρχεία (μηδέν δεδομένα σε
+> DB/Storage) → καλύπτονται 100% από το Git/GitHub· δεν χρειάζονται/δεν μπαίνουν
+> στα daily data-backups (DB + media). Code backup = GitHub.
+
+#### 📋 Προτάσεις για επόμενα εργαλεία (roadmap — TODO)
+
+Προτεραιότητα κατά αξία (SEO + παιδαγωγική) × ευκολία:
+- **🧪 Μοριακή μάζα / γραμμομόρια** — δίνεις τύπο (π.χ. `H2SO4`) → μοριακή μάζα·
+  επαναχρησιμοποιεί τα δεδομένα στοιχείων του περιοδικού πίνακα (φυσικό ζευγάρι, εύκολο).
+- **⚗️ Ισοστάθμιση χημικών εξισώσεων** — μεγάλη ζήτηση μαθητών.
+- **✖️ Λύτης δευτεροβάθμιας με βήματα** — διακρίνουσα + ρίζες + ανάλυση (SEO «λύση δευτεροβάθμιας»).
+- **🎯 Υπολογισμός Μορίων Πανελληνίων** — τεράστιο SEO· caveat: θέλει ετήσια ενημέρωση συντελεστών/πεδίων.
+- **📐 Μετατροπέας μονάδων** (μήκος/μάζα/θερμοκρασία/γωνίες) — εύκολο, ευρείας χρήσης.
+- **∑ Στατιστική** (μέσος/διάμεσος/τυπική απόκλιση), **🎲 συνδυαστική** (διατάξεις/συνδυασμοί) — Γ' Λυκείου.
+- **📐 Φύλλο τύπων Φυσικής** (αναζητήσιμο), **🌊 προσομοιώσεις κίνησης** (canvas).
+- **🃏 Flashcards/Quiz**, **⏱️ Pomodoro study timer** — engagement.
+
+Πρότυπο επέκτασης: 1 αρχείο στο `public/ergaleia/` + 1 εγγραφή στο
+`src/lib/ergaleia.ts` → εμφανίζεται αυτόματα σε hub + sitemap.
+
+---
+
+### ⏸️ Session paused 2026-06-21 — resume point
+
+Όλα committed + pushed + LIVE. Επόμενο: διάλεξε εργαλείο από τη λίστα προτάσεων
+παραπάνω. Πρότυπο ανάπτυξης ίδιο με τα 4 υπάρχοντα (self-contained HTML + εγγραφή
+στο `src/lib/ergaleia.ts`).
 
 ---
 
