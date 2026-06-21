@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta name="theme-color" content="#060d1b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Παράγωγος συνάρτησης βήμα-βήμα — κανόνες δύναμης, γινομένου, πηλίκου, αλυσίδας. Φροντιστήριο Κορυφή.">
+  <title>Παράγωγος Συνάρτησης — Φροντιστήριο Κορυφή</title>
+  <style>
+    :root{
+      --bg:#060d1b; --bg2:#0b1a30; --bg3:#0f2040;
+      --text:#c8d8e8; --dim:#2a5080; --border:#1a3050; --accent:#7ec8e3;
+      --bad:#ff6b6b; --ok:#69db7c;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    html,body{background:var(--bg);color:var(--text);font-family:'Courier New',Courier,monospace;min-height:100dvh;}
+    body{overscroll-behavior:none;}
+    ::-webkit-scrollbar{width:4px;height:4px;}
+    ::-webkit-scrollbar-track{background:var(--bg);}
+    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+    /* ── Toolbar (back to hub) ───────────── */
+    .toolbar{max-width:600px;margin:0 auto;padding:10px 12px 0;}
+    .back-link{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.12em;color:var(--dim);text-decoration:none;text-transform:uppercase;padding:6px 10px;border:1px solid var(--border);border-radius:20px;transition:color .15s,border-color .15s;}
+    .back-link:hover,.back-link:active{color:#7ec8e3;border-color:#7ec8e3;}
+
+    /* ── Layout ─────────────────────────── */
+    #app{max-width:600px;margin:0 auto;padding:4px 12px 48px;}
+
+    /* ── Header ─────────────────────────── */
+    .hdr{text-align:center;margin:8px 0 18px;}
+    .hdr-sub{font-size:8px;letter-spacing:.35em;color:var(--dim);margin-bottom:4px;}
+    .hdr-title{font-size:18px;font-weight:bold;letter-spacing:.10em;color:var(--accent);text-transform:uppercase;line-height:1.25;}
+    .hdr-hint{font-size:9px;color:var(--dim);margin-top:6px;letter-spacing:.08em;}
+
+    /* ── Input row ──────────────────────── */
+    .io{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 12px;margin-bottom:12px;}
+    .io-label{display:flex;align-items:baseline;gap:8px;font-size:15px;}
+    .io-label .fx{color:var(--accent);white-space:nowrap;}
+    .field{flex:1;min-width:0;display:flex;gap:6px;align-items:center;}
+    .field input{
+      flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);color:var(--text);
+      border-radius:6px;padding:10px 10px;font-family:inherit;font-size:16px;outline:none;letter-spacing:.02em;
+    }
+    .field input:focus{border-color:var(--accent);}
+    .field input.bad{border-color:var(--bad);}
+    .go{
+      background:var(--bg3);border:1px solid var(--accent);color:var(--accent);
+      border-radius:6px;padding:10px 14px;font-family:inherit;font-size:13px;cursor:pointer;
+      touch-action:manipulation;transition:background .15s;white-space:nowrap;
+    }
+    .go:hover{background:var(--border);}
+    .go:active{transform:scale(.97);}
+
+    /* ── Chips ──────────────────────────── */
+    .ctrl-title{font-size:9px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:14px 0 7px;}
+    .chips{display:flex;flex-wrap:wrap;gap:6px;}
+    .chip{
+      background:var(--bg2);border:1px solid var(--border);color:var(--accent);
+      border-radius:16px;padding:7px 12px;font-family:inherit;font-size:13px;cursor:pointer;
+      transition:background .15s,border-color .15s;touch-action:manipulation;letter-spacing:.02em;
+    }
+    .chip:hover{border-color:var(--accent);}
+    .chip:active{background:var(--bg3);transform:scale(.96);}
+
+    /* ── Error ──────────────────────────── */
+    .err{display:none;margin:14px 0 0;padding:12px 14px;border:1px solid var(--bad);border-radius:8px;
+      color:var(--bad);font-size:13px;line-height:1.5;text-align:center;}
+    .err.show{display:block;}
+
+    /* ── Result headline ────────────────── */
+    .result{display:none;}
+    .result.show{display:block;}
+    .res-block{text-align:center;margin:18px 0 4px;}
+    .res-block .lab{font-size:9px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-bottom:6px;}
+    .res-fx{font-size:16px;color:var(--text);word-break:break-word;line-height:1.5;}
+    .res-deriv{font-size:22px;font-weight:bold;color:var(--accent);word-break:break-word;line-height:1.5;margin-top:2px;}
+    .res-deriv sup,.res-fx sup{font-size:.62em;vertical-align:super;}
+
+    /* ── Steps ──────────────────────────── */
+    .sec-title{font-size:10px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase;margin:22px 0 10px;text-align:center;}
+    .steps{list-style:none;counter-reset:step;}
+    .step{
+      background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);
+      border-radius:8px;padding:11px 13px 11px 13px;margin-bottom:9px;position:relative;
+    }
+    .step-rule{font-size:13px;color:var(--accent);letter-spacing:.02em;margin-bottom:5px;line-height:1.45;}
+    .step-detail{font-size:13px;color:var(--text);line-height:1.55;word-break:break-word;}
+    .step-detail .op{color:var(--dim);}
+    .step-detail sup{font-size:.62em;vertical-align:super;}
+    .step-num{font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+
+    /* ── Verify panel ───────────────────── */
+    .verify{margin-top:18px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;}
+    .verify-title{font-size:9px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-bottom:8px;text-align:center;}
+    .verify-row{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:3px 0;}
+    .verify-row .k{color:var(--dim);}
+    .verify-row .v{color:var(--text);}
+    .verify-row .v.ok{color:var(--ok);}
+    .verify-row .v.no{color:var(--bad);}
+
+    /* ── Footer note ────────────────────── */
+    .note{margin-top:22px;font-size:9px;color:var(--dim);text-align:center;line-height:1.6;letter-spacing:.04em;}
+  </style>
+</head>
+<body>
+  <div class="toolbar"><a class="back-link" href="/ergaleia">← Εργαλεία</a></div>
+
+  <div id="app">
+    <div class="hdr">
+      <div class="hdr-sub">ΔΙΑΔΡΑΣΤΙΚΟ</div>
+      <h1 class="hdr-title">Παράγωγος Συνάρτησης</h1>
+      <div class="hdr-hint">Γράψε μια συνάρτηση f(x) και δες την παράγωγο βήμα-βήμα</div>
+    </div>
+
+    <div class="io">
+      <div class="io-label">
+        <span class="fx">f(x)&nbsp;=</span>
+        <span class="field">
+          <input id="expr" type="text" inputmode="text" autocomplete="off" autocapitalize="off"
+                 spellcheck="false" value="x^2*sin(x)" aria-label="Συνάρτηση f(x)">
+          <button class="go" id="go">Παράγωγος</button>
+        </span>
+      </div>
+    </div>
+
+    <div class="ctrl-title">Γρήγορα παραδείγματα</div>
+    <div class="chips" id="chips"></div>
+
+    <div class="err" id="err"></div>
+
+    <div class="result" id="result">
+      <div class="res-block">
+        <div class="lab">Συνάρτηση</div>
+        <div class="res-fx" id="outFx"></div>
+      </div>
+      <div class="res-block">
+        <div class="lab">Παράγωγος&nbsp;&nbsp;f &prime;(x)</div>
+        <div class="res-deriv" id="outDeriv"></div>
+      </div>
+
+      <div class="sec-title">Βήμα &mdash; βήμα</div>
+      <ol class="steps" id="steps"></ol>
+    </div>
+
+    <div class="note">
+      Υποστηρίζονται: + &minus; * / ^ , παρενθέσεις, σταθερές pi, e , και οι συναρτήσεις
+      sin cos tan ln log exp sqrt. Επιτρέπεται ο σιωπηρός πολλαπλασιασμός (π.χ. 2x, 3sin(x)).
+    </div>
+  </div>
+
+<script>
+/* ===========================================================================
+   Παράγωγος Συνάρτησης — symbolic differentiation
+   Pipeline:  tokenize → parse (AST) → differentiate (AST) → simplify (AST)
+   Rendering: astToString (text / html), evalAST (numeric)
+   Top-level testable functions:
+     evalExpr(expr, x)        → numeric value of the original expression
+     derivativeString(expr)   → simplified derivative as a string
+     evalDerivative(expr, x)  → numeric value of the computed derivative
+   NO eval() is used anywhere. A real tokenizer + recursive-descent parser.
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   AST node constructors
+   Node kinds:
+     {t:'num',  v:Number}
+     {t:'var'}                          (the single variable x)
+     {t:'const',name:'pi'|'e'}
+     {t:'bin',  op:'+'|'-'|'*'|'/'|'^', a:node, b:node}
+     {t:'neg',  a:node}                 (unary minus)
+     {t:'call', name:'sin'|..., a:node} (single-argument function)
+   --------------------------------------------------------------------------- */
+function num(v){ return {t:'num', v:v}; }
+function vx(){ return {t:'var'}; }
+function konst(name){ return {t:'const', name:name}; }
+function bin(op,a,b){ return {t:'bin', op:op, a:a, b:b}; }
+function neg(a){ return {t:'neg', a:a}; }
+function call(name,a){ return {t:'call', name:name, a:a}; }
+
+var FUNCS = {sin:1, cos:1, tan:1, ln:1, log:1, exp:1, sqrt:1};
+
+/* ===========================================================================
+   1. TOKENIZER
+   Produces a flat list of tokens. Recognises numbers, the variable x,
+   identifiers (functions / constants), operators and parentheses.
+   =========================================================================== */
+function tokenize(src){
+  var tokens = [];
+  var i = 0, n = src.length;
+  while(i < n){
+    var c = src[i];
+    if(c === ' ' || c === '\t' || c === '\n'){ i++; continue; }
+
+    /* number: digits with optional decimal part */
+    if(c >= '0' && c <= '9' || (c === '.' && src[i+1] >= '0' && src[i+1] <= '9')){
+      var start = i;
+      while(i < n && ((src[i] >= '0' && src[i] <= '9') || src[i] === '.')) i++;
+      var text = src.slice(start, i);
+      if((text.match(/\./g) || []).length > 1) throw new Error('Μη έγκυρος αριθμός: ' + text);
+      tokens.push({k:'num', v:parseFloat(text)});
+      continue;
+    }
+
+    /* identifier: letters → variable x, constant, or function name */
+    if(isAlpha(c)){
+      var s = i;
+      while(i < n && isAlphaNum(src[i])) i++;
+      var name = src.slice(s, i).toLowerCase();
+      if(name === 'x')               tokens.push({k:'var'});
+      else if(name === 'pi')         tokens.push({k:'const', name:'pi'});
+      else if(name === 'e')          tokens.push({k:'const', name:'e'});
+      else if(FUNCS[name])           tokens.push({k:'func', name:name});
+      else throw new Error('Άγνωστο σύμβολο: «' + name + '»');
+      continue;
+    }
+
+    /* operators and parentheses */
+    if('+-*/^()'.indexOf(c) !== -1){
+      tokens.push({k:'op', v:c});
+      i++;
+      continue;
+    }
+
+    throw new Error('Μη αναμενόμενος χαρακτήρας: «' + c + '»');
+  }
+  return tokens;
+}
+function isAlpha(c){ return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
+function isAlphaNum(c){ return isAlpha(c) || (c >= '0' && c <= '9'); }
+
+/* ===========================================================================
+   2. PARSER  (recursive descent → AST)
+   Grammar (handles precedence, right-assoc ^, unary minus, implicit *):
+     expr   := term  (('+' | '-') term)*
+     term   := factor (('*' | '/') factor | implicit-factor)*
+     factor := '-' factor | power
+     power  := atom ('^' factor)?            (right associative)
+     atom   := number | var | const | func '(' expr ')' | '(' expr ')'
+   Implicit multiplication: an atom directly followed by another atom-starting
+   token (e.g. 2x, 3sin(x), x(x+1), (x+1)(x-1)) is treated as a product.
+   =========================================================================== */
+function parse(src){
+  var toks = tokenize(src);
+  var pos = 0;
+
+  function peek(){ return toks[pos]; }
+  function next(){ return toks[pos++]; }
+  function eof(){ return pos >= toks.length; }
+
+  function isOp(v){ var t = peek(); return t && t.k === 'op' && t.v === v; }
+
+  /* an atom may *start* here → enables implicit multiplication detection */
+  function startsAtom(){
+    var t = peek();
+    if(!t) return false;
+    if(t.k === 'num' || t.k === 'var' || t.k === 'const' || t.k === 'func') return true;
+    if(t.k === 'op' && t.v === '(') return true;
+    return false;
+  }
+
+  function parseExpr(){
+    var node = parseTerm();
+    while(isOp('+') || isOp('-')){
+      var op = next().v;
+      var rhs = parseTerm();
+      node = bin(op, node, rhs);
+    }
+    return node;
+  }
+
+  function parseTerm(){
+    var node = parseFactor();
+    for(;;){
+      if(isOp('*') || isOp('/')){
+        var op = next().v;
+        node = bin(op, node, parseFactor());
+      } else if(startsAtom()){
+        /* implicit multiplication: 2x, 3sin(x), (x+1)(x-1) … */
+        node = bin('*', node, parseFactor());
+      } else {
+        break;
+      }
+    }
+    return node;
+  }
+
+  function parseFactor(){
+    if(isOp('-')){ next(); return neg(parseFactor()); }
+    if(isOp('+')){ next(); return parseFactor(); }
+    return parsePower();
+  }
+
+  function parsePower(){
+    var base = parseAtom();
+    if(isOp('^')){
+      next();
+      var exp = parseFactor();   /* right associative, allows -, e.g. x^-2 */
+      return bin('^', base, exp);
+    }
+    return base;
+  }
+
+  function parseAtom(){
+    var t = peek();
+    if(!t) throw new Error('Απρόσμενο τέλος της παράστασης.');
+
+    if(t.k === 'num'){ next(); return num(t.v); }
+    if(t.k === 'var'){ next(); return vx(); }
+    if(t.k === 'const'){ next(); return konst(t.name); }
+
+    if(t.k === 'func'){
+      next();
+      if(!isOp('(')) throw new Error('Περίμενα «(» μετά τη συνάρτηση ' + t.name + '.');
+      next(); /* ( */
+      var arg = parseExpr();
+      if(!isOp(')')) throw new Error('Λείπει το «)».');
+      next(); /* ) */
+      return call(t.name, arg);
+    }
+
+    if(isOp('(')){
+      next();
+      var inner = parseExpr();
+      if(!isOp(')')) throw new Error('Λείπει το «)».');
+      next();
+      return inner;
+    }
+
+    throw new Error('Μη αναμενόμενο σύμβολο στην παράσταση.');
+  }
+
+  var ast = parseExpr();
+  if(!eof()) throw new Error('Περίσσιο σύμβολο στην παράσταση.');
+  return ast;
+}
+
+/* ===========================================================================
+   3. NUMERIC EVALUATION of an AST  (used for self-tests + verification)
+   =========================================================================== */
+function evalAST(node, x){
+  switch(node.t){
+    case 'num':   return node.v;
+    case 'var':   return x;
+    case 'const': return node.name === 'pi' ? Math.PI : Math.E;
+    case 'neg':   return -evalAST(node.a, x);
+    case 'bin': {
+      var a = evalAST(node.a, x), b = evalAST(node.b, x);
+      switch(node.op){
+        case '+': return a + b;
+        case '-': return a - b;
+        case '*': return a * b;
+        case '/': return a / b;
+        case '^': return Math.pow(a, b);
+      }
+      break;
+    }
+    case 'call': {
+      var v = evalAST(node.a, x);
+      switch(node.name){
+        case 'sin':  return Math.sin(v);
+        case 'cos':  return Math.cos(v);
+        case 'tan':  return Math.tan(v);
+        case 'ln':   return Math.log(v);
+        case 'log':  return Math.log(v) / Math.LN10;  /* base-10 log */
+        case 'exp':  return Math.exp(v);
+        case 'sqrt': return Math.sqrt(v);
+      }
+      break;
+    }
+  }
+  throw new Error('Άγνωστος κόμβος κατά την αποτίμηση.');
+}
+
+/* ===========================================================================
+   4. DIFFERENTIATION on the AST
+   Each major node records a Greek "step" describing the rule applied.
+   `steps` is an array we push {rule, node} entries into (most-significant
+   rule per major node), assembled afterwards into a readable list.
+   =========================================================================== */
+function differentiate(node, steps){
+  switch(node.t){
+
+    /* d/dx (constant) = 0 */
+    case 'num':
+    case 'const':
+      pushStep(steps, 'Κανόνας σταθεράς: (c)′ = 0', node);
+      return num(0);
+
+    /* d/dx (x) = 1 */
+    case 'var':
+      return num(1);
+
+    /* d/dx (-u) = -(u') */
+    case 'neg':
+      return neg(differentiate(node.a, steps));
+
+    case 'bin':
+      return diffBin(node, steps);
+
+    case 'call':
+      return diffCall(node, steps);
+  }
+  throw new Error('Δεν μπορώ να παραγωγίσω αυτόν τον κόμβο.');
+}
+
+function diffBin(node, steps){
+  var a = node.a, b = node.b;
+  switch(node.op){
+
+    /* Sum / difference: (u ± v)' = u' ± v' */
+    case '+':
+    case '-':
+      pushStep(steps,
+        'Κανόνας αθροίσματος/διαφοράς: (u ' + node.op + ' v)′ = u′ ' + node.op + ' v′',
+        node);
+      return bin(node.op, differentiate(a, steps), differentiate(b, steps));
+
+    /* Product: (u·v)' = u'v + uv'  — unless one side is constant */
+    case '*': {
+      if(isConstNode(a)) return bin('*', a, differentiate(b, steps));
+      if(isConstNode(b)) return bin('*', differentiate(a, steps), b);
+      pushStep(steps, 'Κανόνας γινομένου: (u·v)′ = u′·v + u·v′', node);
+      var da = differentiate(a, steps);
+      var db = differentiate(b, steps);
+      return bin('+', bin('*', da, b), bin('*', a, db));
+    }
+
+    /* Quotient: (u/v)' = (u'v - uv') / v^2 */
+    case '/': {
+      /* u / constant  →  (1/c)·u'  (still the quotient idea, kept simple) */
+      if(isConstNode(b)){
+        return bin('/', differentiate(a, steps), b);
+      }
+      pushStep(steps, 'Κανόνας πηλίκου: (u/v)′ = (u′·v − u·v′) / v²', node);
+      var du = differentiate(a, steps);
+      var dv = differentiate(b, steps);
+      return bin('/',
+        bin('-', bin('*', du, b), bin('*', a, dv)),
+        bin('^', b, num(2)));
+    }
+
+    /* Power: several cases */
+    case '^':
+      return diffPow(node, steps);
+  }
+  throw new Error('Άγνωστος τελεστής στην παραγώγιση.');
+}
+
+function diffPow(node, steps){
+  var base = node.a, exp = node.b;
+
+  /* Case A: variable base, constant exponent → power rule (+ chain) */
+  if(isConstNode(exp)){
+    var nVal = exp;                              /* exponent stays symbolic */
+    /* Power rule on x:  (x^n)' = n·x^(n-1) */
+    if(base.t === 'var'){
+      pushStep(steps, 'Κανόνας δύναμης: (xⁿ)′ = n·xⁿ⁻¹', node);
+      return bin('*', clone(nVal), bin('^', vx(), bin('-', clone(nVal), num(1))));
+    }
+    /* General base u(x): chain rule  (uⁿ)′ = n·uⁿ⁻¹·u′ */
+    pushStep(steps, 'Κανόνας δύναμης + αλυσίδας: (uⁿ)′ = n·uⁿ⁻¹·u′', node);
+    var du = differentiate(base, steps);
+    return bin('*',
+      bin('*', clone(nVal), bin('^', clone(base), bin('-', clone(nVal), num(1)))),
+      du);
+  }
+
+  /* Case B: constant base, variable exponent → a^u : (a^u)' = a^u·ln(a)·u' */
+  if(isConstNode(base)){
+    /* e^u special-cases ln(e)=1 */
+    if(isEulerNode(base)){
+      pushStep(steps, 'Εκθετική με βάση e: (e^u)′ = e^u·u′ (κανόνας αλυσίδας)', node);
+      var due = differentiate(exp, steps);
+      return bin('*', bin('^', konst('e'), clone(exp)), due);
+    }
+    pushStep(steps, 'Εκθετική: (aˣ)′ = aˣ·ln(a)·u′ (κανόνας αλυσίδας)', node);
+    var dux = differentiate(exp, steps);
+    return bin('*',
+      bin('*', bin('^', clone(base), clone(exp)), call('ln', clone(base))),
+      dux);
+  }
+
+  /* Case C: both depend on x (u^v) → logarithmic differentiation.
+     (u^v)' = u^v · ( v'·ln(u) + v·u'/u )  */
+  pushStep(steps, 'Λογαριθμική παραγώγιση: (u^v)′ = u^v·(v′·ln u + v·u′/u)', node);
+  var duC = differentiate(base, steps);
+  var dvC = differentiate(exp, steps);
+  return bin('*',
+    bin('^', clone(base), clone(exp)),
+    bin('+',
+      bin('*', dvC, call('ln', clone(base))),
+      bin('/', bin('*', clone(exp), duC), clone(base))));
+}
+
+function diffCall(node, steps){
+  var u = node.a;
+  var du = function(){ return differentiate(u, steps); };
+  var inner;                       /* the elementary derivative of f, w.r.t its argument */
+  var ruleText;
+
+  switch(node.name){
+    case 'sin':  ruleText = 'Παράγωγος ημιτόνου: (sin u)′ = cos u · u′';        inner = call('cos', clone(u)); break;
+    case 'cos':  ruleText = 'Παράγωγος συνημιτόνου: (cos u)′ = −sin u · u′';     inner = neg(call('sin', clone(u))); break;
+    case 'tan':  ruleText = 'Παράγωγος εφαπτομένης: (tan u)′ = u′ / cos²u';      inner = bin('/', num(1), bin('^', call('cos', clone(u)), num(2))); break;
+    case 'ln':   ruleText = 'Παράγωγος λογαρίθμου: (ln u)′ = u′ / u';            inner = bin('/', num(1), clone(u)); break;
+    case 'log':  ruleText = 'Δεκαδικός λογάριθμος: (log u)′ = u′ / (u·ln10)';    inner = bin('/', num(1), bin('*', clone(u), num(Math.LN10))); break;
+    case 'exp':  ruleText = 'Εκθετική: (exp u)′ = exp u · u′';                   inner = call('exp', clone(u)); break;
+    case 'sqrt': ruleText = 'Τετραγωνική ρίζα: (√u)′ = u′ / (2·√u)';             inner = bin('/', num(1), bin('*', num(2), call('sqrt', clone(u)))); break;
+    default: throw new Error('Άγνωστη συνάρτηση: ' + node.name);
+  }
+
+  /* The chain rule is what couples the elementary derivative with u'. */
+  if(!(u.t === 'var')){
+    pushStep(steps, 'Κανόνας αλυσίδας: f(u)′ = f′(u)·u′', node);
+  }
+  pushStep(steps, ruleText, node);
+
+  return bin('*', inner, du());
+}
+
+/* push a step (rule text + the source node it applies to) */
+function pushStep(steps, rule, node){
+  if(steps) steps.push({rule:rule, node:node});
+}
+
+/* ===========================================================================
+   5. SIMPLIFICATION on the AST
+   Conservative, structural simplification: enough to make answers clean.
+   Handles: ·1, ·0, +0, −0, ^1, ^0, constant folding, x^1→x, double neg,
+   collapsing literal numeric subtrees.
+   Iterates to a fixed point.
+   =========================================================================== */
+function simplify(node){
+  var prev;
+  var cur = node;
+  /* iterate until stable (bounded to avoid pathological loops) */
+  for(var guard = 0; guard < 60; guard++){
+    prev = astToString(cur);
+    cur = simplifyOnce(cur);
+    if(astToString(cur) === prev) break;
+  }
+  return cur;
+}
+
+function simplifyOnce(node){
+  if(node.t === 'num' || node.t === 'var' || node.t === 'const') return node;
+
+  if(node.t === 'neg'){
+    var a = simplifyOnce(node.a);
+    if(a.t === 'num') return num(-a.v);          /* fold -(literal) */
+    if(a.t === 'neg') return a.a;                /* --u = u */
+    return neg(a);
+  }
+
+  if(node.t === 'call'){
+    var arg = simplifyOnce(node.a);
+    /* fold a fully numeric function call into a literal */
+    if(arg.t === 'num' && isFinite(arg.v)){
+      var folded = tryEvalCall(node.name, arg.v);
+      if(folded !== null && isFinite(folded)) return num(roundClean(folded));
+    }
+    return call(node.name, arg);
+  }
+
+  /* binary */
+  var a2 = simplifyOnce(node.a);
+  var b2 = simplifyOnce(node.b);
+  var op = node.op;
+
+  /* constant folding for + - * / ^ */
+  if(a2.t === 'num' && b2.t === 'num'){
+    var r;
+    switch(op){
+      case '+': r = a2.v + b2.v; break;
+      case '-': r = a2.v - b2.v; break;
+      case '*': r = a2.v * b2.v; break;
+      case '/': if(b2.v !== 0) { r = a2.v / b2.v; } else { return bin(op, a2, b2); } break;
+      case '^': r = Math.pow(a2.v, b2.v); break;
+    }
+    if(r !== undefined && isFinite(r)) return num(roundClean(r));
+  }
+
+  switch(op){
+    case '+':
+      if(isZero(a2)) return b2;                  /* 0 + u = u */
+      if(isZero(b2)) return a2;                  /* u + 0 = u */
+      /* u + (-v)  →  u - v */
+      if(b2.t === 'neg') return simplifyOnce(bin('-', a2, b2.a));
+      break;
+
+    case '-':
+      if(isZero(b2)) return a2;                  /* u - 0 = u */
+      if(isZero(a2)) return simplifyOnce(neg(b2)); /* 0 - u = -u */
+      if(b2.t === 'neg') return simplifyOnce(bin('+', a2, b2.a)); /* u-(-v)=u+v */
+      break;
+
+    case '*':
+      if(isZero(a2) || isZero(b2)) return num(0);/* 0·u = 0 */
+      if(isOne(a2)) return b2;                   /* 1·u = u */
+      if(isOne(b2)) return a2;                   /* u·1 = u */
+      if(isNegOne(a2)) return simplifyOnce(neg(b2)); /* -1·u = -u */
+      if(isNegOne(b2)) return simplifyOnce(neg(a2));
+      /* combine numeric coefficients across a product chain:
+         (n·u)·m → (n·m)·u , and n·(m·u) → (n·m)·u → cleaner factors */
+      if(a2.t === 'num' && b2.t === 'bin' && b2.op === '*' && b2.a.t === 'num')
+        return simplifyOnce(bin('*', num(a2.v * b2.a.v), b2.b));
+      if(b2.t === 'num' && a2.t === 'bin' && a2.op === '*' && a2.a.t === 'num')
+        return simplifyOnce(bin('*', num(b2.v * a2.a.v), a2.b));
+      /* (n·A)·(m·B) → (n·m)·(A·B): merges coefficients from two chains */
+      if(a2.t === 'bin' && a2.op === '*' && a2.a.t === 'num' &&
+         b2.t === 'bin' && b2.op === '*' && b2.a.t === 'num')
+        return simplifyOnce(bin('*', num(a2.a.v * b2.a.v), bin('*', a2.b, b2.b)));
+      /* A·(m·B) → m·(A·B) and (n·A)·B → n·(A·B): surface coefficient to front */
+      if(b2.t === 'bin' && b2.op === '*' && b2.a.t === 'num' && a2.t !== 'num')
+        return simplifyOnce(bin('*', b2.a, bin('*', a2, b2.b)));
+      /* pull a numeric factor to the front: u·3 → 3·u (nicer reading) */
+      if(b2.t === 'num' && a2.t !== 'num') return bin('*', b2, a2);
+      break;
+
+    case '/':
+      if(isZero(a2)) return num(0);              /* 0/u = 0 */
+      if(isOne(b2)) return a2;                   /* u/1 = u */
+      break;
+
+    case '^':
+      if(isOne(b2)) return a2;                   /* u^1 = u */
+      if(isZero(b2)) return num(1);              /* u^0 = 1 */
+      if(isOne(a2)) return num(1);               /* 1^u = 1 */
+      break;
+  }
+
+  return bin(op, a2, b2);
+}
+
+/* ----- simplification helpers ----- */
+function isZero(n){ return n.t === 'num' && n.v === 0; }
+function isOne(n){ return n.t === 'num' && n.v === 1; }
+function isNegOne(n){ return n.t === 'num' && n.v === -1; }
+function isConstNode(n){
+  /* true if the subtree does not depend on x */
+  switch(n.t){
+    case 'num': case 'const': return true;
+    case 'var': return false;
+    case 'neg': return isConstNode(n.a);
+    case 'call': return isConstNode(n.a);
+    case 'bin': return isConstNode(n.a) && isConstNode(n.b);
+  }
+  return false;
+}
+function isEulerNode(n){ return n.t === 'const' && n.name === 'e'; }
+function tryEvalCall(name, v){
+  try { return evalAST(call(name, num(v)), 0); }
+  catch(e){ return null; }
+}
+/* round away float noise but keep genuine decimals */
+function roundClean(x){
+  var r = Math.round(x);
+  if(Math.abs(x - r) < 1e-10) return r;
+  return Math.round(x * 1e10) / 1e10;
+}
+function clone(n){ return JSON.parse(JSON.stringify(n)); }
+
+/* ===========================================================================
+   6. AST → STRING   (plain text, and HTML with superscripts)
+   Precedence-aware parenthesisation so output is correct & readable.
+   =========================================================================== */
+var PREC = {'+':1, '-':1, '*':2, '/':2, '^':3};
+
+function astToString(node){ return render(node, false); }
+function astToHTML(node){ return render(node, true); }
+
+function render(node, html){
+  switch(node.t){
+    case 'num':   return fmtNum(node.v);
+    case 'var':   return 'x';
+    case 'const': return node.name === 'pi' ? (html ? 'π' : 'pi') : 'e';
+    case 'neg':   return '-' + wrap(node.a, 3, html, true);
+    case 'call':  return node.name + '(' + render(node.a, html) + ')';
+    case 'bin':   return renderBin(node, html);
+  }
+  return '?';
+}
+
+function renderBin(node, html){
+  var op = node.op;
+  var p  = PREC[op];
+
+  if(op === '^'){
+    var base = wrap(node.a, p + 1, html, false);  /* base binds tighter */
+    if(html){
+      return base + '<sup>' + render(node.b, true) + '</sup>';
+    }
+    var expS = wrap(node.b, p, html, false);
+    return base + '^' + expS;
+  }
+
+  var left  = wrap(node.a, p, html, false);
+  var right = wrap(node.b, p + (op === '-' || op === '/' ? 1 : 0), html, true);
+  var sym = op === '*' ? (html ? '·' : '*') : op;
+  if(op === '+' || op === '-') sym = ' ' + op + ' ';
+  return left + sym + right;
+}
+
+/* wrap child in parens if its precedence is lower than the context */
+function wrap(child, ctxPrec, html, isRight){
+  var s = render(child, html);
+  var needs = false;
+  if(child.t === 'bin'){
+    var cp = PREC[child.op];
+    if(cp < ctxPrec) needs = true;
+    else if(cp === ctxPrec && isRight && (child.op === '-' || child.op === '/')) needs = true;
+  } else if(child.t === 'neg' && ctxPrec >= 2){
+    needs = true;
+  }
+  return needs ? '(' + s + ')' : s;
+}
+
+function fmtNum(v){
+  if(v === Math.PI) return 'π';
+  if(!isFinite(v)) return String(v);
+  /* tidy floats */
+  var r = Math.round(v);
+  if(Math.abs(v - r) < 1e-10) return String(r);
+  return String(Math.round(v * 1e6) / 1e6);
+}
+
+/* ===========================================================================
+   7. PUBLIC / TESTABLE TOP-LEVEL FUNCTIONS
+   =========================================================================== */
+
+/* numeric value of the ORIGINAL expression at x */
+function evalExpr(expr, x){
+  var ast = parse(expr);
+  return evalAST(ast, x);
+}
+
+/* the simplified derivative of expr, as a string */
+function derivativeString(expr){
+  var ast = parse(expr);
+  var d   = differentiate(ast, []);
+  return astToString(simplify(d));
+}
+
+/* numeric value of the COMPUTED (simplified) derivative at x */
+function evalDerivative(expr, x){
+  var ast = parse(expr);
+  var d   = simplify(differentiate(ast, []));
+  return evalAST(d, x);
+}
+
+/* full result bundle for the UI (parsed AST + steps + simplified derivative) */
+function computeAll(expr){
+  var ast   = parse(expr);
+  var steps = [];
+  var raw   = differentiate(ast, steps);
+  var simp  = simplify(raw);
+  return { ast:ast, steps:steps, derivative:simp };
+}
+
+/* ===========================================================================
+   8. STEP LIST BUILDER (for display)
+   Turns the collected {rule,node} entries into ordered, de-duplicated,
+   human-readable steps showing the rule applied to a concrete sub-expression.
+   =========================================================================== */
+function buildStepList(entries){
+  var out = [];
+  var seen = {};
+  for(var i = 0; i < entries.length; i++){
+    var e = entries[i];
+    var sub = astToHTML(e.node);
+    var key = e.rule + '@@' + astToString(e.node);
+    if(seen[key]) continue;       /* avoid repeating the identical rule on identical sub-expr */
+    seen[key] = true;
+    out.push({ rule:e.rule, detail:'στο: ' + sub });
+  }
+  return out;
+}
+
+/* ===========================================================================
+   9. UI WIRING
+   =========================================================================== */
+var EXAMPLES = ['x^3', 'x^2*sin(x)', '1/x', 'sqrt(x)', 'ln(x)',
+                'e^(2x)', '(x^2+1)^3', 'sin(x)/x', 'tan(x)'];
+
+function initUI(){
+  var input = document.getElementById('expr');
+  var goBtn = document.getElementById('go');
+
+  /* render example chips */
+  var chips = document.getElementById('chips');
+  EXAMPLES.forEach(function(ex){
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.type = 'button';
+    b.textContent = ex;
+    b.addEventListener('click', function(){
+      input.value = ex;
+      runDerivative();
+      input.blur();
+    });
+    chips.appendChild(b);
+  });
+
+  goBtn.addEventListener('click', runDerivative);
+  input.addEventListener('keydown', function(ev){
+    if(ev.key === 'Enter'){ ev.preventDefault(); runDerivative(); }
+  });
+
+  runDerivative();   /* show the prefilled example on load */
+}
+
+function showError(msg){
+  var err = document.getElementById('err');
+  err.textContent = '⚠ ' + msg;
+  err.classList.add('show');
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('expr').classList.add('bad');
+}
+function clearError(){
+  document.getElementById('err').classList.remove('show');
+  document.getElementById('expr').classList.remove('bad');
+}
+
+function runDerivative(){
+  var expr = document.getElementById('expr').value.trim();
+  if(!expr){ showError('Γράψε μια συνάρτηση f(x).'); return; }
+
+  var data;
+  try {
+    data = computeAll(expr);
+  } catch(e){
+    showError('Δεν κατάλαβα τη συνάρτηση. ' + (e && e.message ? e.message : ''));
+    return;
+  }
+
+  clearError();
+
+  /* headline */
+  document.getElementById('outFx').innerHTML    = astToHTML(data.ast);
+  document.getElementById('outDeriv').innerHTML = astToHTML(data.derivative);
+
+  /* steps */
+  var stepsEl = document.getElementById('steps');
+  stepsEl.innerHTML = '';
+  var list = buildStepList(data.steps);
+
+  if(list.length === 0){
+    /* e.g. derivative of a constant — still show one explanatory step */
+    var li0 = document.createElement('li');
+    li0.className = 'step';
+    li0.innerHTML = '<div class="step-num">Βήμα 1</div>' +
+                    '<div class="step-rule">Άμεση παραγώγιση</div>' +
+                    '<div class="step-detail">f &prime;(x) = ' + astToHTML(data.derivative) + '</div>';
+    stepsEl.appendChild(li0);
+  } else {
+    list.forEach(function(s, idx){
+      var li = document.createElement('li');
+      li.className = 'step';
+      li.innerHTML =
+        '<div class="step-num">Βήμα ' + (idx + 1) + '</div>' +
+        '<div class="step-rule">' + s.rule + '</div>' +
+        '<div class="step-detail"><span class="op">' + s.detail + '</span></div>';
+      stepsEl.appendChild(li);
+    });
+    /* closing step with the final simplified result */
+    var liF = document.createElement('li');
+    liF.className = 'step';
+    liF.innerHTML =
+      '<div class="step-num">Αποτέλεσμα</div>' +
+      '<div class="step-rule">Απλοποίηση &amp; τελική παράγωγος</div>' +
+      '<div class="step-detail">f &prime;(x) = ' + astToHTML(data.derivative) + '</div>';
+    stepsEl.appendChild(liF);
+  }
+
+  document.getElementById('result').classList.add('show');
+}
+
+/* ===========================================================================
+   10. SELF-TEST  (numerical verification against finite differences)
+   Runs once on load; logs to console. Does not touch the UI.
+   =========================================================================== */
+function selfTest(){
+  var cases = [
+    {e:'x^3',        x:2, want:12},
+    {e:'sin(x)',     x:1, want:Math.cos(1)},
+    {e:'x^2*sin(x)', x:1, want:2*Math.sin(1)+Math.cos(1)},
+    {e:'1/x',        x:2, want:-0.25},
+    {e:'ln(x)',      x:3, want:1/3},
+    {e:'e^(2x)',     x:0, want:2},
+    {e:'(x^2+1)^3',  x:1, want:24},
+    {e:'sqrt(x)',    x:4, want:0.25}
+  ];
+  var h = 1e-5, allPass = true, rows = [];
+  cases.forEach(function(c){
+    var ana = evalDerivative(c.e, c.x);
+    var fd  = (evalExpr(c.e, c.x + h) - evalExpr(c.e, c.x - h)) / (2 * h);
+    var diff = Math.abs(ana - fd);
+    var pass = diff < 1e-3;
+    if(!pass) allPass = false;
+    rows.push({e:c.e, ds:derivativeString(c.e), ana:ana.toFixed(5),
+               fd:fd.toFixed(5), diff:diff.toExponential(2), pass:pass});
+  });
+  if(window.console){
+    console.log('%cΠαράγωγος — self-test ' + (allPass ? 'PASS ✓' : 'FAIL ✗'),
+                'color:' + (allPass ? '#69db7c' : '#ff6b6b'));
+    console.table(rows);
+  }
+  return {pass:allPass, rows:rows};
+}
+
+/* boot */
+if(typeof document !== 'undefined' && document.getElementById('expr')){
+  initUI();
+  selfTest();
+}
+
+/* export for Node-based testing (no effect in the browser) */
+if(typeof module !== 'undefined' && module.exports){
+  module.exports = {
+    evalExpr:evalExpr, derivativeString:derivativeString, evalDerivative:evalDerivative,
+    parse:parse, simplify:simplify, differentiate:differentiate, astToString:astToString,
+    evalAST:evalAST, tokenize:tokenize, computeAll:computeAll, selfTest:selfTest
+  };
+}
+</script>
+</body>
+</html>

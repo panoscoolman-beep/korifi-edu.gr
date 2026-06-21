@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<meta name="theme-color" content="#060d1b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Διαδραστικές προσομοιώσεις κίνησης — πλάγια βολή και απλή αρμονική ταλάντωση. Φροντιστήριο Κορυφή.">
+<title>Προσομοιώσεις Κίνησης — Φροντιστήριο Κορυφή</title>
+<style>
+:root{ --bg:#060d1b; --bg2:#0b1a30; --bg3:#0f2040; --text:#c8d8e8; --dim:#2a5080; --border:#1a3050; --accent:#7ec8e3; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--text);font-family:'Courier New',Courier,monospace;min-height:100dvh;}
+
+/* ---- back-link bar ---- */
+.toolbar{padding:10px 12px 0;}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.12em;color:var(--dim);text-decoration:none;text-transform:uppercase;padding:6px 10px;border:1px solid var(--border);border-radius:20px;transition:color .15s,border-color .15s;}
+.back-link:hover,.back-link:active{color:#7ec8e3;border-color:#7ec8e3;}
+
+/* ---- header ---- */
+header{text-align:center;padding:18px 14px 6px;}
+.eyebrow{font-size:10px;letter-spacing:.32em;color:var(--dim);text-transform:uppercase;}
+h1{font-size:clamp(20px,5.5vw,30px);color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-top:6px;font-weight:bold;}
+
+/* ---- layout ---- */
+main{max-width:880px;margin:0 auto;padding:14px 12px 48px;}
+
+/* ---- tabs ---- */
+.tabs{display:flex;gap:8px;margin:8px 0 16px;}
+.tab{flex:1;padding:12px 8px;font-family:inherit;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);background:var(--bg2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:color .15s,border-color .15s,background .15s;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-color:var(--accent);background:var(--bg3);}
+
+/* ---- panels ---- */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ---- canvas ---- */
+.canvas-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:8px;margin-bottom:14px;}
+canvas{display:block;width:100%;border-radius:8px;touch-action:none;}
+
+/* ---- controls ---- */
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.btn{flex:1;min-width:110px;padding:13px 10px;font-family:inherit;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--bg3);border:1px solid var(--accent);border-radius:10px;cursor:pointer;transition:background .15s,color .15s;}
+.btn:hover,.btn:active{background:var(--accent);color:var(--bg);}
+.btn.secondary{color:var(--dim);border-color:var(--border);background:var(--bg2);}
+.btn.secondary:hover,.btn.secondary:active{color:var(--text);border-color:var(--text);background:var(--bg3);}
+
+/* ---- input groups ---- */
+.inputs{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:18px;}
+@media(min-width:560px){.inputs{grid-template-columns:1fr 1fr;}}
+.field{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.field label{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;letter-spacing:.04em;color:var(--text);margin-bottom:10px;gap:8px;}
+.field .val{color:var(--accent);font-size:13px;}
+.field .row{display:flex;align-items:center;gap:12px;}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:6px;border-radius:4px;background:var(--bg3);outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;border:none;}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;border:none;}
+input[type=number]{width:78px;padding:8px;font-family:inherit;font-size:13px;color:var(--text);background:var(--bg3);border:1px solid var(--border);border-radius:8px;text-align:right;}
+input[type=number]:focus{outline:none;border-color:var(--accent);}
+
+/* ---- readouts ---- */
+.readouts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+@media(min-width:560px){.readouts{grid-template-columns:repeat(3,1fr);}}
+.readout{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+.readout .k{font-size:10px;letter-spacing:.08em;color:var(--dim);text-transform:uppercase;}
+.readout .v{font-size:16px;color:var(--accent);margin-top:4px;}
+
+/* ---- summary ---- */
+.summary{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.summary h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;}
+.summary .line{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border);font-size:13px;gap:10px;}
+.summary .line:last-child{border-bottom:none;}
+.summary .line b{color:var(--accent);font-weight:normal;}
+.summary .verify{margin-top:12px;font-size:11px;color:var(--dim);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;}
+.summary .verify .ok{color:var(--accent);}
+.summary .verify .bad{color:#e37e7e;}
+</style>
+</head>
+<body>
+<div class="toolbar"><a class="back-link" href="/ergaleia">← Εργαλεία</a></div>
+
+<header>
+  <div class="eyebrow">ΔΙΑΔΡΑΣΤΙΚΟ</div>
+  <h1>Προσομοιώσεις Κίνησης</h1>
+</header>
+
+<main>
+  <!-- Tabs -->
+  <div class="tabs" role="tablist">
+    <button class="tab active" id="tab-proj" role="tab">Πλάγια Βολή</button>
+    <button class="tab" id="tab-shm" role="tab">Απλή Αρμονική Ταλάντωση</button>
+  </div>
+
+  <!-- ===================== PROJECTILE PANEL ===================== -->
+  <section class="panel active" id="panel-proj">
+    <div class="canvas-wrap"><canvas id="canvas-proj"></canvas></div>
+
+    <div class="controls">
+      <button class="btn" id="play-proj">▶ Έναρξη</button>
+      <button class="btn secondary" id="reset-proj">↺ Επαναφορά</button>
+    </div>
+
+    <div class="inputs">
+      <div class="field">
+        <label>Αρχική ταχύτητα u₀ <span class="val" id="lbl-u0">20 m/s</span></label>
+        <div class="row">
+          <input type="range" id="rng-u0" min="1" max="60" step="0.5" value="20">
+          <input type="number" id="num-u0" min="1" max="60" step="0.5" value="20">
+        </div>
+      </div>
+      <div class="field">
+        <label>Γωνία θ <span class="val" id="lbl-ang">45°</span></label>
+        <div class="row">
+          <input type="range" id="rng-ang" min="0" max="90" step="1" value="45">
+          <input type="number" id="num-ang" min="0" max="90" step="1" value="45">
+        </div>
+      </div>
+      <div class="field">
+        <label>Επιτάχυνση g <span class="val" id="lbl-g">9.8 m/s²</span></label>
+        <div class="row">
+          <input type="range" id="rng-g" min="1" max="25" step="0.1" value="9.8">
+          <input type="number" id="num-g" min="1" max="25" step="0.1" value="9.8">
+        </div>
+      </div>
+      <div class="field">
+        <label>Αρχικό ύψος h₀ <span class="val" id="lbl-h0">0 m</span></label>
+        <div class="row">
+          <input type="range" id="rng-h0" min="0" max="50" step="0.5" value="0">
+          <input type="number" id="num-h0" min="0" max="50" step="0.5" value="0">
+        </div>
+      </div>
+      <div class="field">
+        <label>Ταχύτητα προσομοίωσης <span class="val" id="lbl-spd-p">1.0×</span></label>
+        <div class="row">
+          <input type="range" id="rng-spd-p" min="0.1" max="3" step="0.1" value="1">
+        </div>
+      </div>
+    </div>
+
+    <div class="readouts">
+      <div class="readout"><div class="k">Χρόνος t</div><div class="v" id="ro-t">0.00 s</div></div>
+      <div class="readout"><div class="k">Θέση x</div><div class="v" id="ro-x">0.00 m</div></div>
+      <div class="readout"><div class="k">Θέση y</div><div class="v" id="ro-y">0.00 m</div></div>
+      <div class="readout"><div class="k">uₓ</div><div class="v" id="ro-vx">0.00 m/s</div></div>
+      <div class="readout"><div class="k">u_y</div><div class="v" id="ro-vy">0.00 m/s</div></div>
+      <div class="readout"><div class="k">|u|</div><div class="v" id="ro-v">0.00 m/s</div></div>
+    </div>
+
+    <div class="summary">
+      <h3>Υπολογισμοί</h3>
+      <div class="line"><span>Βεληνεκές (range)</span><b id="sum-range">—</b></div>
+      <div class="line"><span>Μέγιστο ύψος</span><b id="sum-h">—</b></div>
+      <div class="line"><span>Χρόνος πτήσης</span><b id="sum-tof">—</b></div>
+      <div class="verify" id="verify-proj"></div>
+    </div>
+  </section>
+
+  <!-- ===================== SHM PANEL ===================== -->
+  <section class="panel" id="panel-shm">
+    <div class="canvas-wrap"><canvas id="canvas-shm"></canvas></div>
+
+    <div class="controls">
+      <button class="btn" id="play-shm">▶ Έναρξη</button>
+      <button class="btn secondary" id="reset-shm">↺ Επαναφορά</button>
+    </div>
+
+    <div class="inputs">
+      <div class="field">
+        <label>Πλάτος A <span class="val" id="lbl-A">2 m</span></label>
+        <div class="row">
+          <input type="range" id="rng-A" min="0.2" max="5" step="0.1" value="2">
+          <input type="number" id="num-A" min="0.2" max="5" step="0.1" value="2">
+        </div>
+      </div>
+      <div class="field">
+        <label>Περίοδος T <span class="val" id="lbl-T">4 s</span></label>
+        <div class="row">
+          <input type="range" id="rng-T" min="0.5" max="10" step="0.1" value="4">
+          <input type="number" id="num-T" min="0.5" max="10" step="0.1" value="4">
+        </div>
+      </div>
+      <div class="field">
+        <label>Ταχύτητα προσομοίωσης <span class="val" id="lbl-spd-s">1.0×</span></label>
+        <div class="row">
+          <input type="range" id="rng-spd-s" min="0.1" max="3" step="0.1" value="1">
+        </div>
+      </div>
+    </div>
+
+    <div class="readouts">
+      <div class="readout"><div class="k">Χρόνος t</div><div class="v" id="ro-st">0.00 s</div></div>
+      <div class="readout"><div class="k">Θέση x</div><div class="v" id="ro-sx">0.00 m</div></div>
+      <div class="readout"><div class="k">Ταχύτητα u</div><div class="v" id="ro-sv">0.00 m/s</div></div>
+      <div class="readout"><div class="k">Επιτάχυνση a</div><div class="v" id="ro-sa">0.00 m/s²</div></div>
+      <div class="readout"><div class="k">Γωνιακή ω</div><div class="v" id="ro-w">0.00 rad/s</div></div>
+      <div class="readout"><div class="k">Συχνότητα f</div><div class="v" id="ro-f">0.00 Hz</div></div>
+    </div>
+
+    <div class="summary">
+      <h3>Σχέσεις</h3>
+      <div class="line"><span>x(t) = A·ημ(ωt)</span><b id="rel-x">—</b></div>
+      <div class="line"><span>u(t) = Aω·συν(ωt)</span><b id="rel-v">—</b></div>
+      <div class="line"><span>a(t) = −Aω²·ημ(ωt)</span><b id="rel-a">—</b></div>
+      <div class="verify" id="verify-shm"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+/* =====================================================================
+   PHYSICS HELPERS  (top-level, pure, testable)
+   ===================================================================== */
+
+/**
+ * Πλάγια βολή — closed-form results.
+ * uₓ = u₀·cosθ, u_y = u₀·sinθ
+ * Για h0 = 0: tof = 2u_y/g, range = u₀²·sin(2θ)/g, maxHeight = u_y²/(2g)
+ * Για h0 > 0: λύνουμε την εξίσωση ύψους h0 + u_y·t − ½g·t² = 0 (θετική ρίζα).
+ * @returns {{range:number, maxHeight:number, timeOfFlight:number}}
+ */
+function projectile(u0, angleDeg, g, h0 = 0) {
+  const rad = angleDeg * Math.PI / 180;
+  const ux = u0 * Math.cos(rad);
+  const uy = u0 * Math.sin(rad);
+
+  // Χρόνος πτήσης: ½g·t² − u_y·t − h0 = 0  →  t = (u_y + √(u_y² + 2g·h0)) / g
+  const timeOfFlight = (uy + Math.sqrt(uy * uy + 2 * g * h0)) / g;
+
+  // Βεληνεκές: οριζόντια απόσταση μέχρι να προσγειωθεί
+  const range = ux * timeOfFlight;
+
+  // Μέγιστο ύψος πάνω από το έδαφος: h0 + u_y²/(2g)
+  const maxHeight = h0 + (uy * uy) / (2 * g);
+
+  return { range, maxHeight, timeOfFlight };
+}
+
+/**
+ * Στιγμιαία θέση βολής τη χρονική στιγμή t (closed-form, χωρίς ολοκλήρωση).
+ * @returns {{x:number, y:number, vx:number, vy:number}}
+ */
+function projectileState(u0, angleDeg, g, h0, t) {
+  const rad = angleDeg * Math.PI / 180;
+  const ux = u0 * Math.cos(rad);
+  const uy = u0 * Math.sin(rad);
+  return {
+    x: ux * t,
+    y: h0 + uy * t - 0.5 * g * t * t,
+    vx: ux,
+    vy: uy - g * t
+  };
+}
+
+/**
+ * Απλή αρμονική ταλάντωση.
+ * ω = 2π/T, x = A·ημ(ωt), v = Aω·συν(ωt), a = −Aω²·ημ(ωt)
+ * @returns {{x:number, v:number, a:number}}
+ */
+function shm(A, T, t) {
+  const w = (2 * Math.PI) / T;
+  return {
+    x: A * Math.sin(w * t),
+    v: A * w * Math.cos(w * t),
+    a: -A * w * w * Math.sin(w * t)
+  };
+}
+
+/* =====================================================================
+   SELF-VERIFICATION  (printed in the summary panels)
+   ===================================================================== */
+
+function approx(a, b, tol) { return Math.abs(a - b) <= tol; }
+
+function buildVerification() {
+  const lines = [];
+
+  // -- projectile checks --
+  const p1 = projectile(20, 45, 9.8, 0);
+  const p1ok = approx(p1.range, 40.8, 0.2) && approx(p1.maxHeight, 10.2, 0.1) && approx(p1.timeOfFlight, 2.886, 0.02);
+  const p2 = projectile(10, 90, 9.8, 0);
+  const p2ok = approx(p2.range, 0, 0.01) && approx(p2.maxHeight, 5.10, 0.05) && approx(p2.timeOfFlight, 2.04, 0.02);
+
+  // -- shm checks --
+  const s1 = shm(2, 4, 0);
+  const s1ok = approx(s1.x, 0, 1e-6) && approx(s1.v, Math.PI, 1e-4) && approx(s1.a, 0, 1e-6);
+  const s2 = shm(2, 4, 1);
+  const s2ok = approx(s2.x, 2, 1e-3) && approx(s2.v, 0, 1e-3) && approx(s2.a, -4.93, 0.01);
+
+  return {
+    proj: [
+      tag(p1ok) + ` projectile(20,45,9.8,0) → R=${p1.range.toFixed(2)}m, h=${p1.maxHeight.toFixed(2)}m, t=${p1.timeOfFlight.toFixed(3)}s`,
+      tag(p2ok) + ` projectile(10,90,9.8,0) → R=${p2.range.toFixed(2)}m, h=${p2.maxHeight.toFixed(2)}m, t=${p2.timeOfFlight.toFixed(2)}s`
+    ],
+    shm: [
+      tag(s1ok) + ` shm(2,4,0) → x=${s1.x.toFixed(2)}, u=${s1.v.toFixed(4)}, a=${s1.a.toFixed(2)}`,
+      tag(s2ok) + ` shm(2,4,1) → x=${s2.x.toFixed(2)}, u=${s2.v.toFixed(2)}, a=${s2.a.toFixed(2)}`
+    ]
+  };
+  function tag(ok){ return ok ? '<span class="ok">✓</span>' : '<span class="bad">✗</span>'; }
+}
+
+/* =====================================================================
+   CANVAS UTILITIES  (DPR-crisp, resize-aware)
+   ===================================================================== */
+
+const ACCENT = '#7ec8e3';
+const AXIS   = '#1a3050';
+const DIM    = '#2a5080';
+
+/** Κάνει τον canvas καθαρό σε οθόνες υψηλής ανάλυσης. Επιστρέφει {w,h} σε CSS px. */
+function setupCanvas(canvas, cssHeight) {
+  const dpr = window.devicePixelRatio || 1;
+  const cssWidth = canvas.parentElement.clientWidth - 16; // padding του wrap
+  canvas.style.height = cssHeight + 'px';
+  canvas.width  = Math.round(cssWidth * dpr);
+  canvas.height = Math.round(cssHeight * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // ώστε να σχεδιάζουμε σε CSS px
+  return { ctx, w: cssWidth, h: cssHeight };
+}
+
+/* =====================================================================
+   SHARED SIMULATION CLOCK
+   Χρησιμοποιεί πραγματικό elapsed time· η θέση υπολογίζεται closed-form
+   από τον χρόνο t (όχι Euler), οπότε δεν υπάρχει drift.
+   ===================================================================== */
+
+function makeClock() {
+  return {
+    t: 0,            // χρόνος προσομοίωσης (s)
+    running: false,
+    last: 0,         // performance.now() του προηγούμενου frame
+    speed: 1,
+    raf: null
+  };
+}
+
+/* =====================================================================
+   PROJECTILE SIMULATION
+   ===================================================================== */
+
+const projState = {
+  els: {},
+  clock: makeClock(),
+  canvas: null, ctx: null, w: 0, h: 0,
+  params: { u0: 20, ang: 45, g: 9.8, h0: 0 },
+  result: null // {range, maxHeight, timeOfFlight}
+};
+
+function projInit() {
+  const s = projState;
+  s.canvas = document.getElementById('canvas-proj');
+
+  // Cache controls
+  s.els = {
+    play: document.getElementById('play-proj'),
+    reset: document.getElementById('reset-proj'),
+    rngU0: document.getElementById('rng-u0'), numU0: document.getElementById('num-u0'), lblU0: document.getElementById('lbl-u0'),
+    rngAng: document.getElementById('rng-ang'), numAng: document.getElementById('num-ang'), lblAng: document.getElementById('lbl-ang'),
+    rngG: document.getElementById('rng-g'), numG: document.getElementById('num-g'), lblG: document.getElementById('lbl-g'),
+    rngH0: document.getElementById('rng-h0'), numH0: document.getElementById('num-h0'), lblH0: document.getElementById('lbl-h0'),
+    rngSpd: document.getElementById('rng-spd-p'), lblSpd: document.getElementById('lbl-spd-p'),
+    roT: document.getElementById('ro-t'), roX: document.getElementById('ro-x'), roY: document.getElementById('ro-y'),
+    roVx: document.getElementById('ro-vx'), roVy: document.getElementById('ro-vy'), roV: document.getElementById('ro-v'),
+    sumR: document.getElementById('sum-range'), sumH: document.getElementById('sum-h'), sumTof: document.getElementById('sum-tof')
+  };
+
+  // Link slider <-> number pairs
+  bindPair(s.els.rngU0, s.els.numU0, v => { s.params.u0 = v; s.els.lblU0.textContent = v + ' m/s'; projOnParamChange(); });
+  bindPair(s.els.rngAng, s.els.numAng, v => { s.params.ang = v; s.els.lblAng.textContent = v + '°'; projOnParamChange(); });
+  bindPair(s.els.rngG, s.els.numG, v => { s.params.g = v; s.els.lblG.textContent = v + ' m/s²'; projOnParamChange(); });
+  bindPair(s.els.rngH0, s.els.numH0, v => { s.params.h0 = v; s.els.lblH0.textContent = v + ' m'; projOnParamChange(); });
+
+  s.els.rngSpd.addEventListener('input', () => {
+    s.clock.speed = parseFloat(s.els.rngSpd.value);
+    s.els.lblSpd.textContent = s.clock.speed.toFixed(1) + '×';
+  });
+
+  s.els.play.addEventListener('click', projTogglePlay);
+  s.els.reset.addEventListener('click', projReset);
+
+  projOnParamChange();
+}
+
+/** Επανυπολογισμός αποτελεσμάτων + redraw όταν αλλάζει παράμετρος. */
+function projOnParamChange() {
+  const { u0, ang, g, h0 } = projState.params;
+  projState.result = projectile(u0, ang, g, h0);
+  const r = projState.result;
+  projState.els.sumR.textContent = r.range.toFixed(2) + ' m';
+  projState.els.sumH.textContent = r.maxHeight.toFixed(2) + ' m';
+  projState.els.sumTof.textContent = r.timeOfFlight.toFixed(3) + ' s';
+  // Αν αλλάξει παράμετρος, μηδενίζουμε τον χρόνο για συνεπή τροχιά.
+  projState.clock.t = 0;
+  projResize();
+}
+
+function projTogglePlay() {
+  const c = projState.clock;
+  if (c.running) { projPause(); return; }
+  // Αν τελείωσε η πτήση, ξαναρχίζουμε.
+  if (c.t >= projState.result.timeOfFlight) c.t = 0;
+  c.running = true;
+  c.last = performance.now();
+  projState.els.play.textContent = '⏸ Παύση';
+  c.raf = requestAnimationFrame(projFrame);
+}
+
+function projPause() {
+  const c = projState.clock;
+  c.running = false;
+  if (c.raf) cancelAnimationFrame(c.raf);
+  c.raf = null;
+  projState.els.play.textContent = '▶ Έναρξη';
+}
+
+function projReset() {
+  projPause();
+  projState.clock.t = 0;
+  projDraw();
+  projReadouts();
+}
+
+function projFrame(now) {
+  const c = projState.clock;
+  if (!c.running) return;
+  const dt = (now - c.last) / 1000;
+  c.last = now;
+  c.t += dt * c.speed;
+
+  if (c.t >= projState.result.timeOfFlight) {
+    c.t = projState.result.timeOfFlight;
+    projDraw();
+    projReadouts();
+    projPause();
+    return;
+  }
+  projDraw();
+  projReadouts();
+  c.raf = requestAnimationFrame(projFrame);
+}
+
+function projResize() {
+  const dim = setupCanvas(projState.canvas, projCanvasHeight());
+  projState.ctx = dim.ctx; projState.w = dim.w; projState.h = dim.h;
+  projDraw();
+  projReadouts();
+}
+
+function projCanvasHeight() {
+  return Math.max(240, Math.min(420, Math.round(window.innerWidth * 0.6)));
+}
+
+/** Σχεδίαση τροχιάς + βλήματος + αξόνων. */
+function projDraw() {
+  const s = projState, ctx = s.ctx;
+  if (!ctx) return;
+  const W = s.w, H = s.h;
+  ctx.clearRect(0, 0, W, H);
+
+  const r = s.result;
+  const { u0, ang, g, h0 } = s.params;
+
+  // Κλίμακα: χωράμε όλη την τροχιά + λίγο περιθώριο.
+  const padL = 38, padR = 14, padT = 14, padB = 28;
+  const worldX = Math.max(r.range, 1) * 1.08;
+  const worldY = Math.max(r.maxHeight, 1) * 1.12;
+  const sx = (W - padL - padR) / worldX;
+  const sy = (H - padT - padB) / worldY;
+  const scale = Math.min(sx, sy); // ίδια κλίμακα σε x,y για σωστή παραβολή
+
+  // Μετατροπή κόσμου -> οθόνη
+  const ox = padL, oy = H - padB;
+  const toPx = (wx, wy) => [ox + wx * scale, oy - wy * scale];
+
+  // Έδαφος
+  ctx.strokeStyle = DIM; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(padL - 6, oy); ctx.lineTo(W - padR, oy); ctx.stroke();
+
+  // Άξονες (διακριτικά)
+  ctx.strokeStyle = AXIS; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(ox, padT); ctx.lineTo(ox, oy); ctx.stroke();
+
+  // Ετικέτες κλίμακας
+  ctx.fillStyle = DIM; ctx.font = '10px "Courier New",monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('y/m', ox + 4, padT + 10);
+  ctx.textAlign = 'right';
+  ctx.fillText('x/m', W - padR, oy + 18);
+  ctx.textAlign = 'center';
+  ctx.fillText(r.range.toFixed(0), ox + r.range * scale, oy + 16);
+  ctx.textAlign = 'right';
+  ctx.fillText(r.maxHeight.toFixed(0), ox - 4, oy - r.maxHeight * scale + 3);
+
+  // Σημείο εκτόξευσης (αν h0>0)
+  if (h0 > 0) {
+    ctx.strokeStyle = AXIS; ctx.setLineDash([3, 4]);
+    const [sx0, sy0] = toPx(0, h0);
+    ctx.beginPath(); ctx.moveTo(ox, sy0); ctx.lineTo(sx0 + 6, sy0); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Πλήρης τροχιά (διακριτικά, accent ημιδιαφανές)
+  ctx.strokeStyle = 'rgba(126,200,227,0.35)'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  const N = 120;
+  for (let i = 0; i <= N; i++) {
+    const t = (i / N) * r.timeOfFlight;
+    const st = projectileState(u0, ang, g, h0, t);
+    const [px, py] = toPx(st.x, Math.max(st.y, 0));
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  // Διανυθείσα τροχιά μέχρι τώρα (έντονο accent)
+  ctx.strokeStyle = ACCENT; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  const steps = Math.max(2, Math.round((s.clock.t / r.timeOfFlight) * N));
+  for (let i = 0; i <= steps; i++) {
+    const t = Math.min((i / N) * r.timeOfFlight, s.clock.t);
+    const st = projectileState(u0, ang, g, h0, t);
+    const [px, py] = toPx(st.x, Math.max(st.y, 0));
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  // Βλήμα
+  const cur = projectileState(u0, ang, g, h0, s.clock.t);
+  const [cx, cy] = toPx(cur.x, Math.max(cur.y, 0));
+  ctx.fillStyle = ACCENT;
+  ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2); ctx.stroke();
+}
+
+/** Ενημέρωση ζωντανών τιμών βολής. */
+function projReadouts() {
+  const s = projState;
+  const { u0, ang, g, h0 } = s.params;
+  const st = projectileState(u0, ang, g, h0, s.clock.t);
+  const y = Math.max(st.y, 0);
+  const v = Math.sqrt(st.vx * st.vx + st.vy * st.vy);
+  s.els.roT.textContent = s.clock.t.toFixed(2) + ' s';
+  s.els.roX.textContent = st.x.toFixed(2) + ' m';
+  s.els.roY.textContent = y.toFixed(2) + ' m';
+  s.els.roVx.textContent = st.vx.toFixed(2) + ' m/s';
+  s.els.roVy.textContent = st.vy.toFixed(2) + ' m/s';
+  s.els.roV.textContent = v.toFixed(2) + ' m/s';
+}
+
+/* =====================================================================
+   SHM SIMULATION
+   ===================================================================== */
+
+const shmState = {
+  els: {},
+  clock: makeClock(),
+  canvas: null, ctx: null, w: 0, h: 0,
+  params: { A: 2, T: 4 }
+};
+
+function shmInit() {
+  const s = shmState;
+  s.canvas = document.getElementById('canvas-shm');
+
+  s.els = {
+    play: document.getElementById('play-shm'),
+    reset: document.getElementById('reset-shm'),
+    rngA: document.getElementById('rng-A'), numA: document.getElementById('num-A'), lblA: document.getElementById('lbl-A'),
+    rngT: document.getElementById('rng-T'), numT: document.getElementById('num-T'), lblT: document.getElementById('lbl-T'),
+    rngSpd: document.getElementById('rng-spd-s'), lblSpd: document.getElementById('lbl-spd-s'),
+    roT: document.getElementById('ro-st'), roX: document.getElementById('ro-sx'),
+    roV: document.getElementById('ro-sv'), roA: document.getElementById('ro-sa'),
+    roW: document.getElementById('ro-w'), roF: document.getElementById('ro-f'),
+    relX: document.getElementById('rel-x'), relV: document.getElementById('rel-v'), relA: document.getElementById('rel-a')
+  };
+
+  bindPair(s.els.rngA, s.els.numA, v => { s.params.A = v; s.els.lblA.textContent = v + ' m'; shmOnParamChange(); });
+  bindPair(s.els.rngT, s.els.numT, v => { s.params.T = v; s.els.lblT.textContent = v + ' s'; shmOnParamChange(); });
+
+  s.els.rngSpd.addEventListener('input', () => {
+    s.clock.speed = parseFloat(s.els.rngSpd.value);
+    s.els.lblSpd.textContent = s.clock.speed.toFixed(1) + '×';
+  });
+
+  s.els.play.addEventListener('click', shmTogglePlay);
+  s.els.reset.addEventListener('click', shmReset);
+
+  shmOnParamChange();
+}
+
+function shmOnParamChange() {
+  const { A, T } = shmState.params;
+  const w = (2 * Math.PI) / T;
+  shmState.els.roW.textContent = w.toFixed(2) + ' rad/s';
+  shmState.els.roF.textContent = (1 / T).toFixed(2) + ' Hz';
+  shmState.els.relX.textContent = 'A=' + A + ' m';
+  shmState.els.relV.textContent = 'Aω=' + (A * w).toFixed(2) + ' m/s';
+  shmState.els.relA.textContent = 'Aω²=' + (A * w * w).toFixed(2) + ' m/s²';
+  shmResize();
+}
+
+function shmTogglePlay() {
+  const c = shmState.clock;
+  if (c.running) { shmPause(); return; }
+  c.running = true;
+  c.last = performance.now();
+  shmState.els.play.textContent = '⏸ Παύση';
+  c.raf = requestAnimationFrame(shmFrame);
+}
+
+function shmPause() {
+  const c = shmState.clock;
+  c.running = false;
+  if (c.raf) cancelAnimationFrame(c.raf);
+  c.raf = null;
+  shmState.els.play.textContent = '▶ Έναρξη';
+}
+
+function shmReset() {
+  shmPause();
+  shmState.clock.t = 0;
+  shmDraw();
+  shmReadouts();
+}
+
+function shmFrame(now) {
+  const c = shmState.clock;
+  if (!c.running) return;
+  const dt = (now - c.last) / 1000;
+  c.last = now;
+  c.t += dt * c.speed;
+  shmDraw();
+  shmReadouts();
+  c.raf = requestAnimationFrame(shmFrame);
+}
+
+function shmResize() {
+  const dim = setupCanvas(shmState.canvas, shmCanvasHeight());
+  shmState.ctx = dim.ctx; shmState.w = dim.w; shmState.h = dim.h;
+  shmDraw();
+  shmReadouts();
+}
+
+function shmCanvasHeight() {
+  return Math.max(240, Math.min(400, Math.round(window.innerWidth * 0.58)));
+}
+
+/** Σχεδίαση: μάζα σε ελατήριο (αριστερά) + γράφημα x–t (δεξιά). */
+function shmDraw() {
+  const s = shmState, ctx = s.ctx;
+  if (!ctx) return;
+  const W = s.w, H = s.h;
+  ctx.clearRect(0, 0, W, H);
+
+  const { A, T } = s.params;
+  const t = s.clock.t;
+  const st = shm(A, T, t);
+
+  // Διαχωρισμός: αριστερό 38% ελατήριο, δεξιά γράφημα.
+  const splitX = Math.round(W * 0.36);
+  const midY = H / 2;
+
+  // ----- Αριστερά: ελατήριο + μάζα (κατακόρυφη ταλάντωση) -----
+  const ampPx = (H / 2 - 40); // pixels για το πλάτος A
+  const massX = splitX / 2;
+  const massY = midY - (st.x / A) * ampPx; // x>0 -> προς τα πάνω
+
+  // Στήριγμα οροφής
+  ctx.strokeStyle = DIM; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(massX - 30, 16); ctx.lineTo(massX + 30, 16); ctx.stroke();
+
+  // Ελατήριο (ζιγκ-ζαγκ από οροφή ως μάζα)
+  ctx.strokeStyle = AXIS; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  const coils = 10, topY = 18, bottomY = massY - 14;
+  ctx.moveTo(massX, topY);
+  for (let i = 1; i < coils; i++) {
+    const yy = topY + (bottomY - topY) * (i / coils);
+    const xx = massX + (i % 2 === 0 ? -10 : 10);
+    ctx.lineTo(xx, yy);
+  }
+  ctx.lineTo(massX, bottomY);
+  ctx.stroke();
+
+  // Γραμμή ισορροπίας
+  ctx.strokeStyle = AXIS; ctx.setLineDash([2, 4]); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(massX - 34, midY); ctx.lineTo(massX + 34, midY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Μάζα
+  ctx.fillStyle = ACCENT;
+  ctx.fillRect(massX - 14, massY - 14, 28, 28);
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+  ctx.strokeRect(massX - 14, massY - 14, 28, 28);
+
+  // ----- Δεξιά: γράφημα x–t -----
+  const gx0 = splitX + 12, gx1 = W - 10;
+  const gw = gx1 - gx0;
+  const gAmp = (H / 2 - 26);
+
+  // Άξονες γραφήματος
+  ctx.strokeStyle = AXIS; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(gx0, midY); ctx.lineTo(gx1, midY); ctx.stroke(); // t-axis
+  ctx.beginPath(); ctx.moveTo(gx0, 18); ctx.lineTo(gx0, H - 18); ctx.stroke(); // x-axis
+
+  ctx.fillStyle = DIM; ctx.font = '10px "Courier New",monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('x/m', gx0 + 4, 14);
+  ctx.textAlign = 'right';
+  ctx.fillText('t/s', gx1, midY + 14);
+
+  // Παράθυρο 2 περιόδων που "κυλάει" με τον χρόνο.
+  const windowT = T * 2;
+  const tStart = Math.max(0, t - windowT);
+  const tEnd = Math.max(windowT, t);
+
+  // Καμπύλη x(t) σε accent
+  ctx.strokeStyle = ACCENT; ctx.lineWidth = 2;
+  ctx.beginPath();
+  const M = 200;
+  for (let i = 0; i <= M; i++) {
+    const tt = tStart + (tEnd - tStart) * (i / M);
+    const xx = shm(A, T, tt).x;
+    const px = gx0 + ((tt - tStart) / (tEnd - tStart)) * gw;
+    const py = midY - (xx / A) * gAmp;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  // Τρέχον σημείο πάνω στην καμπύλη
+  const curPx = gx0 + ((t - tStart) / (tEnd - tStart)) * gw;
+  const curPy = midY - (st.x / A) * gAmp;
+  ctx.fillStyle = ACCENT;
+  ctx.beginPath(); ctx.arc(curPx, curPy, 5, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(curPx, curPy, 5, 0, Math.PI * 2); ctx.stroke();
+}
+
+/** Ενημέρωση ζωντανών τιμών ταλάντωσης. */
+function shmReadouts() {
+  const s = shmState;
+  const { A, T } = s.params;
+  const st = shm(A, T, s.clock.t);
+  s.els.roT.textContent = s.clock.t.toFixed(2) + ' s';
+  s.els.roX.textContent = st.x.toFixed(2) + ' m';
+  s.els.roV.textContent = st.v.toFixed(2) + ' m/s';
+  s.els.roA.textContent = st.a.toFixed(2) + ' m/s²';
+}
+
+/* =====================================================================
+   GENERIC HELPERS
+   ===================================================================== */
+
+/** Συγχρονίζει ένα slider με ένα number input και καλεί onChange(value). */
+function bindPair(range, number, onChange) {
+  const clamp = (v) => {
+    const min = parseFloat(range.min), max = parseFloat(range.max);
+    if (isNaN(v)) v = min;
+    return Math.min(max, Math.max(min, v));
+  };
+  range.addEventListener('input', () => {
+    const v = parseFloat(range.value);
+    number.value = v;
+    onChange(v);
+  });
+  number.addEventListener('input', () => {
+    const v = clamp(parseFloat(number.value));
+    range.value = v;
+    onChange(v);
+  });
+}
+
+/* =====================================================================
+   TABS
+   ===================================================================== */
+
+function initTabs() {
+  const tabProj = document.getElementById('tab-proj');
+  const tabShm  = document.getElementById('tab-shm');
+  const panelProj = document.getElementById('panel-proj');
+  const panelShm  = document.getElementById('panel-shm');
+
+  function activate(which) {
+    const proj = which === 'proj';
+    tabProj.classList.toggle('active', proj);
+    tabShm.classList.toggle('active', !proj);
+    panelProj.classList.toggle('active', proj);
+    panelShm.classList.toggle('active', !proj);
+    // Παύση της ανενεργής προσομοίωσης για εξοικονόμηση πόρων.
+    if (proj) { shmPause(); shmResize(); projResize(); }
+    else { projPause(); projResize(); shmResize(); }
+  }
+
+  tabProj.addEventListener('click', () => activate('proj'));
+  tabShm.addEventListener('click', () => activate('shm'));
+}
+
+/* =====================================================================
+   BOOT
+   ===================================================================== */
+
+function init() {
+  projInit();
+  shmInit();
+  initTabs();
+
+  // Self-verification badges
+  const v = buildVerification();
+  document.getElementById('verify-proj').innerHTML =
+    '<div>Έλεγχος ορθότητας:</div>' + v.proj.map(l => '<div>' + l + '</div>').join('');
+  document.getElementById('verify-shm').innerHTML =
+    '<div>Έλεγχος ορθότητας:</div>' + v.shm.map(l => '<div>' + l + '</div>').join('');
+
+  // Resize handling (debounced)
+  let rt;
+  window.addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => { projResize(); shmResize(); }, 120);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
