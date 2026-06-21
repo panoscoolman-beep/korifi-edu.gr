@@ -26,6 +26,7 @@ const SECTIONS: Section[] = [
       { href: "/online-mathimata", label: "Online μαθήματα" },
       { href: "/courses",          label: "Μαθήματα" },
       { href: "/epaggelmatikos-prosanatolismos", label: "Επαγγελματικός Προσανατολισμός" },
+      { href: "/ergaleia",         label: "Διαδραστικά Εργαλεία" },
     ],
   },
   {

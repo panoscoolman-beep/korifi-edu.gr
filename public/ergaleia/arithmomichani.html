@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta name="theme-color" content="#060d1b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Δωρεάν επιστημονική αριθμομηχανή στα ελληνικά — τριγωνομετρία, λογάριθμοι, δυνάμεις, ρίζες. Φροντιστήριο Κορυφή.">
+  <title>Επιστημονική Αριθμομηχανή — Φροντιστήριο Κορυφή</title>
+  <style>
+    :root{
+      --bg:#060d1b; --bg2:#0b1a30; --bg3:#0f2040;
+      --text:#c8d8e8; --dim:#2a5080; --border:#1a3050; --accent:#7ec8e3;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    html,body { background:var(--bg); color:var(--text); font-family:'Courier New',Courier,monospace; min-height:100dvh; }
+    body { padding-bottom:24px; }
+
+    /* ---------- toolbar + header ---------- */
+    .toolbar{max-width:480px;margin:0 auto;padding:10px 4px 0;}
+    .back-link{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.12em;color:var(--dim);text-decoration:none;text-transform:uppercase;padding:6px 10px;border:1px solid var(--border);border-radius:20px;transition:color .15s,border-color .15s;}
+    .back-link:hover,.back-link:active{color:#7ec8e3;border-color:#7ec8e3;}
+
+    .hdr{ max-width:480px; margin:0 auto; text-align:center; padding:14px 4px 6px; }
+    .hdr-sub  { font-size:8px; letter-spacing:.35em; color:var(--dim); margin-bottom:3px; }
+    .hdr-title{ font-size:18px; font-weight:bold; letter-spacing:.13em; color:#7ec8e3; text-transform:uppercase; }
+
+    /* ---------- calculator shell ---------- */
+    .calc{ max-width:480px; margin:0 auto; padding:6px 8px 0; }
+
+    /* ---------- display ---------- */
+    .display{
+      background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+      padding:14px 16px; margin-bottom:10px; min-height:104px;
+      display:flex; flex-direction:column; justify-content:flex-end; gap:6px; overflow:hidden;
+    }
+    .expr{
+      font-size:14px; color:var(--dim); min-height:18px; text-align:right;
+      white-space:nowrap; overflow-x:auto; overflow-y:hidden; letter-spacing:.02em;
+      scrollbar-width:none;
+    }
+    .expr::-webkit-scrollbar{ display:none; }
+    .result{
+      font-size:34px; color:var(--accent); font-weight:bold; text-align:right;
+      white-space:nowrap; overflow-x:auto; overflow-y:hidden; letter-spacing:-.01em;
+      scrollbar-width:none; line-height:1.15;
+    }
+    .result::-webkit-scrollbar{ display:none; }
+    .result.error{ color:#e38080; }
+
+    /* ---------- status row (mode + memory) ---------- */
+    .status{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+    .mode-toggle{
+      display:inline-flex; border:1px solid var(--border); border-radius:20px; overflow:hidden; font-size:11px;
+    }
+    .mode-toggle button{
+      background:transparent; color:var(--dim); border:none; font-family:inherit;
+      padding:6px 14px; cursor:pointer; letter-spacing:.1em; transition:background .15s,color .15s;
+      touch-action:manipulation;
+    }
+    .mode-toggle button.on{ background:var(--accent); color:var(--bg); font-weight:bold; }
+    .mem-ind{ font-size:10px; letter-spacing:.18em; color:var(--dim); opacity:0; transition:opacity .15s; }
+    .mem-ind.on{ opacity:1; color:var(--accent); }
+
+    /* ---------- button grids ---------- */
+    .grid{ display:grid; gap:7px; margin-bottom:7px; }
+    .grid-5{ grid-template-columns:repeat(5,1fr); }
+    .grid-4{ grid-template-columns:repeat(4,1fr); }
+
+    button.key{
+      font-family:inherit; font-size:16px; border-radius:12px; border:1px solid var(--border);
+      padding:0; height:52px; cursor:pointer; color:var(--text); background:var(--bg3);
+      transition:filter .12s, transform .05s; touch-action:manipulation; letter-spacing:.01em;
+      display:flex; align-items:center; justify-content:center; line-height:1;
+    }
+    button.key:hover{ filter:brightness(1.25); }
+    button.key:active{ transform:scale(.95); }
+
+    /* tones */
+    .k-num{ background:var(--bg3); }
+    .k-fn{ background:var(--bg2); color:var(--accent); font-size:13px; }
+    .k-op{ background:var(--bg2); color:var(--accent); font-weight:bold; font-size:18px; }
+    .k-mem{ background:transparent; color:var(--dim); font-size:12px; }
+    .k-clear{ background:#2a1525; color:#e3a0a0; border-color:#4a2535; font-weight:bold; }
+    .k-eq{ background:var(--accent); color:var(--bg); font-weight:bold; font-size:22px; border-color:var(--accent); }
+    .k-sup{ font-size:13px; }
+
+    /* the scientific keys can be a touch shorter on tiny screens */
+    .sci button.key{ font-size:12px; }
+
+    /* ---------- history ---------- */
+    .hist-head{ display:flex; align-items:center; justify-content:space-between; margin:14px 2px 6px; }
+    .hist-title{ font-size:9px; letter-spacing:.25em; color:var(--dim); text-transform:uppercase; }
+    .hist-clear{
+      background:transparent; border:1px solid var(--border); color:var(--dim); font-family:inherit;
+      font-size:9px; letter-spacing:.1em; padding:5px 10px; border-radius:14px; cursor:pointer;
+      transition:color .15s,border-color .15s; touch-action:manipulation;
+    }
+    .hist-clear:hover{ color:var(--accent); border-color:var(--accent); }
+    .hist-list{ list-style:none; display:flex; flex-direction:column; gap:5px; }
+    .hist-item{
+      background:var(--bg2); border:1px solid var(--border); border-radius:10px;
+      padding:8px 12px; font-size:12px; cursor:pointer; text-align:right;
+      transition:filter .12s, transform .05s; touch-action:manipulation;
+      white-space:nowrap; overflow-x:auto; scrollbar-width:none;
+    }
+    .hist-item::-webkit-scrollbar{ display:none; }
+    .hist-item:hover{ filter:brightness(1.3); }
+    .hist-item:active{ transform:scale(.98); }
+    .hist-item .he{ color:var(--dim); }
+    .hist-item .hr{ color:var(--accent); font-weight:bold; }
+    .hist-empty{ font-size:11px; color:var(--dim); text-align:center; padding:6px 0; letter-spacing:.05em; }
+
+    .footer{ max-width:480px; margin:18px auto 0; text-align:center; font-size:8px; color:var(--dim); letter-spacing:.08em; line-height:1.7; }
+
+    @media (max-width:360px){
+      button.key{ height:46px; font-size:14px; }
+      .result{ font-size:28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar"><a class="back-link" href="/ergaleia">← Εργαλεία</a></div>
+
+  <div class="hdr">
+    <div class="hdr-sub">ΔΙΑΔΡΑΣΤΙΚΟ</div>
+    <h1 class="hdr-title">Επιστημονική Αριθμομηχανή</h1>
+  </div>
+
+  <div class="calc">
+    <!-- Display -->
+    <div class="display">
+      <div class="expr" id="expr"></div>
+      <div class="result" id="result">0</div>
+    </div>
+
+    <!-- Status: DEG/RAD toggle + memory indicator -->
+    <div class="status">
+      <div class="mode-toggle" role="group" aria-label="Λειτουργία γωνίας">
+        <button id="modeDeg" class="on" data-mode="DEG">DEG</button>
+        <button id="modeRad" data-mode="RAD">RAD</button>
+      </div>
+      <div class="mem-ind" id="memInd">M</div>
+    </div>
+
+    <!-- Scientific row 1: memory -->
+    <div class="grid grid-5 sci">
+      <button class="key k-mem" data-action="mc">MC</button>
+      <button class="key k-mem" data-action="mr">MR</button>
+      <button class="key k-mem" data-action="m+">M+</button>
+      <button class="key k-mem" data-action="m-">M−</button>
+      <button class="key k-clear" data-action="ac">AC</button>
+    </div>
+
+    <!-- Scientific row 2 -->
+    <div class="grid grid-5 sci">
+      <button class="key k-fn" data-insert="sin(">sin</button>
+      <button class="key k-fn" data-insert="cos(">cos</button>
+      <button class="key k-fn" data-insert="tan(">tan</button>
+      <button class="key k-fn" data-insert="ln(">ln</button>
+      <button class="key k-fn" data-insert="log(">log</button>
+    </div>
+
+    <!-- Scientific row 3 -->
+    <div class="grid grid-5 sci">
+      <button class="key k-fn" data-insert="asin(">sin⁻¹</button>
+      <button class="key k-fn" data-insert="acos(">cos⁻¹</button>
+      <button class="key k-fn" data-insert="atan(">tan⁻¹</button>
+      <button class="key k-fn" data-insert="exp(">eˣ</button>
+      <button class="key k-fn" data-insert="tenexp(">10ˣ</button>
+    </div>
+
+    <!-- Scientific row 4 -->
+    <div class="grid grid-5 sci">
+      <button class="key k-fn" data-action="sq">x²</button>
+      <button class="key k-op" data-insert="^">xʸ</button>
+      <button class="key k-fn" data-insert="sqrt(">√</button>
+      <button class="key k-fn" data-insert="cbrt(">∛</button>
+      <button class="key k-fn" data-action="inv">1/x</button>
+    </div>
+
+    <!-- Scientific row 5 -->
+    <div class="grid grid-5 sci">
+      <button class="key k-fn" data-insert="abs(">|x|</button>
+      <button class="key k-fn" data-action="fact">n!</button>
+      <button class="key k-fn" data-insert="pi">π</button>
+      <button class="key k-fn" data-insert="e">e</button>
+      <button class="key k-fn" data-action="percent">%</button>
+    </div>
+
+    <!-- Main keypad -->
+    <div class="grid grid-4">
+      <button class="key k-fn" data-insert="(">(</button>
+      <button class="key k-fn" data-insert=")">)</button>
+      <button class="key k-clear" data-action="del">⌫</button>
+      <button class="key k-op" data-insert="/">÷</button>
+
+      <button class="key k-num" data-insert="7">7</button>
+      <button class="key k-num" data-insert="8">8</button>
+      <button class="key k-num" data-insert="9">9</button>
+      <button class="key k-op" data-insert="*">×</button>
+
+      <button class="key k-num" data-insert="4">4</button>
+      <button class="key k-num" data-insert="5">5</button>
+      <button class="key k-num" data-insert="6">6</button>
+      <button class="key k-op" data-insert="-">−</button>
+
+      <button class="key k-num" data-insert="1">1</button>
+      <button class="key k-num" data-insert="2">2</button>
+      <button class="key k-num" data-insert="3">3</button>
+      <button class="key k-op" data-insert="+">+</button>
+
+      <button class="key k-fn" data-action="neg">+/−</button>
+      <button class="key k-num" data-insert="0">0</button>
+      <button class="key k-num" data-insert=".">.</button>
+      <button class="key k-eq" data-action="eq">=</button>
+    </div>
+
+    <!-- History -->
+    <div class="hist-head">
+      <span class="hist-title">Ιστορικό</span>
+      <button class="hist-clear" id="histClear">Καθαρισμός</button>
+    </div>
+    <ul class="hist-list" id="histList"></ul>
+  </div>
+
+  <div class="footer">ΦΡΟΝΤΙΣΤΗΡΙΟ ΚΟΡΥΦΗ · ΕΡΓΑΛΕΙΑ</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* =====================================================================
+     ΕΠΙΣΤΗΜΟΝΙΚΗ ΑΡΙΘΜΟΜΗΧΑΝΗ
+     Parser approach: tokenize -> shunting-yard (toRPN) -> evalRPN.
+     No eval() is ever used on user input.
+
+     PERCENT BEHAVIOR (documented):
+       - Standalone "50%"            -> 0.5            (50/100)
+       - "200 + 10%"  / "200 - 10%"  -> 200 ± (200*10/100)  = 220 / 180
+       - "200 * 10%"  / "200 / 10%"  -> 200 * 0.10 etc.     (10% = 0.10)
+       The % key appends a literal '%' token to the expression; its meaning
+       is resolved contextually during RPN evaluation (see applyPercent).
+  ===================================================================== */
+
+  /* ---------------- State ---------------- */
+  var state = {
+    expr: '',        // current raw expression string (math syntax, e.g. "sin(30)+2")
+    lastResult: '0', // last computed result shown big
+    showingResult: false, // true right after '=', so a new digit starts fresh
+    angleMode: 'DEG',
+    memory: 0,
+    history: []      // [{expr, result}]
+  };
+
+  /* ---------------- DOM ---------------- */
+  var elExpr   = document.getElementById('expr');
+  var elResult = document.getElementById('result');
+  var elMem    = document.getElementById('memInd');
+  var elHist   = document.getElementById('histList');
+  var elModeDeg= document.getElementById('modeDeg');
+  var elModeRad= document.getElementById('modeRad');
+
+  var ERR = 'Σφάλμα';
+
+  /* =====================================================================
+     1. TOKENIZER
+     Produces tokens: {type:'num', value:Number}
+                      {type:'op',  value:'+|-|*|/|^'}
+                      {type:'u-',  value:'u-'}        (unary minus)
+                      {type:'func',value:'sin'|...}
+                      {type:'lparen'} {type:'rparen'}
+                      {type:'percent'}
+     Constants pi / e are emitted as numbers.
+  ===================================================================== */
+  var FUNCS = {
+    sin:1, cos:1, tan:1, asin:1, acos:1, atan:1,
+    ln:1, log:1, sqrt:1, cbrt:1, abs:1, exp:1, tenexp:1
+  };
+
+  function tokenize(input){
+    var tokens = [];
+    var i = 0, n = input.length;
+
+    function lastSignificant(){
+      return tokens.length ? tokens[tokens.length-1] : null;
+    }
+    // Decide whether a '-' is unary (negation) or binary (subtraction).
+    function minusIsUnary(){
+      var p = lastSignificant();
+      if(!p) return true; // at start
+      // unary if previous is an operator, an unary-minus, an lparen, or a func
+      return p.type==='op' || p.type==='u-' || p.type==='lparen' || p.type==='func';
+    }
+
+    while(i < n){
+      var c = input[i];
+
+      if(c === ' '){ i++; continue; }
+
+      // numbers (with optional decimal)
+      if((c >= '0' && c <= '9') || c === '.'){
+        var num = '';
+        var dotCount = 0;
+        while(i < n && ((input[i] >= '0' && input[i] <= '9') || input[i] === '.')){
+          if(input[i] === '.'){ dotCount++; if(dotCount > 1) throw new Error('badnum'); }
+          num += input[i]; i++;
+        }
+        if(num === '.') throw new Error('badnum');
+        tokens.push({ type:'num', value: parseFloat(num) });
+        continue;
+      }
+
+      // identifiers: functions or constants (pi, e)
+      if(/[a-z]/i.test(c)){
+        var name = '';
+        while(i < n && /[a-z0-9]/i.test(input[i])){ name += input[i]; i++; }
+        name = name.toLowerCase();
+        if(name === 'pi'){ tokens.push({ type:'num', value: Math.PI }); continue; }
+        if(name === 'e'){  tokens.push({ type:'num', value: Math.E });  continue; }
+        if(FUNCS[name]){ tokens.push({ type:'func', value: name }); continue; }
+        throw new Error('badident');
+      }
+
+      // operators & parens & percent
+      if(c === '+'){ tokens.push({ type:'op', value:'+' }); i++; continue; }
+      if(c === '-'){
+        tokens.push(minusIsUnary() ? { type:'u-', value:'u-' } : { type:'op', value:'-' });
+        i++; continue;
+      }
+      if(c === '*'){ tokens.push({ type:'op', value:'*' }); i++; continue; }
+      if(c === '/'){ tokens.push({ type:'op', value:'/' }); i++; continue; }
+      if(c === '^'){ tokens.push({ type:'op', value:'^' }); i++; continue; }
+      if(c === '('){ tokens.push({ type:'lparen' }); i++; continue; }
+      if(c === ')'){ tokens.push({ type:'rparen' }); i++; continue; }
+      if(c === '%'){ tokens.push({ type:'percent' }); i++; continue; }
+
+      throw new Error('badchar');
+    }
+    return tokens;
+  }
+
+  /* =====================================================================
+     2. SHUNTING-YARD -> RPN
+     Precedence: + -  (2) ; * / (3) ; unary- (4) ; ^ (5, right-assoc) ;
+     functions bind tightest. '%' is treated as a postfix unary operator
+     with very high precedence so it sticks to the value before it.
+  ===================================================================== */
+  var PREC = { '+':2, '-':2, '*':3, '/':3, 'u-':4, '^':5 };
+  var RIGHT_ASSOC = { '^':true, 'u-':true };
+
+  function toRPN(tokens){
+    var output = [];
+    var stack  = [];
+
+    function peek(){ return stack.length ? stack[stack.length-1] : null; }
+
+    for(var k = 0; k < tokens.length; k++){
+      var t = tokens[k];
+
+      if(t.type === 'num'){ output.push(t); continue; }
+
+      if(t.type === 'func'){ stack.push(t); continue; }
+
+      if(t.type === 'percent'){
+        // postfix: emit immediately onto output as a marker operator
+        output.push(t);
+        continue;
+      }
+
+      if(t.type === 'op' || t.type === 'u-'){
+        var o1 = t.value;
+        var top;
+        while((top = peek()) &&
+              (top.type === 'op' || top.type === 'u-') &&
+              ( PREC[top.value] > PREC[o1] ||
+                (PREC[top.value] === PREC[o1] && !RIGHT_ASSOC[o1]) )){
+          output.push(stack.pop());
+        }
+        stack.push(t);
+        continue;
+      }
+
+      if(t.type === 'lparen'){ stack.push(t); continue; }
+
+      if(t.type === 'rparen'){
+        var found = false;
+        while(peek()){
+          if(peek().type === 'lparen'){ found = true; break; }
+          output.push(stack.pop());
+        }
+        if(!found) throw new Error('parens');
+        stack.pop(); // discard lparen
+        if(peek() && peek().type === 'func') output.push(stack.pop());
+        continue;
+      }
+    }
+
+    while(peek()){
+      if(peek().type === 'lparen' || peek().type === 'rparen') throw new Error('parens');
+      output.push(stack.pop());
+    }
+    return output;
+  }
+
+  /* =====================================================================
+     3. RPN EVALUATOR
+  ===================================================================== */
+  function toRad(x){ return state.angleMode === 'DEG' ? x * Math.PI / 180 : x; }
+  function fromRad(x){ return state.angleMode === 'DEG' ? x * 180 / Math.PI : x; }
+
+  function factorial(x){
+    if(x < 0 || Math.floor(x) !== x) throw new Error('fact');
+    if(x > 170) return Infinity; // beyond double range
+    var r = 1;
+    for(var i = 2; i <= x; i++) r *= i;
+    return r;
+  }
+
+  function applyFunc(name, x){
+    switch(name){
+      case 'sin': return Math.sin(toRad(x));
+      case 'cos': return Math.cos(toRad(x));
+      case 'tan': return Math.tan(toRad(x));
+      case 'asin':
+        if(x < -1 || x > 1) throw new Error('domain');
+        return fromRad(Math.asin(x));
+      case 'acos':
+        if(x < -1 || x > 1) throw new Error('domain');
+        return fromRad(Math.acos(x));
+      case 'atan': return fromRad(Math.atan(x));
+      case 'ln':
+        if(x <= 0) throw new Error('domain');
+        return Math.log(x);
+      case 'log':
+        if(x <= 0) throw new Error('domain');
+        return Math.log10(x);
+      case 'sqrt':
+        if(x < 0) throw new Error('domain');
+        return Math.sqrt(x);
+      case 'cbrt': return Math.cbrt(x);
+      case 'abs':  return Math.abs(x);
+      case 'exp':  return Math.exp(x);
+      case 'tenexp': return Math.pow(10, x);
+    }
+    throw new Error('func');
+  }
+
+  function evalRPN(rpn){
+    var st = [];
+    for(var i = 0; i < rpn.length; i++){
+      var t = rpn[i];
+
+      if(t.type === 'num'){ st.push(t.value); continue; }
+
+      if(t.type === 'u-'){
+        if(st.length < 1) throw new Error('syntax');
+        st.push(-st.pop());
+        continue;
+      }
+
+      if(t.type === 'func'){
+        if(st.length < 1) throw new Error('syntax');
+        st.push(applyFunc(t.value, st.pop()));
+        continue;
+      }
+
+      if(t.type === 'percent'){
+        // Resolve % contextually using the operator that PRECEDES this value
+        // in the surrounding expression. We rebuild that context by peeking at
+        // the partial stack: the value on top is the percent operand. The
+        // base for +/- is the value below it.
+        if(st.length < 1) throw new Error('syntax');
+        var operand = st.pop();
+        var ctx = percentContext[i]; // computed during evalRPN prep
+        if(ctx === '+' || ctx === '-'){
+          // 200 + 10%  -> add 200*10/100 ; base is current top of stack
+          if(st.length < 1) throw new Error('syntax');
+          var base = st[st.length-1];
+          st.push(base * operand / 100);
+        } else {
+          // standalone, or *, / context: 10% -> 0.10
+          st.push(operand / 100);
+        }
+        continue;
+      }
+
+      // binary operator
+      if(st.length < 2) throw new Error('syntax');
+      var b = st.pop(), a = st.pop();
+      switch(t.value){
+        case '+': st.push(a + b); break;
+        case '-': st.push(a - b); break;
+        case '*': st.push(a * b); break;
+        case '/':
+          if(b === 0) throw new Error('divzero');
+          st.push(a / b); break;
+        case '^': st.push(Math.pow(a, b)); break;
+        default: throw new Error('op');
+      }
+    }
+    if(st.length !== 1) throw new Error('syntax');
+    var out = st[0];
+    if(!isFinite(out) || isNaN(out)) throw new Error('range');
+    return out;
+  }
+
+  /* Percent context map: for each percent token index in the RPN, record
+     whether the binary operator immediately associated with it (in original
+     token stream) was + or - vs * / / / standalone. We derive this from the
+     original token list, not the RPN, because RPN loses adjacency. */
+  var percentContext = {};
+
+  function buildPercentContext(tokens, rpn){
+    percentContext = {};
+    // For each percent token in original stream, look at the operator that
+    // separates its operand group from the previous one. Simplest robust rule:
+    // scan original tokens; when we hit a 'percent', find the nearest preceding
+    // top-level binary op (+,-,*,/) at the same paren depth.
+    // We then map percent tokens to rpn indices in order of appearance.
+    var ctxByOrder = [];
+    var depth = 0;
+    for(var i = 0; i < tokens.length; i++){
+      var t = tokens[i];
+      if(t.type === 'lparen') depth++;
+      else if(t.type === 'rparen') depth--;
+      else if(t.type === 'percent'){
+        // walk back at depth>=current to find nearest binary op
+        var found = null, d = depth;
+        for(var j = i - 1; j >= 0; j--){
+          var p = tokens[j];
+          if(p.type === 'rparen') d++;
+          else if(p.type === 'lparen'){ d--; if(d < depth) break; }
+          else if(d === depth && p.type === 'op'){ found = p.value; break; }
+          else if(d === depth && p.type === 'num') { /* keep scanning back for op */ }
+        }
+        ctxByOrder.push(found); // '+','-','*','/', or null (standalone)
+      }
+    }
+    // assign to rpn percent token indices in order
+    var order = 0;
+    for(var r = 0; r < rpn.length; r++){
+      if(rpn[r].type === 'percent'){ percentContext[r] = ctxByOrder[order++]; }
+    }
+  }
+
+  /* =====================================================================
+     4. COMPUTE pipeline
+  ===================================================================== */
+  function compute(expression){
+    var tokens = tokenize(expression);
+    if(tokens.length === 0) throw new Error('empty');
+    var rpn = toRPN(tokens);
+    buildPercentContext(tokens, rpn);
+    return evalRPN(rpn);
+  }
+
+  /* =====================================================================
+     5. FORMAT — clean near-zero noise, round to ~10 significant digits
+  ===================================================================== */
+  function format(x){
+    if(typeof x !== 'number' || isNaN(x) || !isFinite(x)) return ERR;
+
+    // clean tiny floating errors near zero
+    if(Math.abs(x) < 1e-12) x = 0;
+
+    // round to ~10 significant digits to kill 0.9999999999 / 30.000000001 noise
+    var rounded = Number(x.toPrecision(10));
+    // collapse near-integers (e.g. 0.9999999999998 -> 1)
+    var near = Math.round(rounded);
+    if(Math.abs(rounded - near) < 1e-10) rounded = near;
+
+    if(rounded === 0) return '0';
+
+    var abs = Math.abs(rounded);
+    var out;
+    if(abs !== 0 && (abs < 1e-9 || abs >= 1e15)){
+      out = rounded.toExponential(9);
+      // trim trailing zeros in mantissa
+      out = out.replace(/\.?0+e/, 'e');
+    } else {
+      // use up to 10 significant digits, then strip trailing zeros
+      out = String(rounded);
+      if(out.indexOf('e') === -1 && out.indexOf('.') !== -1){
+        out = out.replace(/\.?0+$/, '');
+      }
+    }
+    return out;
+  }
+
+  /* =====================================================================
+     6. DISPLAY — convert internal math syntax to pretty Greek symbols
+  ===================================================================== */
+  function prettify(s){
+    return s
+      .replace(/\*/g, '×')
+      .replace(/\//g, '÷')
+      .replace(/-/g,  '−')
+      .replace(/tenexp\(/g, '10^(')
+      .replace(/sqrt\(/g, '√(')
+      .replace(/cbrt\(/g, '∛(')
+      .replace(/abs\(/g, '|')           // visual only
+      .replace(/pi/g, 'π')
+      .replace(/asin/g,'sin⁻¹')
+      .replace(/acos/g,'cos⁻¹')
+      .replace(/atan/g,'tan⁻¹')
+      .replace(/exp\(/g,'e^(');
+  }
+
+  function updateDisplay(){
+    elExpr.textContent = prettify(state.expr);
+    elResult.textContent = state.lastResult;
+    elResult.classList.toggle('error', state.lastResult === ERR);
+    // keep the right edge (newest input) visible
+    elExpr.scrollLeft = elExpr.scrollWidth;
+    elResult.scrollLeft = elResult.scrollWidth;
+    elMem.classList.toggle('on', state.memory !== 0);
+  }
+
+  /* =====================================================================
+     7. HISTORY
+  ===================================================================== */
+  function pushHistory(expr, result){
+    state.history.unshift({ expr: prettify(expr), result: result });
+    if(state.history.length > 10) state.history.pop();
+    renderHistory();
+  }
+
+  function renderHistory(){
+    elHist.innerHTML = '';
+    if(state.history.length === 0){
+      var li = document.createElement('li');
+      li.className = 'hist-empty';
+      li.textContent = 'Δεν υπάρχουν υπολογισμοί ακόμη.';
+      elHist.appendChild(li);
+      return;
+    }
+    state.history.forEach(function(h){
+      var li = document.createElement('li');
+      li.className = 'hist-item';
+      li.innerHTML = '<span class="he">' + escapeHtml(h.expr) +
+                     ' =</span> <span class="hr">' + escapeHtml(h.result) + '</span>';
+      li.addEventListener('click', function(){ insertResult(h.result); });
+      elHist.appendChild(li);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>]/g, function(c){
+      return c === '&' ? '&amp;' : c === '<' ? '&lt;' : '&gt;';
+    });
+  }
+
+  // Insert a history result into the current expression
+  function insertResult(resStr){
+    if(resStr === ERR) return;
+    if(state.showingResult){
+      state.expr = '';
+      state.showingResult = false;
+    }
+    state.expr += resStr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+    updateDisplay();
+  }
+
+  /* =====================================================================
+     8. INPUT HANDLING
+  ===================================================================== */
+  function startFreshIfNeeded(){
+    if(state.showingResult){
+      state.expr = '';
+      state.showingResult = false;
+    }
+  }
+
+  function insert(str){
+    // If a result is showing and user types an operator, continue from result.
+    if(state.showingResult){
+      if(/^[+\-*/^%]$/.test(str) && state.lastResult !== ERR){
+        state.expr = state.lastResult.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+      } else {
+        state.expr = '';
+      }
+      state.showingResult = false;
+    }
+    state.expr += str;
+    livePreview();
+  }
+
+  // Live (non-destructive) preview of the result as the user types.
+  function livePreview(){
+    if(state.expr.trim() === ''){
+      state.lastResult = '0';
+      updateDisplay();
+      return;
+    }
+    try{
+      var v = compute(state.expr);
+      state.lastResult = format(v);
+    }catch(e){
+      // While typing, an incomplete expression is normal — keep last good value
+      // but do not show error mid-typing.
+    }
+    updateDisplay();
+  }
+
+  function doEquals(){
+    if(state.expr.trim() === '') return;
+    try{
+      var v = compute(state.expr);
+      var res = format(v);
+      if(res === ERR) throw new Error('fmt');
+      pushHistory(state.expr, res);
+      state.lastResult = res;
+      state.showingResult = true;
+    }catch(e){
+      state.lastResult = ERR;
+      state.showingResult = true;
+    }
+    updateDisplay();
+  }
+
+  function doClear(){
+    state.expr = '';
+    state.lastResult = '0';
+    state.showingResult = false;
+    updateDisplay();
+  }
+
+  function doDelete(){
+    if(state.showingResult){ doClear(); return; }
+    // delete one logical token (handle multi-char funcs)
+    var s = state.expr;
+    var m = s.match(/(asin|acos|atan|sqrt|cbrt|tenexp|sin|cos|tan|ln|log|abs|exp|pi)\($|(asin|acos|atan|sqrt|cbrt|tenexp|sin|cos|tan|ln|log|abs|exp|pi)$|.$/);
+    if(m){ s = s.slice(0, s.length - m[0].length); }
+    else { s = s.slice(0, -1); }
+    state.expr = s;
+    livePreview();
+  }
+
+  // +/- sign toggle on the trailing number
+  function doNeg(){
+    startFreshIfNeeded();
+    var s = state.expr;
+    // find trailing number
+    var m = s.match(/(\d*\.?\d+)$/);
+    if(m){
+      var num = m[1];
+      var before = s.slice(0, s.length - num.length);
+      // if preceded by "(-", strip it; else wrap as (-num)
+      if(before.endsWith('(-')){
+        state.expr = before.slice(0, -2) + '(' + num; // can't cleanly unwrap; keep simple
+      } else if(before.endsWith('-(') ){
+        state.expr = before + num;
+      } else {
+        state.expr = before + '(-' + num + ')';
+      }
+    } else if(s === ''){
+      state.expr = '(-';
+    } else {
+      state.expr += '(-';
+    }
+    livePreview();
+  }
+
+  // Operate on the *current value* (result or live) for unary buttons
+  function applyToCurrent(wrapPre, wrapPost){
+    // Wrap the entire current expression: e.g. x² -> (expr)^2
+    if(state.expr.trim() === '' && state.lastResult !== ERR){
+      state.expr = state.lastResult.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+    }
+    if(state.showingResult){
+      state.expr = state.lastResult.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+      state.showingResult = false;
+    }
+    if(state.expr.trim() === '') return;
+    state.expr = wrapPre + '(' + state.expr + ')' + wrapPost;
+    livePreview();
+  }
+
+  function handleAction(action){
+    switch(action){
+      case 'ac':   doClear(); break;
+      case 'del':  doDelete(); break;
+      case 'eq':   doEquals(); break;
+      case 'neg':  doNeg(); break;
+      case 'sq':   applyToCurrent('', '^2'); break;
+      case 'inv':  applyToCurrent('1/', ''); break;        // 1/(expr)
+      case 'fact': applyFactorial(); break;
+      case 'percent': insert('%'); break;
+      case 'mc':   state.memory = 0; updateDisplay(); break;
+      case 'mr':   memoryRecall(); break;
+      case 'm+':   memoryAdd(1); break;
+      case 'm-':   memoryAdd(-1); break;
+    }
+  }
+
+  function applyFactorial(){
+    // factorial applies to current numeric value
+    var base = currentValueString();
+    if(base === null) return;
+    state.expr = '';
+    state.showingResult = false;
+    try{
+      var v = compute(base);
+      var f = factorial(v);
+      var res = format(f);
+      if(res === ERR || !isFinite(f)) throw new Error('fact');
+      pushHistory(base + '!', res);
+      state.lastResult = res;
+      state.showingResult = true;
+    }catch(e){
+      state.lastResult = ERR;
+      state.showingResult = true;
+    }
+    updateDisplay();
+  }
+
+  // returns a math-syntax string representing the current value, or null
+  function currentValueString(){
+    if(state.expr.trim() !== '') return state.expr;
+    if(state.lastResult !== ERR && state.lastResult !== '0')
+      return state.lastResult.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+    if(state.lastResult === '0') return '0';
+    return null;
+  }
+
+  function currentNumericValue(){
+    var s = currentValueString();
+    if(s === null) return null;
+    try{ return compute(s); }catch(e){ return null; }
+  }
+
+  /* ---------------- Memory ---------------- */
+  function memoryRecall(){
+    startFreshIfNeeded();
+    state.expr += format(state.memory).replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+    livePreview();
+  }
+  function memoryAdd(sign){
+    var v = currentNumericValue();
+    if(v === null) return;
+    state.memory += sign * v;
+    if(Math.abs(state.memory) < 1e-12) state.memory = 0;
+    updateDisplay();
+  }
+
+  /* ---------------- Angle mode ---------------- */
+  function setMode(mode){
+    state.angleMode = mode;
+    elModeDeg.classList.toggle('on', mode === 'DEG');
+    elModeRad.classList.toggle('on', mode === 'RAD');
+    livePreview(); // re-evaluate current expr under new mode
+  }
+
+  /* =====================================================================
+     9. WIRE UP BUTTONS
+  ===================================================================== */
+  document.querySelectorAll('button.key').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var ins = btn.getAttribute('data-insert');
+      var act = btn.getAttribute('data-action');
+      if(ins !== null) insert(ins);
+      else if(act) handleAction(act);
+    });
+  });
+
+  elModeDeg.addEventListener('click', function(){ setMode('DEG'); });
+  elModeRad.addEventListener('click', function(){ setMode('RAD'); });
+  document.getElementById('histClear').addEventListener('click', function(){
+    state.history = []; renderHistory();
+  });
+
+  /* =====================================================================
+     10. KEYBOARD SUPPORT
+  ===================================================================== */
+  function handleKey(e){
+    var k = e.key;
+
+    // digits & decimal
+    if(/^[0-9]$/.test(k)){ insert(k); e.preventDefault(); return; }
+    if(k === '.'){ insert('.'); e.preventDefault(); return; }
+
+    // operators
+    if(k === '+'){ insert('+'); e.preventDefault(); return; }
+    if(k === '-'){ insert('-'); e.preventDefault(); return; }
+    if(k === '*'){ insert('*'); e.preventDefault(); return; }
+    if(k === '/'){ insert('/'); e.preventDefault(); return; }
+    if(k === '^'){ insert('^'); e.preventDefault(); return; }
+    if(k === '%'){ insert('%'); e.preventDefault(); return; }
+    if(k === '('){ insert('('); e.preventDefault(); return; }
+    if(k === ')'){ insert(')'); e.preventDefault(); return; }
+
+    if(k === 'Enter' || k === '='){ doEquals(); e.preventDefault(); return; }
+    if(k === 'Backspace'){ doDelete(); e.preventDefault(); return; }
+    if(k === 'Escape'){ doClear(); e.preventDefault(); return; }
+  }
+  document.addEventListener('keydown', handleKey);
+
+  /* =====================================================================
+     11. INIT
+  ===================================================================== */
+  renderHistory();
+  updateDisplay();
+})();
+</script>
+</body>
+</html>

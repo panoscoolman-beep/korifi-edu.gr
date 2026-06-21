@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta name="theme-color" content="#060d1b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="application-name" content="Περιοδικός Πίνακας">
+  <meta name="description" content="Διαδραστικός περιοδικός πίνακας στοιχείων στα ελληνικά — 118 στοιχεία, αναζήτηση, κατηγορίες, ηλεκτρονική δομή. Δωρεάν εργαλείο του Φροντιστηρίου Κορυφή.">
+  <title>Περιοδικός Πίνακας Στοιχείων — Φροντιστήριο Κορυφή</title>
+  <style>
+    :root {
+      --bg:     #060d1b;
+      --bg2:    #0b1a30;
+      --bg3:    #0f2040;
+      --text:   #c8d8e8;
+      --dim:    #2a5080;
+      --border: #1a3050;
+      --cw: 44px;
+      --ch: 50px;
+      --gap: 2px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { background: var(--bg); }
+    body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; min-height: 100dvh; overscroll-behavior: none; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Toolbar (back to hub) ───────────── */
+    .toolbar { max-width: 980px; margin: 0 auto; padding: 10px 4px 0; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: .12em; color: var(--dim); text-decoration: none; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--border); border-radius: 20px; transition: color .15s, border-color .15s; }
+    .back-link:hover, .back-link:active { color: #7ec8e3; border-color: #7ec8e3; }
+
+    /* ── Layout ─────────────────────────── */
+    #app { padding: 4px 10px 90px; }
+
+    /* ── Header ─────────────────────────── */
+    .hdr { text-align: center; margin-bottom: 14px; }
+    .hdr-sub  { font-size: 8px; letter-spacing: .35em; color: var(--dim); margin-bottom: 3px; }
+    .hdr-title{ font-size: 18px; font-weight: bold; letter-spacing: .13em; color: #7ec8e3; text-transform: uppercase; }
+    .hdr-hint { font-size: 8px; color: var(--dim); margin-top: 3px; letter-spacing: .1em; }
+
+    /* ── Search ─────────────────────────── */
+    .srch-wrap { display: flex; justify-content: center; margin-bottom: 10px; }
+    .srch { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; color: #7ec8e3; padding: 9px 14px; font-size: 12px; width: 100%; max-width: 420px; font-family: inherit; outline: none; }
+    .srch::placeholder { color: var(--dim); }
+
+    /* ── Category chips ─────────────────── */
+    #cats { display: flex; gap: 5px; overflow-x: auto; padding: 2px 2px 10px; scrollbar-width: none; }
+    #cats::-webkit-scrollbar { display: none; }
+    .cat-btn { white-space: nowrap; border-radius: 20px; padding: 5px 12px; font-size: 10px; font-family: inherit; cursor: pointer; transition: filter .15s; letter-spacing: .04em; flex-shrink: 0; touch-action: manipulation; border: 1px solid; }
+    .cat-btn:active { filter: brightness(.8); }
+
+    /* ── Table shell ────────────────────── */
+    .tbl-outer { overflow-x: auto; overflow-y: visible; -webkit-overflow-scrolling: touch; padding-bottom: 6px; }
+    .grp-row { display: flex; gap: var(--gap); padding-left: calc(20px + var(--gap)); margin-bottom: var(--gap); }
+    .grp-lbl { width: var(--cw); text-align: center; font-size: 7px; color: var(--dim); flex-shrink: 0; }
+    .tbl-wrap { display: flex; }
+    .per-col { display: flex; flex-direction: column; gap: var(--gap); margin-right: var(--gap); flex-shrink: 0; }
+    .per-lbl { width: 20px; height: var(--ch); display: flex; align-items: center; justify-content: center; font-size: 7px; color: var(--dim); flex-shrink: 0; }
+    .per-lbl.sp { height: 14px; }
+
+    /* ── Grid ───────────────────────────── */
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(18, var(--cw));
+      grid-template-rows: repeat(7, var(--ch)) 14px var(--ch) var(--ch);
+      gap: var(--gap);
+      flex-shrink: 0;
+    }
+
+    /* ── Element card ───────────────────── */
+    .el {
+      border-radius: 3px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; padding: 2px 1px; position: relative;
+      transition: transform .12s, box-shadow .12s, opacity .18s;
+      touch-action: manipulation; user-select: none;
+    }
+    .el:active { transform: scale(.92); }
+    .el .eN  { font-size: 7px;  color: var(--dim); line-height: 1; }
+    .el .eSy { font-size: 16px; font-weight: bold; line-height: 1.1; letter-spacing: -.3px; }
+    .el .eNm { font-size: 5.5px; color: var(--dim); line-height: 1; max-width: calc(var(--cw) - 4px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+    .el .eMa { font-size: 6px; color: var(--dim); line-height: 1; }
+    .el.dimmed { opacity: .08; pointer-events: none; }
+    @keyframes gpulse {
+      0%,100% { box-shadow: 0 0 8px var(--g1), 0 0 20px var(--g2); }
+      50%      { box-shadow: 0 0 16px var(--g1), 0 0 38px var(--g2); }
+    }
+    .el.sel { animation: gpulse 2s infinite; }
+
+    /* ── Placeholder & divider ──────────── */
+    .phld { border-radius: 3px; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: 7px; color: var(--dim); }
+    .fdiv { display: flex; align-items: center; justify-content: center; font-size: 7px; color: var(--border); letter-spacing: .15em; }
+
+    /* ── Overlay ────────────────────────── */
+    #overlay { position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .3s; }
+    #overlay.vis { opacity: 1; pointer-events: auto; }
+
+    /* ── Bottom sheet ───────────────────── */
+    #sheet {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      background: var(--bg2); border-radius: 18px 18px 0 0;
+      border-top: 2px solid var(--border); border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+      padding: 0 20px 36px;
+      transform: translateY(100%);
+      transition: transform .35s cubic-bezier(.4,0,.2,1), border-color .3s;
+      max-height: 75dvh; overflow-y: auto; overscroll-behavior: contain;
+    }
+    #sheet.open { transform: translateY(0); }
+    .handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 13px auto 18px; flex-shrink: 0; }
+    .sh-cat  { font-size: 8px; letter-spacing: .2em; margin-bottom: 5px; }
+    .sh-sym  { font-size: 58px; font-weight: bold; line-height: 1; }
+    .sh-name { font-size: 15px; color: #7ec8e3; margin-top: 5px; letter-spacing: .04em; }
+    .sh-num  { font-size: 9px; color: var(--dim); margin-top: 3px; }
+    .sh-hero { text-align: center; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .drow { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--border); padding: 9px 0; gap: 8px; }
+    .dlbl { font-size: 9px; color: var(--dim); letter-spacing: .07em; flex-shrink: 0; }
+    .dval { font-size: 12px; font-weight: bold; text-align: right; }
+    .close-btn { margin-top: 22px; width: 100%; background: transparent; border-radius: 6px; padding: 13px; font-family: inherit; cursor: pointer; font-size: 11px; letter-spacing: .1em; transition: background .15s; touch-action: manipulation; }
+
+    /* ── Footer ─────────────────────────── */
+    .footer { text-align: center; margin-top: 18px; font-size: 8px; color: var(--dim); letter-spacing: .08em; line-height: 1.7; }
+  </style>
+</head>
+<body>
+<div class="toolbar">
+  <a class="back-link" href="/ergaleia">← Εργαλεία</a>
+</div>
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-sub">ΔΙΑΔΡΑΣΤΙΚΟΣ</div>
+    <h1 class="hdr-title">Περιοδικός Πίνακας Στοιχείων</h1>
+    <div class="hdr-hint">118 ΣΤΟΙΧΕΊΑ · ΠΑΤΗΣΤΕ ΓΙΑ ΛΕΠΤΟΜΈΡΕΙΕΣ</div>
+  </div>
+
+  <div class="srch-wrap">
+    <input id="srch" class="srch" type="search" placeholder="Αναζήτηση ονόματος, συμβόλου ή αριθμού…" />
+  </div>
+
+  <div id="cats"></div>
+
+  <div class="tbl-outer">
+    <div class="grp-row" id="grpRow"></div>
+    <div class="tbl-wrap">
+      <div class="per-col" id="perCol"></div>
+      <div id="grid"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Τιμές σε παρένθεση = μαζικός αριθμός σταθερότερου ισοτόπου<br>
+    Αποθηκεύστε τη σελίδα → Chrome → «Προσθήκη στην αρχική οθόνη» για χρήση ως εφαρμογή Android
+  </div>
+</div>
+
+<div id="overlay"></div>
+
+<div id="sheet">
+  <div class="handle" id="shHandle"></div>
+  <div class="sh-hero">
+    <div class="sh-cat" id="shCat"></div>
+    <div class="sh-sym" id="shSym"></div>
+    <div class="sh-name" id="shName"></div>
+    <div class="sh-num" id="shNum"></div>
+  </div>
+  <div id="shData"></div>
+  <button class="close-btn" id="shClose">✕ ΚΛΕΙΣΙΜΟ</button>
+</div>
+
+<script>
+// ── Category definitions ─────────────────────────────────────────────────
+const CATS = {
+  "alkali-metal":     { el:"Αλκάλια Μέταλλα",           color:"#ff6b6b" },
+  "alkaline-earth":   { el:"Μέταλλα Αλκαλικών Γαιών",   color:"#ffa94d" },
+  "transition-metal": { el:"Μεταβατικά Μέταλλα",         color:"#4dabf7" },
+  "post-transition":  { el:"Μεταμεταβατικά Μέταλλα",     color:"#69db7c" },
+  "metalloid":        { el:"Ημιμέταλλα",                  color:"#38d9a9" },
+  "nonmetal":         { el:"Αμέταλλα",                    color:"#ffe066" },
+  "halogen":          { el:"Αλογόνα",                     color:"#da77f2" },
+  "noble-gas":        { el:"Ευγενή Αέρια",                color:"#f783ac" },
+  "lanthanide":       { el:"Λανθανίδια",                  color:"#748ffc" },
+  "actinide":         { el:"Ακτινίδια",                   color:"#9775fa" },
+  "unknown":          { el:"Άγνωστες Ιδιότητες",          color:"#868e96" },
+};
+
+// ── Element data [n, symbol, greekName, mass, category, gridRow, gridCol, electronConfig, electronegativity, phase]
+const EL = [
+  // Περίοδος 1
+  [1,  "H",  "Υδρογόνο",      "1.008",  "nonmetal",        1, 1,  "1s¹",                    2.20, "Αέριο"],
+  [2,  "He", "Ήλιο",          "4.003",  "noble-gas",       1, 18, "1s²",                    null, "Αέριο"],
+  // Περίοδος 2
+  [3,  "Li", "Λίθιο",         "6.941",  "alkali-metal",    2, 1,  "[He] 2s¹",               0.98, "Στερεό"],
+  [4,  "Be", "Βηρύλλιο",      "9.012",  "alkaline-earth",  2, 2,  "[He] 2s²",               1.57, "Στερεό"],
+  [5,  "B",  "Βόριο",         "10.81",  "metalloid",       2, 13, "[He] 2s² 2p¹",           2.04, "Στερεό"],
+  [6,  "C",  "Άνθρακας",      "12.01",  "nonmetal",        2, 14, "[He] 2s² 2p²",           2.55, "Στερεό"],
+  [7,  "N",  "Άζωτο",         "14.01",  "nonmetal",        2, 15, "[He] 2s² 2p³",           3.04, "Αέριο"],
+  [8,  "O",  "Οξυγόνο",       "16.00",  "nonmetal",        2, 16, "[He] 2s² 2p⁴",           3.44, "Αέριο"],
+  [9,  "F",  "Φθόριο",        "19.00",  "halogen",         2, 17, "[He] 2s² 2p⁵",           3.98, "Αέριο"],
+  [10, "Ne", "Νέον",           "20.18",  "noble-gas",       2, 18, "[He] 2s² 2p⁶",           null, "Αέριο"],
+  // Περίοδος 3
+  [11, "Na", "Νάτριο",         "22.99",  "alkali-metal",    3, 1,  "[Ne] 3s¹",               0.93, "Στερεό"],
+  [12, "Mg", "Μαγνήσιο",      "24.31",  "alkaline-earth",  3, 2,  "[Ne] 3s²",               1.31, "Στερεό"],
+  [13, "Al", "Αλουμίνιο",      "26.98",  "post-transition", 3, 13, "[Ne] 3s² 3p¹",           1.61, "Στερεό"],
+  [14, "Si", "Πυρίτιο",        "28.09",  "metalloid",       3, 14, "[Ne] 3s² 3p²",           1.90, "Στερεό"],
+  [15, "P",  "Φώσφορος",       "30.97",  "nonmetal",        3, 15, "[Ne] 3s² 3p³",           2.19, "Στερεό"],
+  [16, "S",  "Θείο",           "32.07",  "nonmetal",        3, 16, "[Ne] 3s² 3p⁴",           2.58, "Στερεό"],
+  [17, "Cl", "Χλώριο",         "35.45",  "halogen",         3, 17, "[Ne] 3s² 3p⁵",           3.16, "Αέριο"],
+  [18, "Ar", "Αργό",           "39.95",  "noble-gas",       3, 18, "[Ne] 3s² 3p⁶",           null, "Αέριο"],
+  // Περίοδος 4
+  [19, "K",  "Κάλιο",          "39.10",  "alkali-metal",    4, 1,  "[Ar] 4s¹",               0.82, "Στερεό"],
+  [20, "Ca", "Ασβέστιο",       "40.08",  "alkaline-earth",  4, 2,  "[Ar] 4s²",               1.00, "Στερεό"],
+  [21, "Sc", "Σκάνδιο",        "44.96",  "transition-metal",4, 3,  "[Ar] 3d¹ 4s²",           1.36, "Στερεό"],
+  [22, "Ti", "Τιτάνιο",        "47.87",  "transition-metal",4, 4,  "[Ar] 3d² 4s²",           1.54, "Στερεό"],
+  [23, "V",  "Βανάδιο",        "50.94",  "transition-metal",4, 5,  "[Ar] 3d³ 4s²",           1.63, "Στερεό"],
+  [24, "Cr", "Χρώμιο",         "52.00",  "transition-metal",4, 6,  "[Ar] 3d⁵ 4s¹",           1.66, "Στερεό"],
+  [25, "Mn", "Μαγγάνιο",      "54.94",  "transition-metal",4, 7,  "[Ar] 3d⁵ 4s²",           1.55, "Στερεό"],
+  [26, "Fe", "Σίδηρος",        "55.85",  "transition-metal",4, 8,  "[Ar] 3d⁶ 4s²",           1.83, "Στερεό"],
+  [27, "Co", "Κοβάλτιο",       "58.93",  "transition-metal",4, 9,  "[Ar] 3d⁷ 4s²",           1.88, "Στερεό"],
+  [28, "Ni", "Νικέλιο",        "58.69",  "transition-metal",4, 10, "[Ar] 3d⁸ 4s²",           1.91, "Στερεό"],
+  [29, "Cu", "Χαλκός",         "63.55",  "transition-metal",4, 11, "[Ar] 3d¹⁰ 4s¹",          1.90, "Στερεό"],
+  [30, "Zn", "Ψευδάργυρος",    "65.38",  "transition-metal",4, 12, "[Ar] 3d¹⁰ 4s²",          1.65, "Στερεό"],
+  [31, "Ga", "Γάλλιο",         "69.72",  "post-transition", 4, 13, "[Ar] 3d¹⁰ 4s² 4p¹",      1.81, "Στερεό"],
+  [32, "Ge", "Γερμάνιο",       "72.63",  "metalloid",       4, 14, "[Ar] 3d¹⁰ 4s² 4p²",      2.01, "Στερεό"],
+  [33, "As", "Αρσενικό",       "74.92",  "metalloid",       4, 15, "[Ar] 3d¹⁰ 4s² 4p³",      2.18, "Στερεό"],
+  [34, "Se", "Σελήνιο",        "78.97",  "nonmetal",        4, 16, "[Ar] 3d¹⁰ 4s² 4p⁴",      2.55, "Στερεό"],
+  [35, "Br", "Βρώμιο",         "79.90",  "halogen",         4, 17, "[Ar] 3d¹⁰ 4s² 4p⁵",      2.96, "Υγρό"],
+  [36, "Kr", "Κρυπτό",         "83.80",  "noble-gas",       4, 18, "[Ar] 3d¹⁰ 4s² 4p⁶",      3.00, "Αέριο"],
+  // Περίοδος 5
+  [37, "Rb", "Ρουβίδιο",       "85.47",  "alkali-metal",    5, 1,  "[Kr] 5s¹",               0.82, "Στερεό"],
+  [38, "Sr", "Στρόντιο",       "87.62",  "alkaline-earth",  5, 2,  "[Kr] 5s²",               0.95, "Στερεό"],
+  [39, "Y",  "Υττρίο",         "88.91",  "transition-metal",5, 3,  "[Kr] 4d¹ 5s²",           1.22, "Στερεό"],
+  [40, "Zr", "Ζιρκόνιο",       "91.22",  "transition-metal",5, 4,  "[Kr] 4d² 5s²",           1.33, "Στερεό"],
+  [41, "Nb", "Νιόβιο",         "92.91",  "transition-metal",5, 5,  "[Kr] 4d⁴ 5s¹",           1.60, "Στερεό"],
+  [42, "Mo", "Μολυβδαίνιο",    "95.96",  "transition-metal",5, 6,  "[Kr] 4d⁵ 5s¹",           2.16, "Στερεό"],
+  [43, "Tc", "Τεχνήτιο",       "(98)",   "transition-metal",5, 7,  "[Kr] 4d⁵ 5s²",           1.90, "Στερεό"],
+  [44, "Ru", "Ρουθήνιο",       "101.1",  "transition-metal",5, 8,  "[Kr] 4d⁷ 5s¹",           2.20, "Στερεό"],
+  [45, "Rh", "Ρόδιο",          "102.9",  "transition-metal",5, 9,  "[Kr] 4d⁸ 5s¹",           2.28, "Στερεό"],
+  [46, "Pd", "Παλλάδιο",       "106.4",  "transition-metal",5, 10, "[Kr] 4d¹⁰",              2.20, "Στερεό"],
+  [47, "Ag", "Άργυρος",        "107.9",  "transition-metal",5, 11, "[Kr] 4d¹⁰ 5s¹",          1.93, "Στερεό"],
+  [48, "Cd", "Κάδμιο",         "112.4",  "transition-metal",5, 12, "[Kr] 4d¹⁰ 5s²",          1.69, "Στερεό"],
+  [49, "In", "Ίνδιο",          "114.8",  "post-transition", 5, 13, "[Kr] 4d¹⁰ 5s² 5p¹",      1.78, "Στερεό"],
+  [50, "Sn", "Κασσίτερος",     "118.7",  "post-transition", 5, 14, "[Kr] 4d¹⁰ 5s² 5p²",      1.96, "Στερεό"],
+  [51, "Sb", "Αντιμόνιο",      "121.8",  "metalloid",       5, 15, "[Kr] 4d¹⁰ 5s² 5p³",      2.05, "Στερεό"],
+  [52, "Te", "Τελλούριο",      "127.6",  "metalloid",       5, 16, "[Kr] 4d¹⁰ 5s² 5p⁴",      2.10, "Στερεό"],
+  [53, "I",  "Ιώδιο",          "126.9",  "halogen",         5, 17, "[Kr] 4d¹⁰ 5s² 5p⁵",      2.66, "Στερεό"],
+  [54, "Xe", "Ξένο",           "131.3",  "noble-gas",       5, 18, "[Kr] 4d¹⁰ 5s² 5p⁶",      2.60, "Αέριο"],
+  // Περίοδος 6
+  [55, "Cs", "Καίσιο",         "132.9",  "alkali-metal",    6, 1,  "[Xe] 6s¹",               0.79, "Στερεό"],
+  [56, "Ba", "Βάριο",          "137.3",  "alkaline-earth",  6, 2,  "[Xe] 6s²",               0.89, "Στερεό"],
+  [72, "Hf", "Άφνιο",          "178.5",  "transition-metal",6, 4,  "[Xe] 4f¹⁴ 5d² 6s²",      1.30, "Στερεό"],
+  [73, "Ta", "Τάνταλο",        "180.9",  "transition-metal",6, 5,  "[Xe] 4f¹⁴ 5d³ 6s²",      1.50, "Στερεό"],
+  [74, "W",  "Βολφράμιο",      "183.8",  "transition-metal",6, 6,  "[Xe] 4f¹⁴ 5d⁴ 6s²",      2.36, "Στερεό"],
+  [75, "Re", "Ρήνιο",          "186.2",  "transition-metal",6, 7,  "[Xe] 4f¹⁴ 5d⁵ 6s²",      1.90, "Στερεό"],
+  [76, "Os", "Όσμιο",          "190.2",  "transition-metal",6, 8,  "[Xe] 4f¹⁴ 5d⁶ 6s²",      2.20, "Στερεό"],
+  [77, "Ir", "Ιρίδιο",         "192.2",  "transition-metal",6, 9,  "[Xe] 4f¹⁴ 5d⁷ 6s²",      2.20, "Στερεό"],
+  [78, "Pt", "Πλατίνα",        "195.1",  "transition-metal",6, 10, "[Xe] 4f¹⁴ 5d⁹ 6s¹",      2.28, "Στερεό"],
+  [79, "Au", "Χρυσός",         "197.0",  "transition-metal",6, 11, "[Xe] 4f¹⁴ 5d¹⁰ 6s¹",     2.54, "Στερεό"],
+  [80, "Hg", "Υδράργυρος",     "200.6",  "transition-metal",6, 12, "[Xe] 4f¹⁴ 5d¹⁰ 6s²",     2.00, "Υγρό"],
+  [81, "Tl", "Θάλλιο",         "204.4",  "post-transition", 6, 13, "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹", 1.62, "Στερεό"],
+  [82, "Pb", "Μόλυβδος",       "207.2",  "post-transition", 6, 14, "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²", 2.33, "Στερεό"],
+  [83, "Bi", "Βισμούθιο",      "209.0",  "post-transition", 6, 15, "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³", 2.02, "Στερεό"],
+  [84, "Po", "Πολώνιο",        "(209)",  "post-transition", 6, 16, "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴", 2.00, "Στερεό"],
+  [85, "At", "Αστάτιο",        "(210)",  "halogen",         6, 17, "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵", 2.20, "Στερεό"],
+  [86, "Rn", "Ραδόνιο",        "(222)",  "noble-gas",       6, 18, "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶", null, "Αέριο"],
+  // Περίοδος 7
+  [87,  "Fr",  "Φράγκιο",      "(223)",  "alkali-metal",    7, 1,  "[Rn] 7s¹",               0.70, "Στερεό"],
+  [88,  "Ra",  "Ράδιο",        "(226)",  "alkaline-earth",  7, 2,  "[Rn] 7s²",               0.89, "Στερεό"],
+  [104, "Rf",  "Ράδερφορδιο",  "(267)",  "transition-metal",7, 4,  "[Rn] 5f¹⁴ 6d² 7s²",      null, "Στερεό"],
+  [105, "Db",  "Ντούμπνιο",    "(268)",  "transition-metal",7, 5,  "[Rn] 5f¹⁴ 6d³ 7s²",      null, "Στερεό"],
+  [106, "Sg",  "Σηαμπόργκιο",  "(271)",  "transition-metal",7, 6,  "[Rn] 5f¹⁴ 6d⁴ 7s²",      null, "Στερεό"],
+  [107, "Bh",  "Μπόχριο",      "(272)",  "transition-metal",7, 7,  "[Rn] 5f¹⁴ 6d⁵ 7s²",      null, "Στερεό"],
+  [108, "Hs",  "Χάσσιο",       "(277)",  "transition-metal",7, 8,  "[Rn] 5f¹⁴ 6d⁶ 7s²",      null, "Στερεό"],
+  [109, "Mt",  "Μαϊτνέριο",    "(278)",  "unknown",         7, 9,  "[Rn] 5f¹⁴ 6d⁷ 7s²",      null, "Στερεό"],
+  [110, "Ds",  "Νταρμστάτιο",  "(281)",  "unknown",         7, 10, "[Rn] 5f¹⁴ 6d⁸ 7s²",      null, "Στερεό"],
+  [111, "Rg",  "Ρεντγκενίο",   "(280)",  "unknown",         7, 11, "[Rn] 5f¹⁴ 6d⁹ 7s²",      null, "Στερεό"],
+  [112, "Cn",  "Κοπερνίκιο",   "(285)",  "transition-metal",7, 12, "[Rn] 5f¹⁴ 6d¹⁰ 7s²",     null, "Αέριο"],
+  [113, "Nh",  "Νιχόνιο",      "(286)",  "unknown",         7, 13, "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹", null, "Στερεό"],
+  [114, "Fl",  "Φλερόβιο",     "(289)",  "post-transition", 7, 14, "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²", null, "Αέριο"],
+  [115, "Mc",  "Μοσκόβιο",     "(290)",  "unknown",         7, 15, "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³", null, "Στερεό"],
+  [116, "Lv",  "Λιβερμόριο",   "(293)",  "unknown",         7, 16, "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴", null, "Στερεό"],
+  [117, "Ts",  "Τενεσίο",      "(294)",  "unknown",         7, 17, "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵", null, "Στερεό"],
+  [118, "Og",  "Ογκανέσσον",   "(294)",  "unknown",         7, 18, "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", null, "Αέριο"],
+  // Λανθανίδια (γραμμή 9)
+  [57,  "La",  "Λανθάνιο",     "138.9",  "lanthanide",      9, 3,  "[Xe] 5d¹ 6s²",           1.10, "Στερεό"],
+  [58,  "Ce",  "Κήριο",        "140.1",  "lanthanide",      9, 4,  "[Xe] 4f¹ 5d¹ 6s²",       1.12, "Στερεό"],
+  [59,  "Pr",  "Πρασεοδύμιο",  "140.9",  "lanthanide",      9, 5,  "[Xe] 4f³ 6s²",           1.13, "Στερεό"],
+  [60,  "Nd",  "Νεοδύμιο",     "144.2",  "lanthanide",      9, 6,  "[Xe] 4f⁴ 6s²",           1.14, "Στερεό"],
+  [61,  "Pm",  "Προμήθειο",    "(145)",  "lanthanide",      9, 7,  "[Xe] 4f⁵ 6s²",           1.13, "Στερεό"],
+  [62,  "Sm",  "Σαμάριο",      "150.4",  "lanthanide",      9, 8,  "[Xe] 4f⁶ 6s²",           1.17, "Στερεό"],
+  [63,  "Eu",  "Ευρώπιο",      "152.0",  "lanthanide",      9, 9,  "[Xe] 4f⁷ 6s²",           1.20, "Στερεό"],
+  [64,  "Gd",  "Γαδολίνιο",    "157.3",  "lanthanide",      9, 10, "[Xe] 4f⁷ 5d¹ 6s²",       1.20, "Στερεό"],
+  [65,  "Tb",  "Τέρβιο",       "158.9",  "lanthanide",      9, 11, "[Xe] 4f⁹ 6s²",           1.10, "Στερεό"],
+  [66,  "Dy",  "Δυσπρόσιο",    "162.5",  "lanthanide",      9, 12, "[Xe] 4f¹⁰ 6s²",          1.22, "Στερεό"],
+  [67,  "Ho",  "Όλμιο",        "164.9",  "lanthanide",      9, 13, "[Xe] 4f¹¹ 6s²",          1.23, "Στερεό"],
+  [68,  "Er",  "Έρβιο",        "167.3",  "lanthanide",      9, 14, "[Xe] 4f¹² 6s²",          1.24, "Στερεό"],
+  [69,  "Tm",  "Θούλιο",       "168.9",  "lanthanide",      9, 15, "[Xe] 4f¹³ 6s²",          1.25, "Στερεό"],
+  [70,  "Yb",  "Υττέρβιο",     "173.1",  "lanthanide",      9, 16, "[Xe] 4f¹⁴ 6s²",          1.10, "Στερεό"],
+  [71,  "Lu",  "Λουτέτιο",     "175.0",  "lanthanide",      9, 17, "[Xe] 4f¹⁴ 5d¹ 6s²",      1.27, "Στερεό"],
+  // Ακτινίδια (γραμμή 10)
+  [89,  "Ac",  "Ακτίνιο",      "(227)",  "actinide",        10, 3, "[Rn] 6d¹ 7s²",           1.10, "Στερεό"],
+  [90,  "Th",  "Θόριο",        "232.0",  "actinide",        10, 4, "[Rn] 6d² 7s²",           1.30, "Στερεό"],
+  [91,  "Pa",  "Πρωτακτίνιο",  "231.0",  "actinide",        10, 5, "[Rn] 5f² 6d¹ 7s²",       1.50, "Στερεό"],
+  [92,  "U",   "Ουράνιο",      "238.0",  "actinide",        10, 6, "[Rn] 5f³ 6d¹ 7s²",       1.38, "Στερεό"],
+  [93,  "Np",  "Νεπτούνιο",    "(237)",  "actinide",        10, 7, "[Rn] 5f⁴ 6d¹ 7s²",       1.36, "Στερεό"],
+  [94,  "Pu",  "Πλουτώνιο",    "(244)",  "actinide",        10, 8, "[Rn] 5f⁶ 7s²",           1.28, "Στερεό"],
+  [95,  "Am",  "Αμερίκιο",     "(243)",  "actinide",        10, 9, "[Rn] 5f⁷ 7s²",           1.13, "Στερεό"],
+  [96,  "Cm",  "Κιούριο",      "(247)",  "actinide",        10,10, "[Rn] 5f⁷ 6d¹ 7s²",       1.28, "Στερεό"],
+  [97,  "Bk",  "Βερκέλιο",     "(247)",  "actinide",        10,11, "[Rn] 5f⁹ 7s²",           1.30, "Στερεό"],
+  [98,  "Cf",  "Καλιφόρνιο",   "(251)",  "actinide",        10,12, "[Rn] 5f¹⁰ 7s²",          1.30, "Στερεό"],
+  [99,  "Es",  "Αϊνστάινιο",   "(252)",  "actinide",        10,13, "[Rn] 5f¹¹ 7s²",          1.30, "Στερεό"],
+  [100, "Fm",  "Φέρμιο",       "(257)",  "actinide",        10,14, "[Rn] 5f¹² 7s²",          1.30, "Στερεό"],
+  [101, "Md",  "Μεντελέβιο",   "(258)",  "actinide",        10,15, "[Rn] 5f¹³ 7s²",          1.30, "Στερεό"],
+  [102, "No",  "Νομπέλιο",     "(259)",  "actinide",        10,16, "[Rn] 5f¹⁴ 7s²",          1.30, "Στερεό"],
+  [103, "Lr",  "Λόρενσιο",     "(266)",  "actinide",        10,17, "[Rn] 5f¹⁴ 7s² 7p¹",      null, "Στερεό"],
+];
+
+// ── Index by atomic number ───────────────────────────────────────────────
+const BY_N = {};
+EL.forEach(e => BY_N[e[0]] = e);
+// Index by symbol (lowercase) for hash deep-linking, e.g. #Fe
+const BY_SYM = {};
+EL.forEach(e => BY_SYM[e[1].toLowerCase()] = e[0]);
+
+// ── State ────────────────────────────────────────────────────────────────
+let selectedN = null;
+let filterCat = null;
+let searchQ   = "";
+
+// ── Build group labels ───────────────────────────────────────────────────
+const grpRow = document.getElementById("grpRow");
+[1,2,null,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18].forEach(g => {
+  const d = document.createElement("div");
+  d.className = "grp-lbl";
+  d.textContent = g || "";
+  grpRow.appendChild(d);
+});
+
+// ── Build period labels ──────────────────────────────────────────────────
+const perCol = document.getElementById("perCol");
+["Π1","Π2","Π3","Π4","Π5","Π6","Π7","","Λ","Α"].forEach((lbl, i) => {
+  const d = document.createElement("div");
+  d.className = "per-lbl" + (i === 7 ? " sp" : "");
+  d.textContent = lbl;
+  perCol.appendChild(d);
+});
+
+// ── Build category chips ─────────────────────────────────────────────────
+const catsDiv = document.getElementById("cats");
+const allBtn = document.createElement("button");
+allBtn.className = "cat-btn";
+allBtn.textContent = "ΟΛΑ";
+allBtn.style.cssText = "background:transparent;border-color:#1a3050;color:#7ec8e3;";
+allBtn.onclick = () => { filterCat = null; allBtn.style.background = "#1a3050"; renderFilter(); };
+catsDiv.appendChild(allBtn);
+
+Object.entries(CATS).forEach(([key, {el: label, color}]) => {
+  const btn = document.createElement("button");
+  btn.className = "cat-btn";
+  btn.textContent = label;
+  btn.style.cssText = `background:transparent;border-color:${color};color:${color};`;
+  btn.dataset.cat = key;
+  btn.onclick = () => {
+    filterCat = (filterCat === key) ? null : key;
+    renderFilter();
+  };
+  catsDiv.appendChild(btn);
+});
+
+// ── Build grid ───────────────────────────────────────────────────────────
+const grid = document.getElementById("grid");
+
+// Placeholder cells for f-block
+[[6,3,"57–71"],[7,3,"89–103"]].forEach(([r,c,txt]) => {
+  const d = document.createElement("div");
+  d.className = "phld";
+  d.style.gridRow = r; d.style.gridColumn = c;
+  d.textContent = txt;
+  grid.appendChild(d);
+});
+
+// f-block divider in row 8
+const fdiv = document.createElement("div");
+fdiv.className = "fdiv";
+fdiv.style.cssText = "grid-row:8;grid-column:3/span 15;";
+fdiv.textContent = "── υπόστρωμα f ──";
+grid.appendChild(fdiv);
+
+// Element cards
+EL.forEach(e => {
+  const [n, sym, name, mass, cat, row, col, cfg, neg, phase] = e;
+  const color = CATS[cat]?.color || "#868e96";
+
+  const card = document.createElement("div");
+  card.className = "el";
+  card.id = "el-" + n;
+  card.style.cssText = `grid-row:${row};grid-column:${col};background:#0b1a30;border:1px solid ${color}55;--g1:${color}88;--g2:${color}33;`;
+
+  card.innerHTML =
+    `<div class="eN">${n}</div>` +
+    `<div class="eSy" style="color:${color}cc">${sym}</div>` +
+    `<div class="eNm">${name}</div>` +
+    `<div class="eMa">${mass}</div>`;
+
+  card.addEventListener("click", () => openSheet(n));
+  grid.appendChild(card);
+});
+
+// ── Filter rendering ─────────────────────────────────────────────────────
+function renderFilter() {
+  // Update chip appearances
+  document.querySelectorAll(".cat-btn").forEach(btn => {
+    const k = btn.dataset.cat;
+    if (!k) { // "all" button
+      btn.style.background = !filterCat ? "#1a3050" : "transparent";
+    } else {
+      const color = CATS[k]?.color || "#868e96";
+      btn.style.background = (filterCat === k) ? color + "22" : "transparent";
+    }
+  });
+
+  const q = searchQ.toLowerCase();
+  const activeSet = (!q && !filterCat) ? null : new Set(
+    EL.filter(([n, sym, name, , cat]) =>
+      (!q || name.toLowerCase().includes(q) || sym.toLowerCase().includes(q) || String(n) === q) &&
+      (!filterCat || cat === filterCat)
+    ).map(e => e[0])
+  );
+
+  EL.forEach(([n]) => {
+    const card = document.getElementById("el-" + n);
+    if (!card) return;
+    const dimmed = activeSet !== null && !activeSet.has(n);
+    card.classList.toggle("dimmed", dimmed);
+  });
+}
+
+// ── Search ───────────────────────────────────────────────────────────────
+document.getElementById("srch").addEventListener("input", function() {
+  searchQ = this.value;
+  renderFilter();
+});
+
+// ── Bottom sheet ─────────────────────────────────────────────────────────
+const sheet   = document.getElementById("sheet");
+const overlay = document.getElementById("overlay");
+
+function openSheet(n) {
+  const e = BY_N[n];
+  if (!e) return;
+  const [num, sym, name, mass, cat, row, col, cfg, neg, phase] = e;
+  const color = CATS[cat]?.color || "#868e96";
+  const period = row <= 7 ? row : row === 9 ? 6 : 7;
+
+  // Deselect previous
+  if (selectedN) {
+    const prev = document.getElementById("el-" + selectedN);
+    if (prev) {
+      prev.classList.remove("sel");
+      prev.style.boxShadow = "";
+      const prevColor = CATS[BY_N[selectedN][4]]?.color || "#868e96";
+      prev.style.background = "#0b1a30";
+      prev.style.border = `1px solid ${prevColor}55`;
+      prev.querySelector(".eSy").style.color = prevColor + "cc";
+    }
+  }
+
+  selectedN = n;
+  const card = document.getElementById("el-" + n);
+  if (card) {
+    card.classList.add("sel");
+    card.style.background = color + "1e";
+    card.style.border = `1px solid ${color}`;
+    card.querySelector(".eSy").style.color = color;
+  }
+
+  // Reflect selection in the URL hash for deep-linking (e.g. #Fe)
+  if (("#" + sym) !== decodeURIComponent(location.hash)) {
+    history.replaceState(null, "", "#" + sym);
+  }
+
+  // Fill sheet content
+  sheet.style.borderColor = color;
+  document.getElementById("shCat").style.color = color;
+  document.getElementById("shCat").textContent = (CATS[cat]?.el || "").toUpperCase();
+  document.getElementById("shSym").style.color = color;
+  document.getElementById("shSym").style.textShadow = `0 0 24px ${color}66`;
+  document.getElementById("shSym").textContent = sym;
+  document.getElementById("shName").textContent = name;
+  document.getElementById("shNum").textContent = "Ατομικός Αριθμός: " + num;
+
+  const phaseColor = phase === "Αέριο" ? "#f783ac" : phase === "Υγρό" ? "#4dabf7" : "#69db7c";
+
+  document.getElementById("shData").innerHTML =
+    row2("ΑΤΟΜΙΚΗ ΜΑΖΑ",          mass + " u",                              color) +
+    row2("ΠΕΡΙΟΔΟΣ / ΟΜΑΔΑ",      period + " / " + col,                    null) +
+    row2("ΚΑΤΑΣΤΑΣΗ (25°C)",       phase,                                    phaseColor) +
+    row2("ΗΛΕΚΤΡΟΝΙΚΗ ΔΟΜΗ",      cfg,                                      null) +
+    row2("ΗΛΕΚΤΡΟΑΡΝΗΤΙΚΟΤΗΤΑ",   neg !== null ? neg.toFixed(2) + " (Pauling)" : "Δ/Υ", null);
+
+  const closeBtn = document.getElementById("shClose");
+  closeBtn.style.cssText = `border-color:${color}55;color:${color};margin-top:22px;width:100%;background:transparent;border-radius:6px;padding:13px;font-family:inherit;cursor:pointer;font-size:11px;letter-spacing:.1em;transition:background .15s;touch-action:manipulation;`;
+
+  sheet.classList.add("open");
+  overlay.classList.add("vis");
+  card && card.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+}
+
+function row2(label, val, color) {
+  return `<div class="drow"><span class="dlbl">${label}</span><span class="dval"${color ? ` style="color:${color}"` : ""}>${val}</span></div>`;
+}
+
+function closeSheet() {
+  if (selectedN) {
+    const card = document.getElementById("el-" + selectedN);
+    if (card) {
+      card.classList.remove("sel");
+      const prevColor = CATS[BY_N[selectedN][4]]?.color || "#868e96";
+      card.style.background = "#0b1a30";
+      card.style.border = `1px solid ${prevColor}55`;
+      card.querySelector(".eSy").style.color = prevColor + "cc";
+    }
+    selectedN = null;
+  }
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  sheet.classList.remove("open");
+  overlay.classList.remove("vis");
+}
+
+document.getElementById("shClose").addEventListener("click", closeSheet);
+overlay.addEventListener("click", closeSheet);
+
+// Swipe down to close
+let touchStartY = 0;
+document.getElementById("shHandle").addEventListener("touchstart", e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+sheet.addEventListener("touchstart", e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+sheet.addEventListener("touchend", e => {
+  if (e.changedTouches[0].clientY - touchStartY > 70) closeSheet();
+}, { passive: true });
+
+// ── Deep-linking: open an element from the URL hash (e.g. #Fe or #26) ─────
+function openFromHash() {
+  const raw = decodeURIComponent((location.hash || "").replace(/^#/, "")).trim().toLowerCase();
+  if (!raw) return;
+  const n = BY_SYM[raw] || (BY_N[raw] ? Number(raw) : null);
+  if (n) openSheet(n);
+}
+window.addEventListener("hashchange", openFromHash);
+openFromHash();
+</script>
+</body>
+</html>

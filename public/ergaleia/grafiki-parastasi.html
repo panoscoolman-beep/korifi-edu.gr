@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta name="theme-color" content="#060d1b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="application-name" content="Γραφική Παράσταση">
+  <meta name="description" content="Δωρεάν διαδραστική γραφική παράσταση συναρτήσεων — γράψε f(x) και δες την καμπύλη. Φροντιστήριο Κορυφή.">
+  <title>Γραφική Παράσταση Συναρτήσεων — Φροντιστήριο Κορυφή</title>
+  <style>
+    :root {
+      --bg:     #060d1b;
+      --bg2:    #0b1a30;
+      --bg3:    #0f2040;
+      --text:   #c8d8e8;
+      --dim:    #2a5080;
+      --border: #1a3050;
+      --accent: #7ec8e3;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { background: var(--bg); }
+    body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; min-height: 100dvh; overscroll-behavior: none; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Toolbar (back to hub) ───────────── */
+    .toolbar { max-width: 980px; margin: 0 auto; padding: 10px 12px 0; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: .12em; color: var(--dim); text-decoration: none; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--border); border-radius: 20px; transition: color .15s, border-color .15s; }
+    .back-link:hover, .back-link:active { color: #7ec8e3; border-color: #7ec8e3; }
+
+    /* ── Layout ─────────────────────────── */
+    #app { max-width: 980px; margin: 0 auto; padding: 4px 10px 24px; }
+
+    /* ── Header ─────────────────────────── */
+    .hdr { text-align: center; margin-bottom: 10px; }
+    .hdr-sub  { font-size: 8px; letter-spacing: .35em; color: var(--dim); margin-bottom: 3px; }
+    .hdr-title{ font-size: 17px; font-weight: bold; letter-spacing: .12em; color: var(--accent); text-transform: uppercase; }
+
+    /* ── Function list ──────────────────── */
+    #fnList { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+    .fn-row {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 8px;
+    }
+    .fn-swatch {
+      width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0;
+      cursor: pointer; border: 1px solid #0006; transition: opacity .15s;
+    }
+    .fn-row.off .fn-swatch { opacity: .25; }
+    .fn-label { font-size: 12px; color: var(--dim); flex-shrink: 0; user-select: none; }
+    .fn-eq    { font-size: 12px; color: var(--accent); flex-shrink: 0; }
+    .fn-input {
+      flex: 1; min-width: 0;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 5px;
+      color: var(--text); padding: 7px 9px; font-size: 13px;
+      font-family: inherit; outline: none;
+    }
+    .fn-input:focus { border-color: var(--accent); }
+    .fn-input.err  { border-color: #ff6b6b; color: #ff9a9a; }
+    .fn-input::placeholder { color: var(--dim); }
+    .fn-rm {
+      width: 26px; height: 26px; flex-shrink: 0;
+      background: transparent; border: 1px solid var(--border); border-radius: 5px;
+      color: var(--dim); font-size: 14px; cursor: pointer; font-family: inherit;
+      transition: color .15s, border-color .15s; line-height: 1;
+    }
+    .fn-rm:hover { color: #ff6b6b; border-color: #ff6b6b; }
+    .fn-err-msg { font-size: 9px; color: #ff7b7b; padding: 0 2px 2px 24px; letter-spacing: .04em; min-height: 0; }
+
+    /* ── Add button ─────────────────────── */
+    #addFn {
+      background: transparent; border: 1px dashed var(--border); border-radius: 8px;
+      color: var(--accent); padding: 8px; font-family: inherit; font-size: 11px;
+      cursor: pointer; letter-spacing: .06em; width: 100%; transition: border-color .15s, background .15s;
+    }
+    #addFn:hover { border-color: var(--accent); background: #7ec8e311; }
+    #addFn:disabled { opacity: .35; cursor: not-allowed; }
+
+    /* ── Examples ───────────────────────── */
+    .ex-wrap { margin: 9px 0 4px; }
+    .ex-lbl  { font-size: 9px; color: var(--dim); letter-spacing: .1em; margin-bottom: 5px; }
+    .ex-chips { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    .ex-chips::-webkit-scrollbar { display: none; }
+    .ex-chip {
+      white-space: nowrap; flex-shrink: 0; cursor: pointer; font-family: inherit;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 20px;
+      color: var(--accent); padding: 5px 11px; font-size: 11px; transition: filter .15s, border-color .15s;
+    }
+    .ex-chip:active { filter: brightness(.8); }
+    .ex-chip:hover  { border-color: var(--accent); }
+
+    /* ── Canvas + controls ──────────────── */
+    .plot-wrap { position: relative; margin-top: 8px; }
+    #plot {
+      display: block; width: 100%;
+      height: min(70vh, 560px);
+      background: var(--bg2);
+      border: 1px solid var(--border); border-radius: 10px;
+      touch-action: none; cursor: crosshair;
+    }
+    /* zoom / reset controls floating bottom-right of the canvas */
+    .ctrls {
+      position: absolute; right: 10px; bottom: 10px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .ctrl-btn {
+      width: 38px; height: 38px;
+      background: var(--bg3cc, rgba(15,32,64,.85)); backdrop-filter: blur(2px);
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--accent); font-size: 19px; line-height: 1; cursor: pointer;
+      font-family: inherit; display: flex; align-items: center; justify-content: center;
+      transition: border-color .15s, background .15s; touch-action: manipulation;
+    }
+    .ctrl-btn:hover  { border-color: var(--accent); }
+    .ctrl-btn:active { background: #7ec8e322; }
+    /* live readouts overlaid top-left of the canvas */
+    .readout {
+      position: absolute; left: 10px; top: 10px;
+      font-size: 10px; color: var(--dim); line-height: 1.5; pointer-events: none;
+      background: rgba(6,13,27,.55); padding: 4px 7px; border-radius: 6px; letter-spacing: .03em;
+    }
+    .readout .coord { color: var(--accent); }
+    .readout .rng   { color: var(--text); opacity: .8; }
+
+    /* ── Footer ─────────────────────────── */
+    .footer { text-align: center; margin-top: 16px; font-size: 8px; color: var(--dim); letter-spacing: .08em; line-height: 1.7; }
+  </style>
+</head>
+<body>
+<div class="toolbar"><a class="back-link" href="/ergaleia">← Εργαλεία</a></div>
+
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-sub">ΔΙΑΔΡΑΣΤΙΚΟ</div>
+    <h1 class="hdr-title">Γραφική Παράσταση Συναρτήσεων</h1>
+  </div>
+
+  <div id="fnList"></div>
+  <button id="addFn">+ Προσθήκη συνάρτησης</button>
+
+  <div class="ex-wrap">
+    <div class="ex-lbl">Παραδείγματα:</div>
+    <div class="ex-chips" id="exChips"></div>
+  </div>
+
+  <div class="plot-wrap">
+    <canvas id="plot"></canvas>
+    <div class="readout">
+      <div><span class="coord" id="roCoord">x = —, y = —</span></div>
+      <div><span class="rng" id="roRange">—</span></div>
+    </div>
+    <div class="ctrls">
+      <button class="ctrl-btn" id="zoomIn"  title="Μεγέθυνση">+</button>
+      <button class="ctrl-btn" id="zoomOut" title="Σμίκρυνση">−</button>
+      <button class="ctrl-btn" id="reset"   title="Επαναφορά">⌖</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Σύρε για μετακίνηση · κύλιση/τσίμπημα για zoom · ραδιανές για τριγωνομετρικές<br>
+    Αποθηκεύστε τη σελίδα → Chrome → «Προσθήκη στην αρχική οθόνη» για χρήση ως εφαρμογή
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ===========================================================================
+   ΓΡΑΦΙΚΗ ΠΑΡΑΣΤΑΣΗ ΣΥΝΑΡΤΗΣΕΩΝ
+   Modular vanilla JS. Concerns are split into clearly labelled sections:
+     1. Parser   — tokenize → toRPN (shunting-yard) → evalRPN
+     2. View     — camera / world<->screen transforms + nice-number ticks
+     3. Renderer — grid, axes (with arrowheads), tick labels, curves
+     4. Input    — pan (mouse/touch), zoom (wheel/pinch/buttons), readouts
+     5. UI       — function-list management, example chips
+   No eval(), no external libraries.
+   ========================================================================= */
+
+/* ===========================================================================
+   1. PARSER  —  tokenizer + shunting-yard (→ RPN) + RPN evaluator
+   ---------------------------------------------------------------------------
+   Grammar supported (one variable: x):
+     numbers        12, 3.5, .5
+     constants      pi, π, e
+     variable       x
+     operators      + - * / ^   (binary), unary minus
+     parentheses    ( )
+     functions      sin cos tan asin acos atan sqrt abs ln log exp
+   Notes:
+     - ^ is RIGHT-associative; everything else left-associative.
+     - log = base 10, ln = natural log. Trig uses radians.
+   ========================================================================= */
+
+// Known one-argument functions, mapped to JS implementations.
+const FUNCTIONS = {
+  sin:  Math.sin,
+  cos:  Math.cos,
+  tan:  Math.tan,
+  asin: Math.asin,
+  acos: Math.acos,
+  atan: Math.atan,
+  sqrt: Math.sqrt,
+  abs:  Math.abs,
+  ln:   Math.log,            // natural logarithm
+  log:  (v) => Math.log10 ? Math.log10(v) : Math.log(v) / Math.LN10, // base 10
+  exp:  Math.exp,
+};
+
+// Named constants.
+const CONSTANTS = { pi: Math.PI, "π": Math.PI, e: Math.E };
+
+// Operator precedence + associativity. Unary minus ("u-") binds tightest below ^.
+const OPS = {
+  "+": { prec: 2, assoc: "L", args: 2, fn: (a, b) => a + b },
+  "-": { prec: 2, assoc: "L", args: 2, fn: (a, b) => a - b },
+  "*": { prec: 3, assoc: "L", args: 2, fn: (a, b) => a * b },
+  "/": { prec: 3, assoc: "L", args: 2, fn: (a, b) => a / b },
+  "u-":{ prec: 4, assoc: "R", args: 1, fn: (a)    => -a },
+  "^": { prec: 5, assoc: "R", args: 2, fn: (a, b) => Math.pow(a, b) },
+};
+
+/* --- tokenize --------------------------------------------------------------
+   Produces a flat token list. CRUCIAL PART: implicit multiplication.
+   After emitting a token we look at whether a "*" must be inserted before the
+   NEXT token. A "*" is inserted whenever an "operand-ending" token (number,
+   variable, constant, or a closing ")") is immediately followed by an
+   "operand-starting" token (number, variable, constant, function name, or an
+   opening "("). This makes student notation work:
+       2x      -> 2 * x
+       3sin(x) -> 3 * sin(x)
+       2(x+1)  -> 2 * (x+1)
+       (x+1)x  -> (x+1) * x
+       xpi     -> x * pi
+   Function names are matched greedily BEFORE a bare variable, so `sin` is one
+   token (a function) rather than s*i*n. A function name is an operand-STARTER
+   but is NOT an operand-ENDER (it must be followed by its argument), which is
+   why we never insert "*" right after a function name.
+--------------------------------------------------------------------------- */
+function tokenize(input) {
+  const s = input.replace(/\s+/g, "");           // strip all whitespace
+  const tokens = [];
+  let i = 0;
+
+  // Does the previous emitted token end an operand? (=> multiplication may follow)
+  const endsOperand = () => {
+    if (!tokens.length) return false;
+    const t = tokens[tokens.length - 1];
+    return t.type === "num" || t.type === "var" || t.type === "const" || t.value === ")";
+  };
+  // Insert an implicit "*" if the previous token ended an operand.
+  const maybeImplicitMul = () => { if (endsOperand()) tokens.push({ type: "op", value: "*" }); };
+
+  while (i < s.length) {
+    const ch = s[i];
+
+    // --- number (integer / decimal, allowing leading dot) ---
+    if (/[0-9]/.test(ch) || (ch === "." && /[0-9]/.test(s[i + 1] || ""))) {
+      let j = i + 1;
+      while (j < s.length && /[0-9.]/.test(s[j])) j++;
+      const numStr = s.slice(i, j);
+      if ((numStr.match(/\./g) || []).length > 1) throw new Error("Μη έγκυρος αριθμός");
+      maybeImplicitMul();                          // e.g. ")2" or "x2"
+      tokens.push({ type: "num", value: parseFloat(numStr) });
+      i = j;
+      continue;
+    }
+
+    // --- operators ---
+    if ("+-*/^".includes(ch)) {
+      // Decide unary vs binary minus: unary at start, or after another operator,
+      // or right after "(". (Unary plus is harmless — we just drop it.)
+      const prev = tokens[tokens.length - 1];
+      const unaryContext = !prev || prev.type === "op" || prev.value === "(";
+      if (ch === "-" && unaryContext)      tokens.push({ type: "op", value: "u-" });
+      else if (ch === "+" && unaryContext) { /* drop leading unary plus */ }
+      else                                  tokens.push({ type: "op", value: ch });
+      i++;
+      continue;
+    }
+
+    // --- parentheses ---
+    if (ch === "(") { maybeImplicitMul(); tokens.push({ type: "paren", value: "(" }); i++; continue; }
+    if (ch === ")") { tokens.push({ type: "paren", value: ")" }); i++; continue; }
+
+    // --- identifiers: function name, constant, or variable x ---
+    if (/[a-zπ]/i.test(ch)) {
+      // Greedily match the longest known function name first.
+      let matchedFn = null;
+      for (const name of Object.keys(FUNCTIONS)) {
+        if (s.startsWith(name, i)) {
+          // Ensure it is not the prefix of a longer identifier (e.g. "exp" vs "e").
+          const after = s[i + name.length];
+          if (!after || !/[a-zπ]/i.test(after)) { matchedFn = name; break; }
+        }
+      }
+      if (matchedFn) {
+        maybeImplicitMul();                        // e.g. "2sin(x)" or ")cos(x)"
+        tokens.push({ type: "func", value: matchedFn });
+        i += matchedFn.length;
+        continue;
+      }
+      // constant "pi" / "π"
+      if (s.startsWith("pi", i)) {
+        maybeImplicitMul();
+        tokens.push({ type: "const", value: "pi" });
+        i += 2;
+        continue;
+      }
+      if (ch === "π") {
+        maybeImplicitMul();
+        tokens.push({ type: "const", value: "π" });
+        i++;
+        continue;
+      }
+      // single letters: e (Euler) or x (variable). Any other letter is invalid.
+      if (ch === "e") { maybeImplicitMul(); tokens.push({ type: "const", value: "e" }); i++; continue; }
+      if (ch === "x" || ch === "X") { maybeImplicitMul(); tokens.push({ type: "var", value: "x" }); i++; continue; }
+      throw new Error("Άγνωστο σύμβολο: " + ch);
+    }
+
+    throw new Error("Άγνωστος χαρακτήρας: " + ch);
+  }
+  return tokens;
+}
+
+/* --- shunting-yard: token list -> Reverse Polish Notation ----------------- */
+function toRPN(tokens) {
+  const output = [];
+  const stack = [];                                // holds ops, funcs, "("
+  for (const tok of tokens) {
+    switch (tok.type) {
+      case "num":
+      case "var":
+      case "const":
+        output.push(tok);
+        break;
+      case "func":
+        stack.push(tok);
+        break;
+      case "op": {
+        const o1 = OPS[tok.value];
+        while (stack.length) {
+          const top = stack[stack.length - 1];
+          if (top.type === "func") { output.push(stack.pop()); continue; }
+          if (top.type === "op") {
+            const o2 = OPS[top.value];
+            if ((o1.assoc === "L" && o1.prec <= o2.prec) ||
+                (o1.assoc === "R" && o1.prec <  o2.prec)) {
+              output.push(stack.pop());
+              continue;
+            }
+          }
+          break;
+        }
+        stack.push(tok);
+        break;
+      }
+      case "paren":
+        if (tok.value === "(") {
+          stack.push(tok);
+        } else {                                    // ")"
+          let found = false;
+          while (stack.length) {
+            const top = stack.pop();
+            if (top.value === "(") { found = true; break; }
+            output.push(top);
+          }
+          if (!found) throw new Error("Λείπει αριστερή παρένθεση");
+          // pop a function sitting on top of the matched "(" — its args are done
+          if (stack.length && stack[stack.length - 1].type === "func") output.push(stack.pop());
+        }
+        break;
+    }
+  }
+  while (stack.length) {
+    const top = stack.pop();
+    if (top.type === "paren") throw new Error("Λείπει δεξιά παρένθεση");
+    output.push(top);
+  }
+  return output;
+}
+
+/* --- evaluate RPN for a given x ------------------------------------------- */
+function evalRPN(rpn, x) {
+  const st = [];
+  for (const tok of rpn) {
+    switch (tok.type) {
+      case "num":   st.push(tok.value); break;
+      case "var":   st.push(x); break;
+      case "const": st.push(CONSTANTS[tok.value]); break;
+      case "func": {
+        if (st.length < 1) throw new Error("Μη έγκυρη παράσταση");
+        const a = st.pop();
+        st.push(FUNCTIONS[tok.value](a));
+        break;
+      }
+      case "op": {
+        const o = OPS[tok.value];
+        if (st.length < o.args) throw new Error("Μη έγκυρη παράσταση");
+        if (o.args === 1) { const a = st.pop(); st.push(o.fn(a)); }
+        else              { const b = st.pop(); const a = st.pop(); st.push(o.fn(a, b)); }
+        break;
+      }
+    }
+  }
+  if (st.length !== 1) throw new Error("Μη έγκυρη παράσταση");
+  return st[0];
+}
+
+/* --- compile an expression string into a fast x->y function --------------- */
+function compile(expr) {
+  // Accept "f(x)=..." / "y=..." style prefixes by stripping them.
+  let clean = expr.trim().replace(/^\s*(f\s*\(\s*x\s*\)|y)\s*=/i, "").trim();
+  if (clean === "") throw new Error("Κενή παράσταση");
+  const rpn = toRPN(tokenize(clean));
+  // sanity-evaluate once so obvious structural errors surface immediately
+  evalRPN(rpn, 1);
+  return (x) => evalRPN(rpn, x);
+}
+
+/* ===========================================================================
+   2. VIEW  —  camera + world<->screen transforms + nice-number ticks
+   The camera is described in WORLD coordinates by its center (cx, cy) and a
+   uniform scale (pixels per world-unit). Equal scale on both axes keeps the
+   aspect ratio square; circles look round, x^2 looks symmetric.
+   ========================================================================= */
+const view = {
+  cx: 0, cy: 0,            // world coordinates at the canvas center
+  scale: 40,               // pixels per world unit (set properly on first fit)
+  w: 0, h: 0,              // CSS pixel size of the canvas
+  // world -> screen
+  sx(x) { return this.w / 2 + (x - this.cx) * this.scale; },
+  sy(y) { return this.h / 2 - (y - this.cy) * this.scale; },
+  // screen -> world
+  wx(px) { return this.cx + (px - this.w / 2) / this.scale; },
+  wy(py) { return this.cy - (py - this.h / 2) / this.scale; },
+};
+
+// Reset to a sensible default framing once we know the canvas size.
+function fitDefault() {
+  view.cx = 0; view.cy = 0;
+  // aim for roughly [-10, 10] on the shorter axis
+  view.scale = Math.min(view.w, view.h) / 20;
+}
+
+// "Nice" tick step: 1, 2, 5 × 10^n closest to a target pixel spacing.
+function niceStep(targetPx) {
+  const rawWorld = targetPx / view.scale;          // world units per ~targetPx
+  const pow = Math.pow(10, Math.floor(Math.log10(rawWorld)));
+  const norm = rawWorld / pow;                      // in [1,10)
+  let nice;
+  if (norm < 1.5) nice = 1;
+  else if (norm < 3) nice = 2;
+  else if (norm < 7) nice = 5;
+  else nice = 10;
+  return nice * pow;
+}
+
+// Format a tick label without ugly floating point dust.
+function fmtTick(v, step) {
+  if (v === 0) return "0";
+  const decimals = Math.max(0, -Math.floor(Math.log10(step)));
+  let s = v.toFixed(Math.min(decimals, 6));
+  if (s.indexOf(".") >= 0) s = s.replace(/0+$/, "").replace(/\.$/, "");
+  return s;
+}
+
+/* ===========================================================================
+   3. RENDERER  —  grid, axes, ticks, curves
+   ========================================================================= */
+const canvas = document.getElementById("plot");
+const ctx = canvas.getContext("2d");
+let dpr = 1;
+
+// Resize backing store for crisp rendering on HiDPI screens.
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  dpr = window.devicePixelRatio || 1;
+  view.w = rect.width;
+  view.h = rect.height;
+  canvas.width  = Math.round(rect.width  * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);          // draw in CSS pixels
+}
+
+function clearPlot() {
+  ctx.save();
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, view.w, view.h);
+  // dark plot background (matches theme)
+  ctx.fillStyle = "#0b1a30";
+  ctx.fillRect(0, 0, view.w, view.h);
+  ctx.restore();
+}
+
+function drawGrid() {
+  const step = niceStep(72);                        // ~72px between major lines
+  const x0 = view.wx(0), x1 = view.wx(view.w);
+  const y1 = view.wy(0), y0 = view.wy(view.h);      // y0 < y1 in world space
+
+  ctx.lineWidth = 1;
+  ctx.font = "10px 'Courier New', monospace";
+
+  // vertical grid lines + x tick labels
+  ctx.strokeStyle = "#1a3050";                       // subtle grid (var(--border))
+  for (let gx = Math.ceil(x0 / step) * step; gx <= x1; gx += step) {
+    const px = Math.round(view.sx(gx)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, view.h); ctx.stroke();
+  }
+  // horizontal grid lines
+  for (let gy = Math.ceil(y0 / step) * step; gy <= y1; gy += step) {
+    const py = Math.round(view.sy(gy)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(view.w, py); ctx.stroke();
+  }
+  return step;
+}
+
+function drawAxes(step) {
+  const ax = view.sx(0);                             // screen x of y-axis
+  const ay = view.sy(0);                             // screen y of x-axis
+  const axisColor = "#5a86b0";                       // brighter than grid
+  ctx.strokeStyle = axisColor;
+  ctx.fillStyle = "#9fc4e0";
+  ctx.lineWidth = 1.4;
+  ctx.font = "10px 'Courier New', monospace";
+
+  // ── X axis (only if visible) ──
+  if (ay >= 0 && ay <= view.h) {
+    const y = Math.round(ay) + 0.5;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(view.w, y); ctx.stroke();
+    arrow(view.w - 1, ay, 1, 0);                     // arrowhead pointing right
+    // x tick labels along the axis
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    const x0 = view.wx(0), x1 = view.wx(view.w);
+    const labelY = Math.min(view.h - 12, Math.max(2, ay + 4));
+    for (let gx = Math.ceil(x0 / step) * step; gx <= x1; gx += step) {
+      if (Math.abs(gx) < step / 2) continue;         // skip 0 (drawn at origin)
+      const px = view.sx(gx);
+      ctx.fillRect(px - 0.5, y - 3, 1, 6);           // tick mark
+      ctx.fillText(fmtTick(gx, step), px, labelY);
+    }
+  }
+
+  // ── Y axis (only if visible) ──
+  if (ax >= 0 && ax <= view.w) {
+    const x = Math.round(ax) + 0.5;
+    ctx.beginPath(); ctx.moveTo(x, view.h); ctx.lineTo(x, 0); ctx.stroke();
+    arrow(ax, 1, 0, -1);                             // arrowhead pointing up
+    // y tick labels along the axis
+    ctx.textBaseline = "middle";
+    const placeRight = ax < 40;                       // keep labels on screen near edges
+    ctx.textAlign = placeRight ? "left" : "right";
+    const y0 = view.wy(view.h), y1 = view.wy(0);
+    const labelX = placeRight ? Math.min(ax + 6, view.w - 4) : Math.max(ax - 6, 4);
+    for (let gy = Math.ceil(y0 / step) * step; gy <= y1; gy += step) {
+      if (Math.abs(gy) < step / 2) continue;
+      const py = view.sy(gy);
+      ctx.fillRect(x - 3, py - 0.5, 6, 1);
+      ctx.fillText(fmtTick(gy, step), labelX, py);
+    }
+  }
+
+  // origin label
+  if (ax >= 0 && ax <= view.w && ay >= 0 && ay <= view.h) {
+    ctx.textAlign = "right"; ctx.textBaseline = "top";
+    ctx.fillText("0", ax - 4, ay + 4);
+  }
+}
+
+// Small filled arrowhead at (x,y) pointing in direction (dx,dy) (unit-ish).
+function arrow(x, y, dx, dy) {
+  const len = 9, wid = 4;
+  const bx = x - dx * len, by = y - dy * len;        // base center
+  const px = -dy, py = dx;                            // perpendicular
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(bx + px * wid, by + py * wid);
+  ctx.lineTo(bx - px * wid, by - py * wid);
+  ctx.closePath();
+  ctx.fill();
+}
+
+/* --- draw one curve, per-pixel sampling with asymptote handling ----------
+   We sample one y value per horizontal CSS pixel. The "pen is lifted" (a new
+   sub-path begins) whenever:
+     - y is NaN / Infinity (e.g. sqrt of a negative, 1/0), OR
+     - a discontinuity is detected: the segment between consecutive samples is
+       near-vertical AND its endpoints jump sign while shooting far beyond the
+       viewport (the signature of tan(x), 1/x crossing an asymptote).
+   This prevents the spurious vertical lines those functions would otherwise
+   draw straight across the screen.
+------------------------------------------------------------------------- */
+function drawCurve(fn, color) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, view.w, view.h);                    // clip to plot area
+  ctx.clip();
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+
+  const yTopWorld = view.wy(0);                       // top edge in world y
+  const yBotWorld = view.wy(view.h);                  // bottom edge in world y
+  const span = yTopWorld - yBotWorld;                 // visible world height
+  const offLimit = Math.max(Math.abs(yTopWorld), Math.abs(yBotWorld)) + span * 4;
+
+  ctx.beginPath();
+  let penDown = false;
+  let prevY = NaN, prevPy = NaN;
+
+  for (let px = 0; px <= view.w; px++) {
+    const xw = view.wx(px);
+    let yw;
+    try { yw = fn(xw); } catch (_) { yw = NaN; }
+
+    if (!isFinite(yw)) {                              // NaN / Infinity -> lift pen
+      penDown = false; prevY = NaN; prevPy = NaN;
+      continue;
+    }
+    const py = view.sy(yw);
+
+    if (!penDown) {
+      ctx.moveTo(px, py);
+      penDown = true;
+    } else {
+      // Discontinuity test: huge jump that crosses through an asymptote.
+      const jump = Math.abs(yw - prevY);
+      const bothFarOpposite = (Math.abs(yw) > offLimit || Math.abs(prevY) > offLimit) &&
+                              Math.sign(yw) !== Math.sign(prevY) && jump > span;
+      if (bothFarOpposite) {
+        ctx.moveTo(px, py);                           // lift the pen across the gap
+      } else {
+        ctx.lineTo(px, py);
+      }
+    }
+    prevY = yw; prevPy = py;
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* --- master render -------------------------------------------------------- */
+function render() {
+  clearPlot();
+  const step = drawGrid();
+  drawAxes(step);
+  for (const f of functions) {
+    if (!f.visible || !f.fn) continue;
+    drawCurve(f.fn, f.color);
+  }
+  updateRangeReadout();
+}
+
+function updateRangeReadout() {
+  const x0 = view.wx(0), x1 = view.wx(view.w);
+  const y0 = view.wy(view.h), y1 = view.wy(0);
+  const f = (v) => fmtTick(v, niceStep(72));
+  document.getElementById("roRange").textContent =
+    `x ∈ [${f(x0)}, ${f(x1)}]  ·  y ∈ [${f(y0)}, ${f(y1)}]`;
+}
+
+/* ===========================================================================
+   4. INPUT  —  pan (mouse / one-finger touch), zoom (wheel / pinch / buttons),
+   live coordinate readout.
+   ========================================================================= */
+let dragging = false, lastX = 0, lastY = 0;
+
+// Convert a pointer event to CSS-pixel canvas coordinates.
+function canvasPos(clientX, clientY) {
+  const r = canvas.getBoundingClientRect();
+  return { x: clientX - r.left, y: clientY - r.top };
+}
+
+function showCoord(px, py) {
+  const xw = view.wx(px), yw = view.wy(py);
+  const f = (v) => {
+    const a = Math.abs(v);
+    if (a !== 0 && (a < 0.001 || a >= 1e6)) return v.toExponential(2);
+    return v.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
+  };
+  document.getElementById("roCoord").textContent = `x = ${f(xw)}, y = ${f(yw)}`;
+}
+
+// Zoom by factor `f` keeping the world point under (px,py) fixed on screen.
+function zoomAt(px, py, f) {
+  const wxBefore = view.wx(px), wyBefore = view.wy(py);
+  view.scale *= f;
+  view.scale = Math.max(1e-6, Math.min(1e9, view.scale));
+  // re-center so the same world point stays under the cursor
+  view.cx = wxBefore - (px - view.w / 2) / view.scale;
+  view.cy = wyBefore + (py - view.h / 2) / view.scale;
+  render();
+}
+
+// --- mouse pan ---
+canvas.addEventListener("mousedown", (e) => {
+  dragging = true;
+  const p = canvasPos(e.clientX, e.clientY);
+  lastX = p.x; lastY = p.y;
+});
+window.addEventListener("mousemove", (e) => {
+  const p = canvasPos(e.clientX, e.clientY);
+  if (dragging) {
+    view.cx -= (p.x - lastX) / view.scale;
+    view.cy += (p.y - lastY) / view.scale;
+    lastX = p.x; lastY = p.y;
+    render();
+  }
+  // readout only when pointer is over the canvas
+  const r = canvas.getBoundingClientRect();
+  if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
+    showCoord(p.x, p.y);
+  }
+});
+window.addEventListener("mouseup", () => { dragging = false; });
+
+// --- mouse wheel zoom (toward cursor) ---
+canvas.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const p = canvasPos(e.clientX, e.clientY);
+  const f = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+  zoomAt(p.x, p.y, f);
+}, { passive: false });
+
+// --- touch: one finger pans, two fingers pinch-zoom ---
+let touchMode = null;            // "pan" | "pinch"
+let pinchDist = 0, pinchMid = { x: 0, y: 0 };
+
+function touchDist(t0, t1) {
+  return Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
+}
+
+canvas.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 1) {
+    touchMode = "pan";
+    const p = canvasPos(e.touches[0].clientX, e.touches[0].clientY);
+    lastX = p.x; lastY = p.y;
+    showCoord(p.x, p.y);
+  } else if (e.touches.length === 2) {
+    touchMode = "pinch";
+    pinchDist = touchDist(e.touches[0], e.touches[1]);
+    const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    pinchMid = canvasPos(mx, my);
+  }
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => {
+  if (touchMode === "pan" && e.touches.length === 1) {
+    const p = canvasPos(e.touches[0].clientX, e.touches[0].clientY);
+    view.cx -= (p.x - lastX) / view.scale;
+    view.cy += (p.y - lastY) / view.scale;
+    lastX = p.x; lastY = p.y;
+    showCoord(p.x, p.y);
+    render();
+  } else if (touchMode === "pinch" && e.touches.length === 2) {
+    const d = touchDist(e.touches[0], e.touches[1]);
+    const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    const mid = canvasPos(mx, my);
+    if (pinchDist > 0) zoomAt(mid.x, mid.y, d / pinchDist);
+    pinchDist = d; pinchMid = mid;
+  }
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener("touchend", (e) => {
+  if (e.touches.length === 0) touchMode = null;
+  else if (e.touches.length === 1) {
+    touchMode = "pan";
+    const p = canvasPos(e.touches[0].clientX, e.touches[0].clientY);
+    lastX = p.x; lastY = p.y;
+  }
+}, { passive: false });
+
+// --- on-screen control buttons ---
+document.getElementById("zoomIn").addEventListener("click",
+  () => zoomAt(view.w / 2, view.h / 2, 1.3));
+document.getElementById("zoomOut").addEventListener("click",
+  () => zoomAt(view.w / 2, view.h / 2, 1 / 1.3));
+document.getElementById("reset").addEventListener("click",
+  () => { fitDefault(); render(); });
+
+// --- window resize ---
+let resizeRAF = null;
+window.addEventListener("resize", () => {
+  if (resizeRAF) cancelAnimationFrame(resizeRAF);
+  resizeRAF = requestAnimationFrame(() => { resizeCanvas(); render(); });
+});
+
+/* ===========================================================================
+   5. UI  —  function list management + example chips
+   ========================================================================= */
+// Distinct vivid curve colors, assigned in order.
+const COLORS = ["#7ec8e3", "#ff8787", "#69db7c", "#ffd43b", "#da77f2", "#ffa94d"];
+const MAX_FN = 6;
+
+// Each function entry: { id, expr, color, visible, fn, error }
+let functions = [];
+let nextId = 1;
+let activeId = null;             // which input most recently had focus (for chips)
+
+const fnListEl = document.getElementById("fnList");
+
+function pickColor() {
+  const used = new Set(functions.map((f) => f.color));
+  return COLORS.find((c) => !used.has(c)) || COLORS[functions.length % COLORS.length];
+}
+
+// (Re)compile a single function entry from its expression string.
+function recompile(entry) {
+  const raw = entry.expr.trim();
+  if (raw === "") { entry.fn = null; entry.error = null; return; }
+  try {
+    entry.fn = compile(raw);
+    entry.error = null;
+  } catch (err) {
+    entry.fn = null;
+    entry.error = err.message || "Σφάλμα";
+  }
+}
+
+function addFunction(initialExpr) {
+  if (functions.length >= MAX_FN) return;
+  const entry = {
+    id: nextId++,
+    expr: initialExpr || "",
+    color: pickColor(),
+    visible: true,
+    fn: null,
+    error: null,
+  };
+  recompile(entry);
+  functions.push(entry);
+  buildList();
+  render();
+  updateAddBtn();
+}
+
+function removeFunction(id) {
+  functions = functions.filter((f) => f.id !== id);
+  if (functions.length === 0) addFunction("");   // never leave the list empty
+  else { buildList(); render(); }
+  updateAddBtn();
+}
+
+function updateAddBtn() {
+  document.getElementById("addFn").disabled = functions.length >= MAX_FN;
+}
+
+// Rebuild the whole function-list DOM from state.
+function buildList() {
+  fnListEl.innerHTML = "";
+  functions.forEach((entry, idx) => {
+    const row = document.createElement("div");
+    row.className = "fn-row" + (entry.visible ? "" : " off");
+
+    // color swatch doubles as the show/hide toggle
+    const swatch = document.createElement("div");
+    swatch.className = "fn-swatch";
+    swatch.style.background = entry.color;
+    swatch.title = "Εμφάνιση / απόκρυψη";
+    swatch.addEventListener("click", () => {
+      entry.visible = !entry.visible;
+      row.classList.toggle("off", !entry.visible);
+      render();
+    });
+
+    const eq = document.createElement("span");
+    eq.className = "fn-eq";
+    eq.textContent = "f(x) =";
+
+    const input = document.createElement("input");
+    input.className = "fn-input" + (entry.error ? " err" : "");
+    input.type = "text";
+    input.spellcheck = false;
+    input.autocapitalize = "off";
+    input.autocomplete = "off";
+    input.value = entry.expr;
+    input.placeholder = "π.χ. x^2";
+    input.setAttribute("aria-label", "Συνάρτηση " + (idx + 1));
+    input.addEventListener("focus", () => { activeId = entry.id; });
+    input.addEventListener("input", () => {
+      entry.expr = input.value;
+      recompile(entry);
+      input.classList.toggle("err", !!entry.error);
+      errMsg.textContent = entry.error || "";
+      render();
+    });
+
+    const rm = document.createElement("button");
+    rm.className = "fn-rm";
+    rm.textContent = "×";
+    rm.title = "Αφαίρεση";
+    rm.setAttribute("aria-label", "Αφαίρεση συνάρτησης");
+    rm.addEventListener("click", () => removeFunction(entry.id));
+
+    row.append(swatch, eq, input, rm);
+    fnListEl.appendChild(row);
+
+    // inline error hint under the row
+    const errMsg = document.createElement("div");
+    errMsg.className = "fn-err-msg";
+    errMsg.textContent = entry.error || "";
+    fnListEl.appendChild(errMsg);
+  });
+}
+
+// --- example chips: fill the active (or first) input ---
+const EXAMPLES = ["x^2", "sin(x)", "cos(x)", "1/x", "sqrt(x)", "2^x", "x^3-3x", "tan(x)", "ln(x)"];
+const exChipsEl = document.getElementById("exChips");
+EXAMPLES.forEach((ex) => {
+  const chip = document.createElement("button");
+  chip.className = "ex-chip";
+  chip.textContent = ex;
+  chip.addEventListener("click", () => {
+    // target the last-focused function, else the first one
+    let target = functions.find((f) => f.id === activeId) || functions[0];
+    if (!target) { addFunction(ex); return; }
+    target.expr = ex;
+    recompile(target);
+    buildList();
+    render();
+    // refocus that input so successive chips keep targeting it
+    const inputs = fnListEl.querySelectorAll(".fn-input");
+    const i = functions.indexOf(target);
+    if (inputs[i]) { inputs[i].focus(); activeId = target.id; }
+  });
+  exChipsEl.appendChild(chip);
+});
+
+document.getElementById("addFn").addEventListener("click", () => addFunction(""));
+
+/* ===========================================================================
+   BOOT
+   ========================================================================= */
+function init() {
+  resizeCanvas();
+  fitDefault();
+  addFunction("x^2");       // start with one prefilled parabola
+  // (addFunction already renders; ensure the readout reflects the default view)
+  render();
+}
+init();
+</script>
+</body>
+</html>

@@ -6,6 +6,41 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-06-21 (feature — Διαδραστικά Εργαλεία / interactive study tools)
+
+### ✨ New section: `/ergaleia`
+
+Νέα ενότητα με δωρεάν διαδραστικά εκπαιδευτικά εργαλεία για μαθητές/καθηγητές
+(SEO lead-magnet + χρηστικότητα). Κάθε εργαλείο είναι **αυτόνομο HTML στο
+`public/ergaleia/`** — ανοίγει full-screen, δουλεύει σε κινητό + offline, έχει
+δικό του `← Εργαλεία` back-link. Μηδενικές εξαρτήσεις, μηδενικά external requests.
+
+**Εργαλεία (4):**
+- `periodikos-pinakas.html` — διαδραστικός περιοδικός πίνακας 118 στοιχείων
+  (+ deep-linking με hash, π.χ. `#Fe`).
+- `arithmomichani.html` — επιστημονική αριθμομηχανή (parser shunting-yard, DEG/RAD,
+  μνήμη, ιστορικό, keyboard support).
+- `grafiki-parastasi.html` — γραφική παράσταση συναρτήσεων (canvas, pan/zoom,
+  implicit multiplication, σωστός χειρισμός ασυμπτώτων).
+- `trigonometrikos-kyklos.html` — διαδραστικός μοναδιαίος κύκλος (ημ/συν/εφ,
+  μοίρες+ακτίνια, snap σε χαρακτηριστικές γωνίες με ακριβείς τιμές).
+
+**Integration (Next):**
+- `src/lib/ergaleia.ts` — κατάλογος εργαλείων (single source of truth, εύκολη επέκταση).
+- `src/app/(public)/ergaleia/page.tsx` — hub page με κάρτες + JSON-LD ItemList + breadcrumbs.
+- Navbar + MobileMenu: link «Εργαλεία».
+- `sitemap.ts`: `/ergaleia` στα static routes + RESERVED_SLUGS.
+
+**Verification:** μαθηματική ορθότητα επαληθεύτηκε ανεξάρτητα σε Node (parsers/eval,
+factorial, domain errors, special-angle signs)· `tsc --noEmit` + `eslint` καθαρά·
+`next dev` σερβίρει `/ergaleia` (200) + 4 εργαλεία (200) + sitemap.
+
+> Επόμενα πιθανά εργαλεία: υπολογισμός μορίων Πανελληνίων, μετατροπέας μονάδων,
+> flashcards/quiz χημείας. Πρόσθεσε αρχείο στο `public/ergaleia/` + εγγραφή στο
+> `src/lib/ergaleia.ts` και εμφανίζεται αυτόματα.
+
+---
+
 ## 2026-05-05 (incident — RLS over-tightening broke public reads)
 
 ### 🔥 Incident: ALL public pages 404/500
