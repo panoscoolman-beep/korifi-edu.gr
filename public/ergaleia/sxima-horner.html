@@ -57,7 +57,7 @@ button{font-family:inherit;cursor:pointer;}
 table.horner{border-collapse:collapse;margin:0 auto;font-size:15px;min-width:100%;}
 table.horner td{border:1px solid var(--border);padding:10px 14px;text-align:center;min-width:48px;white-space:nowrap;}
 table.horner td.rowlabel{color:var(--dim);font-size:11px;letter-spacing:.06em;text-align:right;border:none;padding-right:12px;}
-table.horner td.rho-cell{color:var(--accent);font-weight:bold;border:none;border-right:2px solid var(--accent);padding-right:14px;}
+table.horner td.rho-cell{color:var(--accent);font-weight:bold;border:none;border-left:2px solid var(--accent);padding-left:14px;}
 table.horner tr.coeffs td{color:var(--text);}
 table.horner tr.products td{color:var(--dim);}
 table.horner tr.sums td{color:var(--accent);font-weight:bold;border-top:2px solid var(--dim);}
@@ -320,7 +320,7 @@ function buildSteps(coeffs, r, sums, products){
   const rho = fmtNum(r);
   const steps = [];
   steps.push("Γράφουμε τους συντελεστές στην πρώτη γραμμή και το ρ = " + rho +
-             " αριστερά.");
+             " δεξιά.");
   steps.push("Κατεβάζουμε τον πρώτο συντελεστή " + fmtNum(coeffs[0]) +
              " αυτούσιο στην κάτω γραμμή.");
 
@@ -392,27 +392,30 @@ function clearError(){
 function renderTable(coeffs, r, sums, products){
   const n = coeffs.length;
 
-  // Γραμμή 1: ρ | συντελεστές
-  let row1 = '<td class="rho-cell">' + fmtNum(r) + '</td>';
+  // Γραμμή 1: συντελεστές | ρ (το ρ δεξιά)
+  let row1 = '';
   for(let i = 0; i < n; i++){
     row1 += '<td>' + fmtNum(coeffs[i]) + '</td>';
   }
+  row1 += '<td class="rho-cell">' + fmtNum(r) + '</td>';
 
-  // Γραμμή 2: (κενό) | γινόμενα (πρώτο κελί κενό)
-  let row2 = '<td class="blank"></td>';
+  // Γραμμή 2: γινόμενα (πρώτο κελί κενό) | (κενό κάτω από το ρ)
+  let row2 = '';
   for(let i = 0; i < n; i++){
     row2 += (products[i] === null || products[i] === undefined)
       ? '<td class="blank"></td>'
       : '<td>' + fmtNum(products[i]) + '</td>';
   }
+  row2 += '<td class="blank"></td>';
 
-  // Γραμμή 3: (κενό) | αθροίσματα (τελευταίο = υπόλοιπο, highlight)
-  let row3 = '<td class="blank"></td>';
+  // Γραμμή 3: αθροίσματα (τελευταίο συντελεστών = υπόλοιπο, highlight) | (κενό κάτω από το ρ)
+  let row3 = '';
   for(let i = 0; i < n; i++){
     const isRem = (i === n - 1);
     row3 += '<td' + (isRem ? ' class="remainder"' : '') + '>' +
             fmtNum(sums[i]) + '</td>';
   }
+  row3 += '<td class="blank"></td>';
 
   return '<table class="horner">' +
            '<tr class="coeffs">' + row1 + '</tr>' +
