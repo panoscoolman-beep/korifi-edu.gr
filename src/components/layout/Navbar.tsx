@@ -53,6 +53,7 @@ export async function Navbar() {
           <NavLink href="/online-mathimata">Online μαθήματα</NavLink>
           <NavLink href="/courses">Μαθήματα</NavLink>
           <NavLink href="/epaggelmatikos-prosanatolismos">Προσανατολισμός</NavLink>
+          <NavLink href="/ergaleia">Εργαλεία</NavLink>
           <NavLink href="/blog">Blog</NavLink>
           <NavLink href="/gia-emas">Για εμάς</NavLink>
           <NavLink href="/epikoinonia">Επικοινωνία</NavLink>
