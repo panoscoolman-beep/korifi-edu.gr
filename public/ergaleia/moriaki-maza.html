@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta name="theme-color" content="#060d1b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Δωρεάν υπολογισμός μοριακής μάζας και γραμμομορίων από χημικό τύπο. Φροντιστήριο Κορυφή.">
+  <title>Μοριακή Μάζα & Γραμμομόρια — Φροντιστήριο Κορυφή</title>
+  <style>
+    :root {
+      --bg:     #060d1b;
+      --bg2:    #0b1a30;
+      --bg3:    #0f2040;
+      --text:   #c8d8e8;
+      --dim:    #2a5080;
+      --border: #1a3050;
+      --accent: #7ec8e3;
+      --err:    #e36e7e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { background: var(--bg); }
+    body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; min-height: 100dvh; overscroll-behavior-y: none; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Toolbar (back to hub) ───────────── */
+    .toolbar { max-width: 560px; margin: 0 auto; padding: 10px 12px 0; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: .12em; color: var(--dim); text-decoration: none; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--border); border-radius: 20px; transition: color .15s, border-color .15s; }
+    .back-link:hover, .back-link:active { color: #7ec8e3; border-color: #7ec8e3; }
+
+    /* ── Layout ─────────────────────────── */
+    #app { max-width: 560px; margin: 0 auto; padding: 4px 12px 60px; }
+
+    /* ── Header ─────────────────────────── */
+    .hdr { text-align: center; margin: 14px 0 18px; }
+    .hdr-sub  { font-size: 8px; letter-spacing: .35em; color: var(--dim); margin-bottom: 4px; }
+    .hdr-title{ font-size: 18px; font-weight: bold; letter-spacing: .13em; color: var(--accent); text-transform: uppercase; line-height: 1.3; }
+
+    /* ── Cards ──────────────────────────── */
+    .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+    .card-lbl { font-size: 8px; letter-spacing: .25em; color: var(--dim); text-transform: uppercase; margin-bottom: 10px; }
+
+    /* ── Formula input ──────────────────── */
+    .formula-wrap { display: flex; }
+    .formula { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; color: var(--accent); padding: 13px 14px; font-size: 18px; letter-spacing: .04em; width: 100%; font-family: inherit; outline: none; transition: border-color .15s; }
+    .formula:focus { border-color: var(--accent); }
+    .formula::placeholder { color: var(--dim); }
+
+    /* ── Quick-insert chips ─────────────── */
+    #chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .chip { background: transparent; border: 1px solid var(--border); border-radius: 20px; color: var(--text); padding: 6px 11px; font-size: 11px; font-family: inherit; cursor: pointer; letter-spacing: .02em; transition: border-color .15s, color .15s; touch-action: manipulation; }
+    .chip:hover { border-color: var(--accent); color: var(--accent); }
+    .chip:active { transform: scale(.97); }
+
+    /* ── Result (mass) ──────────────────── */
+    .result { text-align: center; padding: 6px 0 2px; }
+    .result-num { font-size: 38px; font-weight: bold; color: var(--accent); line-height: 1.1; letter-spacing: -.5px; }
+    .result-unit { font-size: 13px; color: var(--dim); margin-left: 4px; letter-spacing: .05em; }
+    .result-sub { font-size: 10px; color: var(--dim); margin-top: 6px; letter-spacing: .08em; }
+    .error { text-align: center; color: var(--err); font-size: 13px; padding: 14px 6px; letter-spacing: .03em; line-height: 1.5; }
+
+    /* ── Breakdown table ────────────────── */
+    table { width: 100%; border-collapse: collapse; margin-top: 2px; }
+    th { font-size: 8px; letter-spacing: .12em; color: var(--dim); text-transform: uppercase; text-align: right; padding: 6px 4px; border-bottom: 1px solid var(--border); font-weight: normal; }
+    th:first-child { text-align: left; }
+    td { font-size: 12px; padding: 8px 4px; border-bottom: 1px solid var(--border); text-align: right; }
+    td:first-child { text-align: left; }
+    tr:last-child td { border-bottom: none; }
+    .el-sym { color: var(--accent); font-weight: bold; font-size: 14px; }
+    .pct-bar-cell { position: relative; }
+    .pct-val { position: relative; z-index: 1; }
+    .pct-bar { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); height: 60%; background: var(--bg3); border-radius: 3px; z-index: 0; }
+    tfoot td { border-top: 1px solid var(--border); border-bottom: none; color: var(--accent); font-weight: bold; padding-top: 10px; }
+
+    /* ── Moles section ──────────────────── */
+    .moles-grid { display: flex; flex-direction: column; gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field-lbl { font-size: 10px; color: var(--dim); letter-spacing: .04em; display: flex; justify-content: space-between; align-items: baseline; }
+    .field-lbl .hint { font-size: 8px; letter-spacing: .04em; }
+    .field input { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 11px 13px; font-size: 15px; width: 100%; font-family: inherit; outline: none; transition: border-color .15s; }
+    .field input:focus { border-color: var(--accent); color: var(--accent); }
+    .field input::placeholder { color: var(--dim); }
+    .field input:disabled { opacity: .45; }
+    .moles-note { font-size: 9px; color: var(--dim); line-height: 1.6; margin-top: 12px; letter-spacing: .03em; }
+    .reset-btn { margin-top: 12px; width: 100%; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--dim); padding: 11px; font-family: inherit; cursor: pointer; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; transition: color .15s, border-color .15s; touch-action: manipulation; }
+    .reset-btn:hover { color: var(--accent); border-color: var(--accent); }
+    .reset-btn:active { transform: scale(.97); }
+    .moles-disabled { opacity: .4; pointer-events: none; }
+
+    /* ── Footer ─────────────────────────── */
+    .footer { text-align: center; margin-top: 20px; font-size: 8px; color: var(--dim); letter-spacing: .08em; line-height: 1.8; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+<div class="toolbar"><a class="back-link" href="/ergaleia">← Εργαλεία</a></div>
+
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-sub">ΔΙΑΔΡΑΣΤΙΚΟ</div>
+    <h1 class="hdr-title">Μοριακή Μάζα &amp; Γραμμομόρια</h1>
+  </div>
+
+  <!-- ── Formula input ── -->
+  <div class="card">
+    <div class="card-lbl">Χημικός τύπος</div>
+    <div class="formula-wrap">
+      <input id="formula" class="formula" type="text" inputmode="text"
+             spellcheck="false" autocapitalize="off" autocomplete="off"
+             value="H2SO4" placeholder="π.χ. H2SO4" aria-label="Χημικός τύπος">
+    </div>
+    <div id="chips"></div>
+  </div>
+
+  <!-- ── Result + breakdown ── -->
+  <div class="card">
+    <div class="card-lbl">Μοριακή / Γραμμομοριακή μάζα</div>
+    <div id="resultBox"></div>
+    <div id="breakdownBox"></div>
+  </div>
+
+  <!-- ── Moles calculator ── -->
+  <div class="card" id="molesCard">
+    <div class="card-lbl">Γραμμομόρια (mol)</div>
+    <div class="moles-grid" id="molesGrid">
+      <div class="field">
+        <label class="field-lbl" for="mMass">Μάζα m <span class="hint">(g)</span></label>
+        <input id="mMass" type="text" inputmode="decimal" autocomplete="off" placeholder="γραμμάρια">
+      </div>
+      <div class="field">
+        <label class="field-lbl" for="mMol">Ποσότητα n <span class="hint">(mol)</span></label>
+        <input id="mMol" type="text" inputmode="decimal" autocomplete="off" placeholder="γραμμομόρια">
+      </div>
+      <div class="field">
+        <label class="field-lbl" for="mPart">Πλήθος σωματιδίων N <span class="hint">(NA = 6,022·10²³)</span></label>
+        <input id="mPart" type="text" inputmode="decimal" autocomplete="off" placeholder="σωματίδια">
+      </div>
+    </div>
+    <button class="reset-btn" id="resetMoles" type="button">Καθαρισμός</button>
+    <div class="moles-note">
+      n = m / M &nbsp;·&nbsp; m = n × M &nbsp;·&nbsp; N = n × N<sub>A</sub><br>
+      Συμπληρώστε ένα πεδίο — τα υπόλοιπα υπολογίζονται αυτόματα.
+    </div>
+  </div>
+
+  <div class="footer">
+    Ατομικές μάζες σε g/mol (IUPAC, στρογγυλοποιημένες)<br>
+    Φροντιστήριο Κορυφή · Καλλονή Λέσβου
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ════════════════════════════════════════════════════════════════
+   ΔΕΔΟΜΕΝΑ — Ατομικές μάζες (g/mol) και σταθερά Avogadro
+   ════════════════════════════════════════════════════════════════ */
+const ATOMIC_MASS = {"H":1.008, "He":4.003, "Li":6.941, "Be":9.012, "B":10.81, "C":12.01, "N":14.01, "O":16, "F":19, "Ne":20.18, "Na":22.99, "Mg":24.31, "Al":26.98, "Si":28.09, "P":30.97, "S":32.07, "Cl":35.45, "Ar":39.95, "K":39.1, "Ca":40.08, "Sc":44.96, "Ti":47.87, "V":50.94, "Cr":52, "Mn":54.94, "Fe":55.85, "Co":58.93, "Ni":58.69, "Cu":63.55, "Zn":65.38, "Ga":69.72, "Ge":72.63, "As":74.92, "Se":78.97, "Br":79.9, "Kr":83.8, "Rb":85.47, "Sr":87.62, "Y":88.91, "Zr":91.22, "Nb":92.91, "Mo":95.96, "Tc":98, "Ru":101.1, "Rh":102.9, "Pd":106.4, "Ag":107.9, "Cd":112.4, "In":114.8, "Sn":118.7, "Sb":121.8, "Te":127.6, "I":126.9, "Xe":131.3, "Cs":132.9, "Ba":137.3, "Hf":178.5, "Ta":180.9, "W":183.8, "Re":186.2, "Os":190.2, "Ir":192.2, "Pt":195.1, "Au":197, "Hg":200.6, "Tl":204.4, "Pb":207.2, "Bi":209, "Po":209, "At":210, "Rn":222, "Fr":223, "Ra":226, "Rf":267, "Db":268, "Sg":271, "Bh":272, "Hs":277, "Mt":278, "Ds":281, "Rg":280, "Cn":285, "Nh":286, "Fl":289, "Mc":290, "Lv":293, "Ts":294, "Og":294, "La":138.9, "Ce":140.1, "Pr":140.9, "Nd":144.2, "Pm":145, "Sm":150.4, "Eu":152, "Gd":157.3, "Tb":158.9, "Dy":162.5, "Ho":164.9, "Er":167.3, "Tm":168.9, "Yb":173.1, "Lu":175, "Ac":227, "Th":232, "Pa":231, "U":238, "Np":237, "Pu":244, "Am":243, "Cm":247, "Bk":247, "Cf":251, "Es":252, "Fm":257, "Md":258, "No":259, "Lr":266};
+
+const AVOGADRO = 6.022e23;
+
+const QUICK_FORMULAS = ["H2O", "CO2", "H2SO4", "NaCl", "Ca(OH)2", "C6H12O6", "CuSO4·5H2O", "NaHCO3"];
+
+/* Σφάλμα τύπου — χρησιμοποιείται για φιλικά ελληνικά μηνύματα */
+class FormulaError extends Error {}
+
+/* ════════════════════════════════════════════════════════════════
+   1. TOKENIZER — σπάει τον τύπο σε διακριτά σύμβολα
+   Token types: element, number, open, close, hydrate(·)
+   ════════════════════════════════════════════════════════════════ */
+function tokenize(raw) {
+  // Κανονικοποίηση: όλα τα είδη παρενθέσεων → ( ), όλα τα είδη τελείας → ·
+  const text = raw
+    .replace(/\s+/g, "")
+    .replace(/[\[\{]/g, "(")
+    .replace(/[\]\}]/g, ")")
+    .replace(/[*.•]/g, "·");
+
+  const tokens = [];
+  let i = 0;
+  while (i < text.length) {
+    const ch = text[i];
+
+    if (ch === "(") { tokens.push({ type: "open" });  i++; continue; }
+    if (ch === ")") { tokens.push({ type: "close" }); i++; continue; }
+    if (ch === "·") { tokens.push({ type: "hydrate" }); i++; continue; }
+
+    // Στοιχείο: κεφαλαίο γράμμα + προαιρετικό πεζό (Co ≠ CO)
+    if (/[A-Z]/.test(ch)) {
+      let sym = ch;
+      if (i + 1 < text.length && /[a-z]/.test(text[i + 1])) {
+        sym += text[i + 1];
+        i++;
+      }
+      tokens.push({ type: "element", value: sym });
+      i++;
+      continue;
+    }
+
+    // Αριθμός (δείκτης ή συντελεστής ενυδάτωσης)
+    if (/[0-9]/.test(ch)) {
+      let num = "";
+      while (i < text.length && /[0-9]/.test(text[i])) { num += text[i]; i++; }
+      tokens.push({ type: "number", value: parseInt(num, 10) });
+      continue;
+    }
+
+    // Πεζό γράμμα χωρίς προηγούμενο κεφαλαίο, ή άγνωστος χαρακτήρας
+    throw new FormulaError("Μη έγκυρος τύπος");
+  }
+  return tokens;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   2. PARSER — αναδρομικός parser με μετρητή θέσης (recursive descent)
+   Επιστρέφει χάρτη { στοιχείο: πλήθος ατόμων }
+   Υποστηρίζει: δείκτες, εμφωλευμένες παρενθέσεις, ένυδρα (·)
+   ════════════════════════════════════════════════════════════════ */
+function parseFormula(formula) {
+  const tokens = tokenize(formula);
+  let pos = 0;
+
+  // Συγχωνεύει counts ενός υπο-τύπου σε έναν συνολικό χάρτη, με πολλαπλασιαστή
+  function merge(target, source, multiplier) {
+    for (const el in source) {
+      target[el] = (target[el] || 0) + source[el] * multiplier;
+    }
+  }
+
+  // Διαβάζει μια ακολουθία (στοιχεία / ομάδες) μέχρι ) ή · ή τέλος
+  function parseSequence() {
+    const counts = {};
+
+    while (pos < tokens.length) {
+      const tok = tokens[pos];
+
+      if (tok.type === "close" || tok.type === "hydrate") break;
+
+      if (tok.type === "open") {
+        pos++;                       // καταναλώνει '('
+        const group = parseSequence();
+        if (!tokens[pos] || tokens[pos].type !== "close") {
+          throw new FormulaError("Λείπει κλείσιμο παρένθεσης");
+        }
+        pos++;                       // καταναλώνει ')'
+        const mult = readOptionalNumber();
+        merge(counts, group, mult);
+        continue;
+      }
+
+      if (tok.type === "element") {
+        pos++;                       // καταναλώνει το στοιχείο
+        if (!(tok.value in ATOMIC_MASS)) {
+          throw new FormulaError("Άγνωστο στοιχείο: " + tok.value);
+        }
+        const n = readOptionalNumber();
+        counts[tok.value] = (counts[tok.value] || 0) + n;
+        continue;
+      }
+
+      // Αριθμός χωρίς προηγούμενο στοιχείο/ομάδα → άκυρο
+      throw new FormulaError("Μη έγκυρος τύπος");
+    }
+
+    return counts;
+  }
+
+  // Διαβάζει προαιρετικό δείκτη μετά από στοιχείο/ομάδα (default 1)
+  function readOptionalNumber() {
+    if (pos < tokens.length && tokens[pos].type === "number") {
+      const n = tokens[pos].value;
+      pos++;
+      if (n === 0) throw new FormulaError("Μη έγκυρος δείκτης: 0");
+      return n;
+    }
+    return 1;
+  }
+
+  /* Top level: χειρίζεται ένυδρες ενώσεις χωρισμένες με ·
+     π.χ. CuSO4·5H2O — ο αριθμός μετά το · πολλαπλασιάζει όλη την ομάδα */
+  const total = {};
+  // Πρώτο τμήμα
+  merge(total, parseSequence(), 1);
+
+  while (pos < tokens.length && tokens[pos].type === "hydrate") {
+    pos++;                           // καταναλώνει '·'
+    // Προαιρετικός συντελεστής πριν την ομάδα ενυδάτωσης
+    let mult = 1;
+    if (pos < tokens.length && tokens[pos].type === "number") {
+      mult = tokens[pos].value;
+      pos++;
+    }
+    const hydratePart = parseSequence();
+    if (Object.keys(hydratePart).length === 0) {
+      throw new FormulaError("Μη έγκυρος τύπος");
+    }
+    merge(total, hydratePart, mult);
+  }
+
+  if (pos < tokens.length) {
+    // Περισσεύουν tokens (π.χ. αταίριαστη ')')
+    throw new FormulaError("Μη έγκυρος τύπος");
+  }
+  if (Object.keys(total).length === 0) {
+    throw new FormulaError("Μη έγκυρος τύπος");
+  }
+
+  return total;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   3. COMPUTE — συνολική μάζα + ανάλυση συνεισφορών ανά στοιχείο
+   ════════════════════════════════════════════════════════════════ */
+function computeMass(counts) {
+  let total = 0;
+  const rows = [];
+
+  for (const el in counts) {
+    const n = counts[el];
+    const mass = ATOMIC_MASS[el];
+    const contribution = n * mass;
+    total += contribution;
+    rows.push({ el, n, mass, contribution });
+  }
+
+  // Ποσοστιαία σύσταση κατά μάζα + ταξινόμηση κατά φθίνουσα συνεισφορά
+  for (const r of rows) {
+    r.pct = total > 0 ? (r.contribution / total) * 100 : 0;
+  }
+  rows.sort((a, b) => b.contribution - a.contribution);
+
+  return { total, rows };
+}
+
+/* Στρογγυλοποίηση σε δεκαδικά με ελληνικό κόμμα */
+function fmt(value, decimals) {
+  if (!isFinite(value)) return "—";
+  return value.toLocaleString("el-GR", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+}
+
+/* Επιστημονική μορφή για μεγάλους αριθμούς σωματιδίων (π.χ. 6,022·10²³) */
+function fmtSci(value) {
+  if (!isFinite(value)) return "—";
+  if (value === 0) return "0";
+  const exp = Math.floor(Math.log10(Math.abs(value)));
+  const mantissa = value / Math.pow(10, exp);
+  return fmt(mantissa, 3) + "·10" + toSuperscript(exp);
+}
+
+function toSuperscript(n) {
+  const map = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",
+                "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  return String(n).split("").map(c => map[c] || c).join("");
+}
+
+/* ════════════════════════════════════════════════════════════════
+   4. RENDER — αποτέλεσμα μάζας + πίνακας ανάλυσης
+   ════════════════════════════════════════════════════════════════ */
+const els = {
+  formula:    document.getElementById("formula"),
+  chips:      document.getElementById("chips"),
+  resultBox:  document.getElementById("resultBox"),
+  breakdown:  document.getElementById("breakdownBox"),
+  molesCard:  document.getElementById("molesCard"),
+  molesGrid:  document.getElementById("molesGrid"),
+  mMass:      document.getElementById("mMass"),
+  mMol:       document.getElementById("mMol"),
+  mPart:      document.getElementById("mPart"),
+  resetMoles: document.getElementById("resetMoles")
+};
+
+let currentMass = null;   // η ενεργή Μ (g/mol) ή null αν ο τύπος είναι άκυρος
+
+function renderError(message) {
+  currentMass = null;
+  els.resultBox.innerHTML = '<div class="error">⚠ ' + escapeHtml(message) + "</div>";
+  els.breakdown.innerHTML = "";
+  els.molesCard.classList.add("moles-disabled");
+}
+
+function renderResult(counts) {
+  const { total, rows } = computeMass(counts);
+  currentMass = total;
+
+  // Κύριο αποτέλεσμα
+  els.resultBox.innerHTML =
+    '<div class="result">' +
+      '<span class="result-num">' + fmt(total, 2) + '</span>' +
+      '<span class="result-unit">g/mol</span>' +
+      '<div class="result-sub">Μ = γραμμομοριακή μάζα</div>' +
+    '</div>';
+
+  // Πίνακας ανάλυσης
+  let html =
+    '<table><thead><tr>' +
+      '<th>Στοιχείο</th><th>Άτομα</th><th>Α.Μ.</th><th>Συνεισφορά</th><th>% μάζας</th>' +
+    '</tr></thead><tbody>';
+
+  for (const r of rows) {
+    html +=
+      '<tr>' +
+        '<td><span class="el-sym">' + r.el + '</span></td>' +
+        '<td>' + r.n + '</td>' +
+        '<td>' + fmt(r.mass, 2) + '</td>' +
+        '<td>' + fmt(r.contribution, 2) + '</td>' +
+        '<td class="pct-bar-cell">' +
+          '<span class="pct-bar" style="width:' + Math.max(2, r.pct * 0.9).toFixed(1) + '%"></span>' +
+          '<span class="pct-val">' + fmt(r.pct, 1) + '%</span>' +
+        '</td>' +
+      '</tr>';
+  }
+
+  html +=
+    '</tbody><tfoot><tr>' +
+      '<td>Σύνολο</td><td></td><td></td>' +
+      '<td>' + fmt(total, 2) + '</td><td>100,0%</td>' +
+    '</tr></tfoot></table>';
+
+  els.breakdown.innerHTML = html;
+  els.molesCard.classList.remove("moles-disabled");
+}
+
+/* Κύρια συνάρτηση: parse → render, με χειρισμό σφαλμάτων */
+function updateFormula() {
+  const raw = els.formula.value.trim();
+  if (!raw) {
+    renderError("Πληκτρολογήστε έναν χημικό τύπο");
+    return;
+  }
+  try {
+    const counts = parseFormula(raw);
+    renderResult(counts);
+    recomputeMolesFrom(lastMoleField);   // ανανέωση με νέα Μ
+  } catch (e) {
+    if (e instanceof FormulaError) {
+      renderError(e.message);
+    } else {
+      renderError("Μη έγκυρος τύπος");
+    }
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   5. MOLES — αμφίδρομος υπολογισμός m ↔ n ↔ N
+   Όποιο πεδίο γράφει ο χρήστης, υπολογίζονται τα υπόλοιπα.
+   ════════════════════════════════════════════════════════════════ */
+let lastMoleField = null;   // "mass" | "mol" | "part" — ποιο όρισε ο χρήστης
+
+// Δέχεται και κόμμα και τελεία ως δεκαδικό διαχωριστικό
+function parseInput(str) {
+  const cleaned = String(str).trim().replace(",", ".");
+  if (cleaned === "") return null;
+  const v = Number(cleaned);
+  return isFinite(v) && v >= 0 ? v : null;
+}
+
+/* Υπολογίζει τα δύο άλλα πεδία με βάση το πεδίο "source" και την τρέχουσα Μ */
+function recomputeMolesFrom(source) {
+  if (currentMass === null || currentMass <= 0) return;
+  const M = currentMass;
+
+  let moles = null;
+
+  if (source === "mass") {
+    const m = parseInput(els.mMass.value);
+    moles = (m === null) ? null : m / M;          // n = m / M
+  } else if (source === "mol") {
+    moles = parseInput(els.mMol.value);
+  } else if (source === "part") {
+    const N = parseInput(els.mPart.value);
+    moles = (N === null) ? null : N / AVOGADRO;   // n = N / NA
+  } else {
+    return; // κανένα ενεργό πεδίο
+  }
+
+  if (moles === null) {
+    // Κενό source → καθάρισε τα παράγωγα (όχι το source)
+    if (source !== "mass") els.mMass.value = "";
+    if (source !== "mol")  els.mMol.value  = "";
+    if (source !== "part") els.mPart.value = "";
+    return;
+  }
+
+  // Συμπληρώνει όλα τα πεδία εκτός από αυτό που πληκτρολογεί ο χρήστης
+  if (source !== "mol")  els.mMol.value  = fmt(moles, 4);
+  if (source !== "mass") els.mMass.value = fmt(moles * M, 4);          // m = n × M
+  if (source !== "part") els.mPart.value = fmtSci(moles * AVOGADRO);   // N = n × NA
+}
+
+function bindMoleField(input, name) {
+  input.addEventListener("input", () => {
+    lastMoleField = name;
+    recomputeMolesFrom(name);
+  });
+}
+
+bindMoleField(els.mMass, "mass");
+bindMoleField(els.mMol,  "mol");
+bindMoleField(els.mPart, "part");
+
+els.resetMoles.addEventListener("click", () => {
+  els.mMass.value = "";
+  els.mMol.value = "";
+  els.mPart.value = "";
+  lastMoleField = null;
+  els.mMol.focus();
+});
+
+/* ════════════════════════════════════════════════════════════════
+   6. CHIPS + αρχικοποίηση
+   ════════════════════════════════════════════════════════════════ */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function buildChips() {
+  for (const f of QUICK_FORMULAS) {
+    const btn = document.createElement("button");
+    btn.className = "chip";
+    btn.type = "button";
+    btn.textContent = f;
+    btn.addEventListener("click", () => {
+      els.formula.value = f;
+      els.formula.focus();
+      updateFormula();
+    });
+    els.chips.appendChild(btn);
+  }
+}
+
+// Live ενημέρωση καθώς πληκτρολογεί ο χρήστης
+els.formula.addEventListener("input", updateFormula);
+
+buildChips();
+updateFormula();   // αρχικός υπολογισμός για το προ-συμπληρωμένο H2SO4
+</script>
+</body>
+</html>

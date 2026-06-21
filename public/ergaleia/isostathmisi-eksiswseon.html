@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta name="theme-color" content="#060d1b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Δωρεάν ισοστάθμιση χημικών εξισώσεων — βάλε την εξίσωση και βρες τους συντελεστές. Φροντιστήριο Κορυφή.">
+  <title>Ισοστάθμιση Χημικών Εξισώσεων — Φροντιστήριο Κορυφή</title>
+  <style>
+    :root {
+      --bg:     #060d1b;
+      --bg2:    #0b1a30;
+      --bg3:    #0f2040;
+      --text:   #c8d8e8;
+      --dim:    #2a5080;
+      --border: #1a3050;
+      --accent: #7ec8e3;
+      --err:    #e3727e;
+      --ok:     #7ee39a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { background: var(--bg); }
+    body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; min-height: 100dvh; overscroll-behavior: none; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Toolbar (back to hub) ───────────── */
+    .toolbar { max-width: 600px; margin: 0 auto; padding: 10px 12px 0; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: .12em; color: var(--dim); text-decoration: none; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--border); border-radius: 20px; transition: color .15s, border-color .15s; }
+    .back-link:hover, .back-link:active { color: #7ec8e3; border-color: #7ec8e3; }
+
+    /* ── Layout ─────────────────────────── */
+    #app { max-width: 600px; margin: 0 auto; padding: 4px 14px 60px; }
+
+    /* ── Header ─────────────────────────── */
+    .hdr { text-align: center; margin: 10px 0 20px; }
+    .hdr-sub  { font-size: 8px; letter-spacing: .35em; color: var(--dim); margin-bottom: 5px; }
+    .hdr-title{ font-size: 19px; font-weight: bold; letter-spacing: .1em; color: var(--accent); text-transform: uppercase; line-height: 1.25; }
+    .hdr-hint { font-size: 9px; color: var(--dim); margin-top: 8px; letter-spacing: .08em; line-height: 1.6; }
+
+    /* ── Input card ─────────────────────── */
+    .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 14px; margin-bottom: 14px; }
+    .lbl { font-size: 9px; letter-spacing: .18em; color: var(--dim); text-transform: uppercase; margin-bottom: 8px; }
+    .eq-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .eq-input { flex: 1 1 200px; min-width: 0; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--accent); padding: 12px 14px; font-size: 15px; font-family: inherit; outline: none; transition: border-color .15s; }
+    .eq-input:focus { border-color: var(--accent); }
+    .eq-input::placeholder { color: var(--dim); }
+    .btn { flex: 0 0 auto; background: var(--bg3); border: 1px solid var(--accent); border-radius: 8px; color: var(--accent); padding: 12px 20px; font-size: 13px; font-family: inherit; letter-spacing: .08em; cursor: pointer; transition: filter .15s, transform .1s; touch-action: manipulation; text-transform: uppercase; }
+    .btn:active { transform: scale(.95); filter: brightness(1.2); }
+
+    /* ── Chips ──────────────────────────── */
+    .chips-lbl { font-size: 9px; letter-spacing: .18em; color: var(--dim); text-transform: uppercase; margin: 4px 0 8px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; color: var(--text); padding: 7px 12px; font-size: 11px; font-family: inherit; cursor: pointer; transition: color .15s, border-color .15s, transform .1s; touch-action: manipulation; white-space: nowrap; }
+    .chip:hover, .chip:active { color: var(--accent); border-color: var(--accent); }
+    .chip:active { transform: scale(.95); }
+
+    /* ── Result ─────────────────────────── */
+    #result { margin-top: 18px; }
+    .res-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 18px 16px; margin-bottom: 14px; }
+    .res-eq { font-size: 22px; font-weight: bold; color: var(--accent); text-align: center; line-height: 1.5; word-break: break-word; letter-spacing: .02em; }
+    .res-eq .co { color: var(--text); }
+    .note { font-size: 10px; color: var(--dim); text-align: center; margin-top: 12px; line-height: 1.6; letter-spacing: .04em; }
+
+    /* ── Error ──────────────────────────── */
+    .err-card { background: var(--bg2); border: 1px solid var(--err); border-radius: 12px; padding: 16px; color: var(--err); font-size: 13px; text-align: center; line-height: 1.6; }
+    .err-card .err-sub { color: var(--dim); font-size: 10px; margin-top: 8px; letter-spacing: .04em; }
+
+    /* ── Atom check table ───────────────── */
+    .chk-title { font-size: 10px; letter-spacing: .16em; color: var(--dim); text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .chk-badge { color: var(--ok); border: 1px solid var(--ok); border-radius: 12px; padding: 2px 8px; font-size: 9px; letter-spacing: .06em; }
+    table.chk { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table.chk th { font-size: 9px; letter-spacing: .1em; color: var(--dim); text-transform: uppercase; text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--border); font-weight: normal; }
+    table.chk th:first-child { text-align: left; }
+    table.chk td { padding: 8px; border-bottom: 1px solid var(--border); text-align: right; }
+    table.chk td:first-child { text-align: left; color: var(--accent); font-weight: bold; }
+    table.chk tr:last-child td { border-bottom: none; }
+    .eq-mark { color: var(--ok); }
+
+    /* ── Footer ─────────────────────────── */
+    .footer { text-align: center; margin-top: 24px; font-size: 8px; color: var(--dim); letter-spacing: .08em; line-height: 1.8; }
+  </style>
+</head>
+<body>
+<div class="toolbar"><a class="back-link" href="/ergaleia">← Εργαλεία</a></div>
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-sub">ΔΙΑΔΡΑΣΤΙΚΟ</div>
+    <h1 class="hdr-title">Ισοστάθμιση Χημικών Εξισώσεων</h1>
+    <div class="hdr-hint">ΓΡΑΨΕ ΤΗΝ ΕΞΙΣΩΣΗ ΚΑΙ ΒΡΕΣ ΤΟΥΣ ΣΥΝΤΕΛΕΣΤΕΣ</div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Η εξίσωση (π.χ. H2 + O2 → H2O)</div>
+    <div class="eq-row">
+      <input id="eqInput" class="eq-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+             placeholder="H2 + O2 -> H2O" value="H2 + O2 -> H2O" />
+      <button id="balanceBtn" class="btn" type="button">Ισοστάθμιση</button>
+    </div>
+  </div>
+
+  <div class="chips-lbl">Γρήγορα παραδείγματα</div>
+  <div class="chips" id="chips"></div>
+
+  <div id="result"></div>
+
+  <div class="footer">
+    Χρησιμοποιεί ακριβή αριθμητική κλασμάτων (μηδενόχωρος) — όχι στρογγυλοποιήσεις<br>
+    Αποθηκεύστε τη σελίδα → Chrome → «Προσθήκη στην αρχική οθόνη» για χρήση ως εφαρμογή
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   Ισοστάθμιση Χημικών Εξισώσεων
+   Approach: build the element×species matrix (reactants +,
+   products −), find the null space with EXACT rational
+   arithmetic, then scale to smallest positive integers.
+   ============================================================ */
+
+/* ---------- 1. Exact rational arithmetic ---------- */
+// A fraction is stored as {n, d} with d > 0, always reduced.
+
+function gcd(a, b) {
+  a = Math.abs(a); b = Math.abs(b);
+  while (b) { [a, b] = [b, a % b]; }
+  return a;
+}
+
+function lcm(a, b) {
+  a = Math.abs(a); b = Math.abs(b);
+  if (a === 0 || b === 0) return 0;
+  return a / gcd(a, b) * b;
+}
+
+function frac(n, d = 1) {
+  if (d === 0) throw new Error("division by zero");
+  if (d < 0) { n = -n; d = -d; }
+  const g = gcd(n, d) || 1;
+  return { n: n / g, d: d / g };
+}
+
+const fAdd = (a, b) => frac(a.n * b.d + b.n * a.d, a.d * b.d);
+const fSub = (a, b) => frac(a.n * b.d - b.n * a.d, a.d * b.d);
+const fMul = (a, b) => frac(a.n * b.n, a.d * b.d);
+const fDiv = (a, b) => frac(a.n * b.d, a.d * b.n);
+const fIsZero = (a) => a.n === 0;
+const ZERO = frac(0), ONE = frac(1);
+
+/* ---------- 2. Formula parser (recursive) ---------- */
+// Parses element symbols (Capital + optional lowercase run), subscripts,
+// and nested groups () and []. Returns a map { element: count }.
+// Throws on malformed input.
+
+function parseFormula(formula) {
+  if (/[\^]/.test(formula) || /[₊₋]/.test(formula)) {
+    const e = new Error("ions");
+    e.code = "IONS";
+    throw e;
+  }
+  let pos = 0;
+
+  // Read an integer starting at pos; returns 1 if none (default subscript).
+  function readNumber() {
+    let start = pos;
+    while (pos < formula.length && formula[pos] >= '0' && formula[pos] <= '9') pos++;
+    if (pos === start) return 1;
+    return parseInt(formula.slice(start, pos), 10);
+  }
+
+  // Parse a contiguous run until end-of-string or a closing bracket.
+  function parseGroup() {
+    const counts = {};
+    while (pos < formula.length) {
+      const ch = formula[pos];
+
+      if (ch === '(' || ch === '[') {
+        pos++;
+        const inner = parseGroup();
+        // expect matching closer
+        const closer = formula[pos];
+        if (closer !== ')' && closer !== ']') throw new Error("unbalanced parentheses");
+        pos++;
+        const mult = readNumber();
+        for (const el in inner) counts[el] = (counts[el] || 0) + inner[el] * mult;
+
+      } else if (ch === ')' || ch === ']') {
+        // hand control back to the caller that opened the bracket
+        return counts;
+
+      } else if (ch >= 'A' && ch <= 'Z') {
+        // element symbol: one uppercase + following lowercase letters
+        let sym = ch;
+        pos++;
+        while (pos < formula.length && formula[pos] >= 'a' && formula[pos] <= 'z') {
+          sym += formula[pos];
+          pos++;
+        }
+        const num = readNumber();
+        counts[sym] = (counts[sym] || 0) + num;
+
+      } else if (ch === ' ') {
+        pos++; // tolerate stray spaces inside a species
+
+      } else {
+        throw new Error("invalid character: " + ch);
+      }
+    }
+    return counts;
+  }
+
+  const result = parseGroup();
+  if (pos !== formula.length) throw new Error("unbalanced parentheses");
+  if (Object.keys(result).length === 0) throw new Error("empty formula");
+  return result;
+}
+
+/* ---------- 3. Strip a leading user coefficient ---------- */
+// We ignore whatever coefficients the user typed and compute our own.
+
+function stripCoefficient(species) {
+  const m = species.match(/^\s*(\d+)\s*(.+)$/);
+  return m ? m[2].trim() : species.trim();
+}
+
+/* ---------- 4. Split the equation into reactants / products ---------- */
+
+function splitEquation(raw) {
+  // Normalise the various arrow / equals separators to a single token.
+  const normalised = raw
+    .replace(/-->/g, "=")
+    .replace(/->/g, "=")
+    .replace(/→/g, "=")
+    .replace(/⇌/g, "=")
+    .replace(/=/g, "=");
+
+  const sides = normalised.split("=");
+  if (sides.length !== 2) throw new Error("Χρειάζεται ένα σύμβολο = ή → ανάμεσα στις δύο πλευρές.");
+
+  const parse = (side) => side.split("+")
+    .map(s => stripCoefficient(s))
+    .filter(s => s.length > 0);
+
+  const reactants = parse(sides[0]);
+  const products = parse(sides[1]);
+  if (reactants.length === 0 || products.length === 0) {
+    throw new Error("Χρειάζονται ουσίες και στις δύο πλευρές.");
+  }
+  return { reactants, products };
+}
+
+/* ---------- 5. Build the element×species matrix ---------- */
+// Column j = species j. Row i = element i.
+// Reactant atoms positive, product atoms negative, so that the balanced
+// coefficient vector x satisfies  M · x = 0.
+
+function buildMatrix(reactants, products) {
+  const species = [...reactants, ...products];
+  const parsed = species.map(parseFormula);
+
+  const elements = [];
+  const seen = new Set();
+  parsed.forEach(p => {
+    for (const el in p) if (!seen.has(el)) { seen.add(el); elements.push(el); }
+  });
+
+  const M = elements.map(el =>
+    parsed.map((p, j) => {
+      const count = p[el] || 0;
+      const sign = j < reactants.length ? 1 : -1;
+      return frac(sign * count);
+    })
+  );
+
+  return { M, elements, species, nReact: reactants.length };
+}
+
+/* ---------- 6. Exact rational null space ---------- */
+// Reduce M to reduced row-echelon form over the rationals, then read off
+// one basis vector of the null space (the free variable set to 1).
+
+function nullSpace(M) {
+  const rows = M.length;
+  const cols = rows ? M[0].length : 0;
+  // Deep copy as fractions.
+  const A = M.map(r => r.map(f => frac(f.n, f.d)));
+
+  const pivotCol = []; // pivotCol[r] = column index of the pivot in row r
+  let r = 0;
+  for (let c = 0; c < cols && r < rows; c++) {
+    // find a pivot in column c at or below row r
+    let pr = -1;
+    for (let i = r; i < rows; i++) if (!fIsZero(A[i][c])) { pr = i; break; }
+    if (pr === -1) continue;
+    // swap into place
+    [A[r], A[pr]] = [A[pr], A[r]];
+    // normalise pivot row so pivot = 1
+    const pivVal = A[r][c];
+    for (let j = 0; j < cols; j++) A[r][j] = fDiv(A[r][j], pivVal);
+    // eliminate this column from every other row
+    for (let i = 0; i < rows; i++) {
+      if (i === r) continue;
+      const factor = A[i][c];
+      if (fIsZero(factor)) continue;
+      for (let j = 0; j < cols; j++) {
+        A[i][j] = fSub(A[i][j], fMul(factor, A[r][j]));
+      }
+    }
+    pivotCol[r] = c;
+    r++;
+  }
+
+  const rank = r;
+  const pivotSet = new Set(pivotCol.slice(0, rank));
+  const freeCols = [];
+  for (let c = 0; c < cols; c++) if (!pivotSet.has(c)) freeCols.push(c);
+
+  return { A, rank, pivotCol: pivotCol.slice(0, rank), freeCols, cols };
+}
+
+/* ---------- 7. Solve for the coefficient vector ---------- */
+// Expect a 1-dimensional null space (one free variable) for a normal
+// balanceable equation. If there are more free variables the system is
+// underdetermined; we pick a sensible particular solution.
+
+function solveCoefficients(M) {
+  const { A, rank, pivotCol, freeCols, cols } = nullSpace(M);
+
+  if (freeCols.length === 0) {
+    // Only the trivial solution exists → cannot balance.
+    const e = new Error("Η εξίσωση δεν ισοσταθμίζεται.");
+    e.code = "NOBALANCE";
+    throw e;
+  }
+
+  // Build a basis vector for each free column; sum them for a particular
+  // solution. With one free column this is the unique direction.
+  const x = new Array(cols).fill(null).map(() => frac(0));
+  freeCols.forEach(fc => { x[fc] = fAdd(x[fc], ONE); });
+
+  // Solve pivot variables from the RREF rows:
+  //   x[pivot] = -Σ over free cols ( A[row][freeCol] * x[freeCol] )
+  for (let row = 0; row < rank; row++) {
+    const pc = pivotCol[row];
+    let val = frac(0);
+    freeCols.forEach(fc => {
+      val = fSub(val, fMul(A[row][fc], x[fc]));
+    });
+    x[pc] = val;
+  }
+
+  return x;
+}
+
+/* ---------- 8. Scale rational solution to smallest positive integers ---------- */
+
+function integerize(x) {
+  // multiply through by the LCM of all denominators
+  let L = 1;
+  x.forEach(f => { L = lcm(L, f.d); });
+  let ints = x.map(f => f.n * (L / f.d));
+
+  // force all-positive (the null-space direction may come out negated)
+  if (ints.some(v => v > 0) && ints.every(v => v <= 0)) ints = ints.map(v => -v);
+  // mixed signs are flipped per the dominant sign convention below
+  const negCount = ints.filter(v => v < 0).length;
+  const posCount = ints.filter(v => v > 0).length;
+  if (negCount > posCount) ints = ints.map(v => -v);
+
+  // divide out the overall gcd → smallest integers
+  let g = 0;
+  ints.forEach(v => { g = gcd(g, v); });
+  if (g > 1) ints = ints.map(v => v / g);
+
+  return ints;
+}
+
+/* ---------- 9. Verify the balance programmatically ---------- */
+// Returns { ok, perElement: [{el, left, right}] } using the final integer
+// coefficients. If any element fails, the caller shows the error path.
+
+function verifyBalance(coeffs, species, nReact) {
+  const parsed = species.map(parseFormula);
+  const totals = {}; // el -> {left, right}
+  species.forEach((sp, j) => {
+    const c = coeffs[j];
+    const side = j < nReact ? "left" : "right";
+    for (const el in parsed[j]) {
+      if (!totals[el]) totals[el] = { left: 0, right: 0 };
+      totals[el][side] += c * parsed[j][el];
+    }
+  });
+  const perElement = Object.keys(totals).map(el => ({
+    el, left: totals[el].left, right: totals[el].right
+  }));
+  const ok = coeffs.every(c => c > 0) &&
+             perElement.every(e => e.left === e.right);
+  return { ok, perElement };
+}
+
+/* ---------- 10. The full balance pipeline ---------- */
+
+function balanceEquation(raw) {
+  const { reactants, products } = splitEquation(raw);
+  const { M, elements, species, nReact } = buildMatrix(reactants, products);
+  const xRational = solveCoefficients(M);
+  const coeffs = integerize(xRational);
+
+  const check = verifyBalance(coeffs, species, nReact);
+  if (!check.ok) {
+    const e = new Error("Η εξίσωση δεν ισοσταθμίζεται.");
+    e.code = "NOBALANCE";
+    throw e;
+  }
+
+  // dimension of the null space = number of free variables
+  const ns = nullSpace(M);
+  return {
+    coeffs, species, nReact,
+    perElement: check.perElement,
+    underdetermined: ns.freeCols.length > 1
+  };
+}
+
+/* ---------- 11. Rendering helpers ---------- */
+
+const SUBSCRIPTS = { "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅","6":"₆","7":"₇","8":"₈","9":"₉" };
+
+// Turn digits that follow letters or ) ] into subscripts for display,
+// keeping leading coefficients as normal numbers.
+function prettyFormula(formula) {
+  let out = "";
+  for (let i = 0; i < formula.length; i++) {
+    const ch = formula[i];
+    if (ch >= '0' && ch <= '9') {
+      const prev = formula[i - 1];
+      // subscript only when the digit belongs to the formula (after a letter or close bracket)
+      if (prev && (/[A-Za-z\)\]]/.test(prev) || (prev >= '0' && prev <= '9' && out.endsWith(SUBSCRIPTS[prev] || "")))) {
+        out += SUBSCRIPTS[ch];
+      } else {
+        out += ch;
+      }
+    } else {
+      out += ch;
+    }
+  }
+  return out;
+}
+
+function renderEquation(coeffs, species, nReact) {
+  const term = (j) => {
+    const c = coeffs[j];
+    const coStr = c === 1 ? "" : `<span class="co">${c}</span> `;
+    return coStr + prettyFormula(species[j]);
+  };
+  const left = [];
+  const right = [];
+  for (let j = 0; j < species.length; j++) {
+    (j < nReact ? left : right).push(term(j));
+  }
+  return left.join(" + ") + " → " + right.join(" + ");
+}
+
+function renderResult(res) {
+  const eqHtml = renderEquation(res.coeffs, res.species, res.nReact);
+  const rows = res.perElement.map(e =>
+    `<tr><td>${e.el}</td><td>${e.left}</td><td>${e.right}</td><td class="eq-mark">✓</td></tr>`
+  ).join("");
+
+  const note = res.underdetermined
+    ? `<div class="note">Σημείωση: το σύστημα είναι υποπροσδιορισμένο (περισσότερες από μία ανεξάρτητες λύσεις). Εμφανίζεται μία έγκυρη λύση.</div>`
+    : "";
+
+  return `
+    <div class="res-card">
+      <div class="res-eq">${eqHtml}</div>
+      ${note}
+    </div>
+    <div class="res-card">
+      <div class="chk-title">Έλεγχος ατόμων <span class="chk-badge">ΙΣΟΣΤΑΘΜΙΣΜΕΝΗ</span></div>
+      <table class="chk">
+        <thead>
+          <tr><th>Στοιχείο</th><th>Αριστερά</th><th>Δεξιά</th><th></th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderError(message, sub) {
+  return `<div class="err-card">${message}${sub ? `<div class="err-sub">${sub}</div>` : ""}</div>`;
+}
+
+/* ---------- 12. Wire up the UI ---------- */
+
+const QUICK = [
+  "H2 + O2 -> H2O",
+  "Fe + O2 -> Fe2O3",
+  "C3H8 + O2 -> CO2 + H2O",
+  "KMnO4 + HCl -> KCl + MnCl2 + H2O + Cl2",
+  "Al + HCl -> AlCl3 + H2",
+  "Ca(OH)2 + HCl -> CaCl2 + H2O"
+];
+
+const $input = document.getElementById("eqInput");
+const $result = document.getElementById("result");
+const $chips = document.getElementById("chips");
+
+function showError(err) {
+  if (err.code === "IONS") {
+    $result.innerHTML = renderError(
+      "Δεν υποστηρίζονται ιόντα / φορτία.",
+      "Δοκίμασε χωρίς το σύμβολο φορτίου (^)."
+    );
+  } else if (err.code === "NOBALANCE") {
+    $result.innerHTML = renderError(
+      "Η εξίσωση δεν ισοσταθμίζεται.",
+      "Έλεγξε ότι οι ουσίες είναι σωστές και ότι η αντίδραση μπορεί να ισοσταθμιστεί."
+    );
+  } else {
+    $result.innerHTML = renderError(
+      "Μη έγκυρος τύπος ή εξίσωση.",
+      "Παράδειγμα σωστής μορφής: H2 + O2 → H2O"
+    );
+  }
+}
+
+function run() {
+  const raw = $input.value;
+  if (!raw || !raw.trim()) {
+    $result.innerHTML = renderError("Γράψε μια εξίσωση πρώτα.");
+    return;
+  }
+  try {
+    const res = balanceEquation(raw);
+    $result.innerHTML = renderResult(res);
+  } catch (err) {
+    showError(err);
+  }
+}
+
+// Build the quick-insert chips.
+QUICK.forEach(eq => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "chip";
+  b.textContent = prettyFormula(eq.replace(/->/g, "→"));
+  b.addEventListener("click", () => {
+    $input.value = eq;
+    run();
+    $input.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+  $chips.appendChild(b);
+});
+
+document.getElementById("balanceBtn").addEventListener("click", run);
+$input.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); run(); } });
+
+// Balance the prefilled example on load.
+run();
+
+/* ---------- 13. Self-test (logged once, no UI impact) ---------- */
+(function selfTest() {
+  const cases = [
+    ["H2 + O2 -> H2O", [2, 1, 2]],
+    ["Fe + O2 -> Fe2O3", [4, 3, 2]],
+    ["C3H8 + O2 -> CO2 + H2O", [1, 5, 3, 4]],
+    ["Al + HCl -> AlCl3 + H2", [2, 6, 2, 3]],
+    ["KMnO4 + HCl -> KCl + MnCl2 + H2O + Cl2", [2, 16, 2, 2, 8, 5]],
+    ["Ca(OH)2 + HCl -> CaCl2 + H2O", [1, 2, 1, 2]]
+  ];
+  let allOk = true;
+  cases.forEach(([eq, expected]) => {
+    try {
+      const got = balanceEquation(eq).coeffs;
+      const ok = got.length === expected.length && got.every((v, i) => v === expected[i]);
+      if (!ok) { allOk = false; console.error("FAIL", eq, "got", got, "expected", expected); }
+    } catch (e) { allOk = false; console.error("FAIL", eq, e.message); }
+  });
+  if (allOk) console.log("Ισοστάθμιση: όλα τα self-tests πέρασαν ✓");
+})();
+</script>
+</body>
+</html>

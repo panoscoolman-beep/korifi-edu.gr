@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta name="theme-color" content="#060d1b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="application-name" content="Λύτης Δευτεροβάθμιας Εξίσωσης">
+  <meta name="description" content="Δωρεάν λύτης δευτεροβάθμιας εξίσωσης με αναλυτικά βήματα — διακρίνουσα, ρίζες, γράφημα. Φροντιστήριο Κορυφή.">
+  <title>Λύτης Δευτεροβάθμιας Εξίσωσης — Φροντιστήριο Κορυφή</title>
+  <style>
+    :root {
+      --bg:     #060d1b;
+      --bg2:    #0b1a30;
+      --bg3:    #0f2040;
+      --text:   #c8d8e8;
+      --dim:    #2a5080;
+      --border: #1a3050;
+      --accent: #7ec8e3;
+      /* Semantic accents for the three discriminant cases */
+      --pos:  #69db7c;  /* Δ > 0  — δύο ρίζες   */
+      --zero: #ffd43b;  /* Δ = 0  — διπλή ρίζα  */
+      --neg:  #ff6b6b;  /* Δ < 0  — μιγαδικές   */
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { background: var(--bg); }
+    body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; min-height: 100dvh; overscroll-behavior: none; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Toolbar (back to hub) ───────────── */
+    .toolbar { max-width: 560px; margin: 0 auto; padding: 10px 12px 0; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: .12em; color: var(--dim); text-decoration: none; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--border); border-radius: 20px; transition: color .15s, border-color .15s; }
+    .back-link:hover, .back-link:active { color: #7ec8e3; border-color: #7ec8e3; }
+
+    /* ── Layout ─────────────────────────── */
+    #app { max-width: 560px; margin: 0 auto; padding: 4px 12px 40px; }
+
+    /* ── Header ─────────────────────────── */
+    .hdr { text-align: center; margin: 8px 0 16px; }
+    .hdr-sub  { font-size: 8px; letter-spacing: .35em; color: var(--dim); margin-bottom: 3px; }
+    .hdr-title{ font-size: 18px; font-weight: bold; letter-spacing: .10em; color: var(--accent); text-transform: uppercase; line-height: 1.25; }
+    .hdr-hint { font-size: 8px; color: var(--dim); margin-top: 4px; letter-spacing: .1em; }
+
+    /* ── Equation input ─────────────────── */
+    .eqn { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 12px; margin-bottom: 12px; }
+    .eqn .tok { font-size: 17px; color: var(--text); letter-spacing: .02em; }
+    .eqn .tok sup { font-size: 11px; }
+    .eqn .accent { color: var(--accent); }
+    .coef {
+      background: var(--bg); border: 1px solid var(--border); color: var(--accent);
+      border-radius: 6px; padding: 8px 6px; font-family: inherit; font-size: 16px;
+      width: 56px; outline: none; text-align: center; -moz-appearance: textfield;
+    }
+    .coef::-webkit-outer-spin-button, .coef::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .coef:focus { border-color: var(--accent); }
+    .coef.bad { border-color: var(--neg); color: var(--neg); }
+
+    /* ── Quick examples (chips) ─────────── */
+    .ctrl-title { font-size: 9px; letter-spacing: .14em; color: var(--dim); text-transform: uppercase; margin: 14px 0 7px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      background: var(--bg2); border: 1px solid var(--border); color: var(--accent);
+      border-radius: 16px; padding: 7px 12px; font-family: inherit; font-size: 12px;
+      cursor: pointer; transition: background .15s, border-color .15s; touch-action: manipulation;
+      letter-spacing: .02em;
+    }
+    .chip:hover { border-color: var(--accent); }
+    .chip:active { background: var(--bg3); transform: scale(.96); }
+
+    /* ── Result headline ────────────────── */
+    .verdict { text-align: center; margin: 16px 0 4px; }
+    .verdict .badge { display: inline-block; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; padding: 5px 12px; border-radius: 16px; border: 1px solid var(--border); }
+    .verdict .roots { font-size: 19px; font-weight: bold; color: var(--accent); margin-top: 10px; line-height: 1.5; word-break: break-word; }
+    .verdict .roots .approx { font-size: 12px; color: var(--dim); font-weight: normal; }
+
+    .badge.b-pos  { color: var(--pos);  border-color: var(--pos); }
+    .badge.b-zero { color: var(--zero); border-color: var(--zero); }
+    .badge.b-neg  { color: var(--neg);  border-color: var(--neg); }
+    .badge.b-info { color: var(--dim); }
+
+    /* ── Section title ──────────────────── */
+    .sec-title { font-size: 9px; letter-spacing: .14em; color: var(--accent); text-transform: uppercase; margin: 18px 0 8px; text-align: center; }
+
+    /* ── Graph ──────────────────────────── */
+    .canvas-wrap { width: 100%; max-width: 460px; margin: 0 auto; aspect-ratio: 1 / 1; position: relative; }
+    #graph { display: block; width: 100%; height: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: center; margin: 10px 0 2px; }
+    .leg-item { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: .03em; color: var(--dim); }
+    .leg-swatch { width: 16px; height: 4px; border-radius: 2px; flex-shrink: 0; }
+    .leg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Steps panel ────────────────────── */
+    .steps { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 4px 14px 8px; }
+    .step { border-top: 1px solid var(--border); padding: 12px 2px 13px; }
+    .step:first-child { border-top: none; }
+    .step-h { font-size: 11px; color: var(--accent); letter-spacing: .06em; margin-bottom: 7px; font-weight: bold; }
+    .step-h .num { display: inline-block; min-width: 18px; color: var(--dim); }
+    .step-body { font-size: 13px; line-height: 1.85; color: var(--text); }
+    .step-body .mono { display: block; margin: 3px 0; word-break: break-word; }
+    .step-body .sub { color: var(--dim); font-size: 11px; }
+    .step-body b { color: var(--accent); }
+    .hl-pos  { color: var(--pos); }
+    .hl-zero { color: var(--zero); }
+    .hl-neg  { color: var(--neg); }
+    .note { background: var(--bg3); border-left: 3px solid var(--zero); border-radius: 4px; padding: 8px 10px; margin: 4px 0 2px; font-size: 12px; line-height: 1.6; color: var(--text); }
+
+    /* ── Footer ─────────────────────────── */
+    .footer { text-align: center; margin-top: 18px; font-size: 8px; color: var(--dim); letter-spacing: .08em; line-height: 1.7; }
+  </style>
+</head>
+<body>
+<div class="toolbar"><a class="back-link" href="/ergaleia">← Εργαλεία</a></div>
+
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-sub">ΔΙΑΔΡΑΣΤΙΚΟ</div>
+    <h1 class="hdr-title">Λύτης Δευτεροβάθμιας Εξίσωσης</h1>
+    <div class="hdr-hint">ΑΛΛΑΞΕ a, b, c — Η ΛΥΣΗ ΥΠΟΛΟΓΙΖΕΤΑΙ ΑΥΤΟΜΑΤΑ</div>
+  </div>
+
+  <!-- Equation with inline coefficient inputs -->
+  <div class="eqn" aria-label="Εξίσωση δευτεροβάθμιου">
+    <input class="coef" id="a" type="number" step="any" inputmode="decimal" aria-label="Συντελεστής a" value="1">
+    <span class="tok accent">x<sup>2</sup></span>
+    <span class="tok">+</span>
+    <input class="coef" id="b" type="number" step="any" inputmode="decimal" aria-label="Συντελεστής b" value="-5">
+    <span class="tok accent">x</span>
+    <span class="tok">+</span>
+    <input class="coef" id="c" type="number" step="any" inputmode="decimal" aria-label="Σταθερός όρος c" value="6">
+    <span class="tok">= 0</span>
+  </div>
+
+  <!-- Quick example chips -->
+  <div class="ctrl-title">Γρήγορα παραδείγματα</div>
+  <div class="chips" id="chips"></div>
+
+  <!-- Result headline (verdict + roots) -->
+  <div class="verdict">
+    <span class="badge" id="badge"></span>
+    <div class="roots" id="roots"></div>
+  </div>
+
+  <!-- Parabola graph -->
+  <div class="sec-title">Γραφική παράσταση y = a x² + b x + c</div>
+  <div class="canvas-wrap"><canvas id="graph"></canvas></div>
+  <div class="legend">
+    <span class="leg-item"><span class="leg-swatch" style="background:var(--accent)"></span>παραβολή</span>
+    <span class="leg-item"><span class="leg-dot" style="background:var(--pos)"></span>ρίζες</span>
+    <span class="leg-item"><span class="leg-dot" style="background:var(--zero)"></span>κορυφή</span>
+    <span class="leg-item"><span class="leg-swatch" style="background:var(--dim)"></span>άξονας συμμετρίας</span>
+  </div>
+
+  <!-- Step-by-step worked solution -->
+  <div class="sec-title">Αναλυτική λύση βήμα-βήμα</div>
+  <div class="steps" id="steps"></div>
+
+  <div class="footer">
+    Δευτεροβάθμια εξίσωση α·x² + β·x + γ = 0 · διακρίνουσα Δ = β² − 4αγ<br>
+    Φροντιστήριο Κορυφή — Καλλονή Λέσβου
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ════════════════════════════════════════════════════════════════════════
+   ΛΥΤΗΣ ΔΕΥΤΕΡΟΒΑΘΜΙΑΣ ΕΞΙΣΩΣΗΣ
+   Modular vanilla JS. Sections:
+     1. Number helpers (FP cleaning, gcd, fraction reduction)
+     2. Surd simplifier  √n → k√m
+     3. Root / fraction formatting (exact surd form + decimal)
+     4. solve() — full analysis of a x² + b x + c = 0
+     5. renderSteps() — teacher-style worked solution (Greek)
+     6. drawParabola() — DPR-crisp canvas plot, auto-scaled
+     7. Examples, wiring, boot
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Number helpers ─────────────────────────────────────────────────── */
+
+// Clean floating-point dust so e.g. 2.9999999999 → 3 and -0 → 0.
+// Rounds to ~10 significant decimals, which is well below FP error for the
+// integer/simple-decimal coefficients students actually type.
+function clean(v) {
+  if (!isFinite(v)) return v;
+  const r = Math.round(v);
+  if (Math.abs(v - r) < 1e-9) return r === 0 ? 0 : r; // snap to nearest integer
+  // otherwise round to 10 dp to drop trailing FP noise
+  const x = Math.round(v * 1e10) / 1e10;
+  return x === 0 ? 0 : x;
+}
+
+// Is v (after cleaning) an integer?
+function isInt(v) { return Number.isInteger(clean(v)); }
+
+// Greatest common divisor of two non-negative integers.
+function gcd(a, b) {
+  a = Math.abs(Math.round(a));
+  b = Math.abs(Math.round(b));
+  while (b) { [a, b] = [b, a % b]; }
+  return a || 1;
+}
+
+// Reduce an integer fraction p/q to lowest terms, denominator kept positive.
+// Returns { p, q } where q >= 1. Pass integers (callers ensure this).
+function reduceFraction(p, q) {
+  p = Math.round(p); q = Math.round(q);
+  if (q < 0) { p = -p; q = -q; }   // keep denominator positive
+  const g = gcd(p, q);
+  return { p: p / g, q: q / g };
+}
+
+// Format an integer fraction p/q as a clean string: integer if q===1, else p/q.
+function fracString(p, q) {
+  const f = reduceFraction(p, q);
+  if (f.q === 1) return String(f.p);
+  return f.p + "/" + f.q;
+}
+
+/* ── 2. Surd simplifier ────────────────────────────────────────────────── */
+
+/* Simplify √n (n a non-negative integer) to k·√m by factoring out the largest
+   perfect square. Returns { k, m }:  √n = k√m.
+     √8  → {k:2, m:2}   √12 → {k:2, m:3}
+     √20 → {k:2, m:5}   √5  → {k:1, m:5}   √9 → {k:3, m:1}
+   m===1 means the root is a whole number (k). m===0 only if n===0. */
+function simplifySurd(n) {
+  n = Math.round(n);
+  if (n <= 0) return { k: 0, m: 0 };
+  let k = 1, m = n;
+  // Pull out every square factor i*i that divides m.
+  for (let i = 2; i * i <= m; i++) {
+    while (m % (i * i) === 0) { m /= (i * i); k *= i; }
+  }
+  return { k, m };
+}
+
+// Render √Δ (Δ integer ≥ 0) as a string: "0" / "3" (perfect square) / "2√3".
+function surdString(n) {
+  const { k, m } = simplifySurd(n);
+  if (m === 0) return "0";
+  if (m === 1) return String(k);             // perfect square → integer
+  return (k === 1 ? "" : k) + "√" + m;       // k√m  (drop leading 1)
+}
+
+/* ── 3. Root / fraction formatting ─────────────────────────────────────── */
+
+// Round to 4 dp for the decimal-approximation display, killing "-0".
+function approx(v) {
+  const x = Math.round(clean(v) * 1e4) / 1e4;
+  return (x === 0 ? 0 : x).toFixed(4);
+}
+
+/* Format a single real root of the form (−b ± √Δ) / (2a) in EXACT form when Δ
+   is an integer, simplifying the surd and reducing the rational part.
+   `sign` is +1 or −1 (which of the ± to take).
+   Returns { exact, dec } strings. When Δ is not a clean integer we fall back to
+   the decimal value as the "exact" string too. */
+function formatRoot(a, b, disc, sign) {
+  const denom = 2 * a;
+  const decVal = (-b + sign * Math.sqrt(disc)) / denom;
+  const dec = approx(decVal);
+
+  // Δ must be a non-negative integer for a meaningful surd form.
+  if (!isInt(disc) || disc < 0) return { exact: dec, dec };
+
+  const D = Math.round(clean(disc));
+  const { k, m } = simplifySurd(D);          // √Δ = k√m
+
+  // Rational root: Δ is a perfect square (m === 1) → (−b ± k) / (2a) reduces.
+  if (m === 1) {
+    const num = -b + sign * k;
+    if (isInt(num) && isInt(denom)) return { exact: fracString(num, denom), dec };
+    return { exact: dec, dec };
+  }
+
+  // Irrational root: (−b ± k√m) / (2a). Reduce −b, k and (2a) by their common gcd.
+  if (!isInt(b) || !isInt(denom)) return { exact: dec, dec };
+  let B = -Math.round(clean(b));             // the −b numerator term
+  let A2 = Math.round(clean(denom));
+  // Force a positive denominator first (flip the whole numerator if 2a < 0).
+  let flip = 1;
+  if (A2 < 0) { A2 = -A2; B = -B; flip = -1; }
+  const g = gcd(gcd(B, k), A2);              // common factor of all three (g >= 1)
+  const Bp = B / g, A2p = A2 / g;
+  const kp = (k / g) * flip;                 // surd-coefficient magnitude (flip applied)
+
+  const surd = (Math.abs(kp) === 1 ? "" : Math.abs(kp)) + "√" + m;
+  // The ± in the formula combines with kp's sign to give the actual surd sign.
+  const surdPos = (sign * kp) > 0;           // true → "+ surd", false → "− surd"
+  let numStr;
+  if (Bp === 0) {
+    numStr = (surdPos ? "" : "−") + surd;     // pure ±k√m / denom → e.g. ±√2
+  } else {
+    numStr = Bp + (surdPos ? " + " : " − ") + surd;
+  }
+  const exact = (A2p === 1) ? numStr : "(" + numStr + ") / " + A2p;
+  return { exact, dec };
+}
+
+/* ── 4. solve() — full analysis ────────────────────────────────────────── */
+
+/* Returns a structured result object describing the equation's solution.
+   kind: "quadratic" | "linear" | "constant".
+   For quadratics, `disc` and a `case` ("two"|"double"|"complex") drive both the
+   steps and the graph. */
+function solve(a, b, c) {
+  a = clean(a); b = clean(b); c = clean(c);
+
+  // a = 0 → not quadratic. Handle the linear / degenerate cases.
+  if (a === 0) {
+    if (b === 0) {
+      // c = 0 → 0 = 0 (αόριστη); c ≠ 0 → no solution (αδύνατη)
+      return { kind: "constant", a, b, c, solvable: c === 0 };
+    }
+    // bx + c = 0  →  x = −c/b
+    const x = clean(-c / b);
+    return { kind: "linear", a, b, c, root: x };
+  }
+
+  // Genuine quadratic.
+  const disc = clean(b * b - 4 * a * c);
+  let kase;
+  if (disc > 0) kase = "two";
+  else if (disc === 0) kase = "double";
+  else kase = "complex";
+
+  const res = { kind: "quadratic", a, b, c, disc, case: kase };
+
+  if (kase === "two") {
+    res.r1 = formatRoot(a, b, disc, +1);
+    res.r2 = formatRoot(a, b, disc, -1);
+    res.x1 = clean((-b + Math.sqrt(disc)) / (2 * a));
+    res.x2 = clean((-b - Math.sqrt(disc)) / (2 * a));
+  } else if (kase === "double") {
+    const x = clean(-b / (2 * a));
+    res.x1 = res.x2 = x;
+    res.r1 = { exact: fracString(-b, 2 * a), dec: approx(x) };
+  } else {
+    // Complex conjugate roots: (−b ± i√|Δ|) / (2a).
+    res.complex = formatComplex(a, b, disc);
+    // For Vieta numeric check we still have real S, P (sum/product are real).
+    res.x1 = res.x2 = NaN;
+  }
+
+  // Vieta's relations (exact rational, since a,b,c rational here).
+  res.sum  = clean(-b / a);   // S = x1 + x2 = −b/a
+  res.prod = clean(c / a);    // P = x1 · x2 =  c/a
+  res.sumFrac  = (isInt(b) && isInt(a)) ? fracString(-b, a) : approx(-b / a);
+  res.prodFrac = (isInt(c) && isInt(a)) ? fracString(c, a)  : approx(c / a);
+  return res;
+}
+
+/* Format complex conjugate roots (−b ± i√|Δ|)/(2a) into exact strings.
+   By convention we present them as re + im·i and re − im·i with im > 0.
+   Returns { str1, str2, reDec, imDec }. */
+function formatComplex(a, b, disc) {
+  const absD = Math.round(clean(-disc));     // |Δ|, integer
+  const reVal = clean(-b / (2 * a));
+  const imVal = clean(Math.sqrt(absD) / (2 * a));
+
+  // Clean reduced surd form for both parts, with a positive denominator.
+  if (isInt(b) && isInt(2 * a)) {
+    const { k, m } = simplifySurd(absD);     // √|Δ| = k√m
+    let A2 = Math.round(clean(2 * a));
+    let B  = -Math.round(clean(b));
+    if (A2 < 0) { A2 = -A2; B = -B; }        // force positive denominator
+    const g  = gcd(gcd(B, k), A2);           // g >= 1
+    const Bp = B / g, kp = k / g, A2p = A2 / g;
+    return buildComplexStrings(Bp, kp, m, A2p);
+  }
+
+  // Fallback to decimals (e.g. non-integer coefficients).
+  const reD = approx(reVal), imD = approx(Math.abs(imVal));
+  return {
+    str1: reD + " + " + imD + "i",
+    str2: reD + " − " + imD + "i",
+    reDec: reD, imDec: imD
+  };
+}
+
+/* Compose the two conjugate strings from reduced non-negative integer parts:
+   real numerator Bp, surd coeff kp (>=1), radicand m, denominator A2p (>=1).
+   Output form: re ± i√m style, e.g. (-1 + i√3)/2. */
+function buildComplexStrings(Bp, kp, m, A2p) {
+  // imTok is the imaginary magnitude token. For a whole-number coefficient (m=1)
+  // we write "ki" (e.g. 2i); otherwise "i k√m" / "i√m" (e.g. i√3, 2i√5 → i 2√5).
+  const imTok = (m === 1)
+    ? (kp === 1 ? "i" : kp + "i")
+    : "i" + (kp === 1 ? "√" + m : kp + "√" + m);
+  const mk = (op) => {
+    let num;
+    if (Bp === 0) num = (op === "−" ? "−" : "") + imTok;   // pure ±i√m
+    else          num = Bp + " " + op + " " + imTok;
+    return (A2p === 1) ? num : "(" + num + ") / " + A2p;
+  };
+  return {
+    str1: mk("+"),
+    str2: mk("−"),
+    reDec: approx(Bp / A2p),
+    imDec: approx(kp * Math.sqrt(m) / A2p)
+  };
+}
+
+/* ── 5. renderSteps() — teacher-style worked solution ──────────────────── */
+
+const stepsEl  = document.getElementById("steps");
+const badgeEl  = document.getElementById("badge");
+const rootsEl  = document.getElementById("roots");
+
+// Pretty-print a coefficient for inline text (keeps a leading minus tidy).
+function num(v) { v = clean(v); return (v < 0 ? "−" + Math.abs(v) : String(v)); }
+// Signed term for "+ b" style writing (always shows the operator).
+function signed(v) { v = clean(v); return (v < 0 ? " − " + Math.abs(v) : " + " + v); }
+
+// Build one step block.
+function stepBlock(n, title, bodyHtml) {
+  return '<div class="step"><div class="step-h"><span class="num">' + n + '.</span>'
+       + title + '</div><div class="step-body">' + bodyHtml + '</div></div>';
+}
+
+function renderSteps(r) {
+  // ---- Non-quadratic verdicts (a = 0) ----
+  if (r.kind === "constant") {
+    badgeEl.className = "badge b-info";
+    badgeEl.textContent = "Δεν είναι εξίσωση 2ου βαθμού";
+    if (r.solvable) {
+      rootsEl.innerHTML = "Αόριστη — κάθε x είναι λύση";
+    } else {
+      rootsEl.innerHTML = "Αδύνατη — καμία λύση";
+    }
+    stepsEl.innerHTML = stepBlock(1, "Έλεγχος συντελεστή a",
+      '<div class="note">Με a = 0 <b>δεν</b> έχουμε δευτεροβάθμια εξίσωση. '
+      + 'Εδώ μηδενίζεται και το b, άρα μένει η σταθερή σχέση '
+      + '<span class="mono">' + num(r.c) + ' = 0</span>.</div>'
+      + (r.solvable
+          ? '<div class="mono">0 = 0 → ισχύει για κάθε x (<b>αόριστη</b>).</div>'
+          : '<div class="mono">' + num(r.c) + ' = 0 → άτοπο (<b>αδύνατη</b>, καμία λύση).</div>'));
+    return;
+  }
+
+  if (r.kind === "linear") {
+    badgeEl.className = "badge b-info";
+    badgeEl.textContent = "Πρωτοβάθμια (a = 0)";
+    rootsEl.innerHTML = 'x = <b>' + fracOrNum(r.root, -r.c, r.b) + '</b>'
+      + ' <span class="approx">≈ ' + approx(r.root) + '</span>';
+    stepsEl.innerHTML =
+      stepBlock(1, "Έλεγχος συντελεστή a",
+        '<div class="note">Επειδή a = 0, η εξίσωση γίνεται <b>πρωτοβάθμια</b>: '
+        + '<span class="mono">' + num(r.b) + 'x' + signed(r.c) + ' = 0</span>.</div>')
+      + stepBlock(2, "Λύση ως προς x",
+        '<span class="mono">' + num(r.b) + 'x = ' + num(-r.c) + '</span>'
+        + '<span class="mono">x = ' + num(-r.c) + ' / ' + num(r.b) + ' = <b>'
+        + fracOrNum(r.root, -r.c, r.b) + '</b> <span class="approx">≈ ' + approx(r.root) + '</span></span>');
+    return;
+  }
+
+  // ---- Quadratic ----
+  const a = r.a, b = r.b, c = r.c, D = r.disc;
+  const caseClass = r.case === "two" ? "hl-pos" : r.case === "double" ? "hl-zero" : "hl-neg";
+
+  // Verdict badge + headline roots
+  if (r.case === "two") {
+    badgeEl.className = "badge b-pos";
+    badgeEl.textContent = "Δ > 0 · δύο πραγματικές ρίζες";
+    rootsEl.innerHTML =
+      'x₁ = <b>' + r.r1.exact + '</b>' + approxTag(r.r1, r.x1)
+      + '<br>x₂ = <b>' + r.r2.exact + '</b>' + approxTag(r.r2, r.x2);
+  } else if (r.case === "double") {
+    badgeEl.className = "badge b-zero";
+    badgeEl.textContent = "Δ = 0 · μία διπλή ρίζα";
+    rootsEl.innerHTML = 'x₁ = x₂ = <b>' + r.r1.exact + '</b>'
+      + ' <span class="approx">≈ ' + approx(r.x1) + '</span>';
+  } else {
+    badgeEl.className = "badge b-neg";
+    badgeEl.textContent = "Δ < 0 · καμία πραγματική ρίζα";
+    rootsEl.innerHTML = 'x₁ = <b>' + r.complex.str1 + '</b>'
+      + '<br>x₂ = <b>' + r.complex.str2 + '</b>'
+      + '<br><span class="approx">(μιγαδικές, συζυγείς)</span>';
+  }
+
+  let html = "";
+
+  // Step 1 — equation & coefficients
+  html += stepBlock(1, "Η εξίσωση και οι συντελεστές",
+    '<span class="mono">' + num(a) + 'x²' + signed(b) + 'x' + signed(c) + ' = 0</span>'
+    + '<span class="mono sub">a = ' + num(a) + ' ,  b = ' + num(b) + ' ,  c = ' + num(c) + '</span>');
+
+  // Step 2 — discriminant
+  html += stepBlock(2, "Διακρίνουσα Δ = b² − 4ac",
+    '<span class="mono">Δ = (' + num(b) + ')² − 4·(' + num(a) + ')·(' + num(c) + ')</span>'
+    + '<span class="mono">Δ = ' + num(b * b) + ' − ' + num(4 * a * c)
+    + ' = <b class="' + caseClass + '">' + num(D) + '</b></span>');
+
+  // Step 3 — case analysis & roots
+  if (r.case === "two") {
+    html += stepBlock(3, "Δ > 0 → δύο πραγματικές ρίζες",
+      '<span class="mono sub">x₁,₂ = (−b ± √Δ) / (2a)</span>'
+      + '<span class="mono">x₁,₂ = (' + num(-b) + ' ± √' + num(D) + ') / ' + num(2 * a) + '</span>'
+      + surdLine(D)
+      + '<span class="mono">x₁ = <b class="hl-pos">' + r.r1.exact + '</b>' + approxTag(r.r1, r.x1) + '</span>'
+      + '<span class="mono">x₂ = <b class="hl-pos">' + r.r2.exact + '</b>' + approxTag(r.r2, r.x2) + '</span>');
+  } else if (r.case === "double") {
+    html += stepBlock(3, "Δ = 0 → μία διπλή ρίζα",
+      '<span class="mono sub">x = −b / (2a)</span>'
+      + '<span class="mono">x = ' + num(-b) + ' / ' + num(2 * a)
+      + ' = <b class="hl-zero">' + r.r1.exact + '</b> <span class="approx">≈ ' + approx(r.x1) + '</span></span>');
+  } else {
+    const absD = num(-D);
+    html += stepBlock(3, "Δ < 0 → καμία πραγματική ρίζα",
+      '<div class="note">Επειδή Δ < 0 η εξίσωση <b>δεν έχει πραγματικές ρίζες</b>. '
+      + 'Στους μιγαδικούς αριθμούς έχει δύο <b>συζυγείς μιγαδικές</b> ρίζες:</div>'
+      + '<span class="mono sub">x₁,₂ = (−b ± i√|Δ|) / (2a)</span>'
+      + '<span class="mono">x₁,₂ = (' + num(-b) + ' ± i√' + absD + ') / ' + num(2 * a) + '</span>'
+      + '<span class="mono">x₁ = <b class="hl-neg">' + r.complex.str1 + '</b> <span class="approx">≈ '
+        + r.complex.reDec + ' + ' + r.complex.imDec + 'i</span></span>'
+      + '<span class="mono">x₂ = <b class="hl-neg">' + r.complex.str2 + '</b> <span class="approx">≈ '
+        + r.complex.reDec + ' − ' + r.complex.imDec + 'i</span></span>');
+  }
+
+  // Step 4 — Vieta
+  html += stepBlock(4, "Τύποι Vieta (άθροισμα & γινόμενο)",
+    '<span class="mono">S = x₁ + x₂ = −b/a = ' + num(-b) + '/' + num(a)
+      + ' = <b>' + r.sumFrac + '</b></span>'
+    + '<span class="mono">P = x₁ · x₂ = c/a = ' + num(c) + '/' + num(a)
+      + ' = <b>' + r.prodFrac + '</b></span>');
+
+  // Step 5 — factorisation (only meaningful with real roots)
+  if (r.case === "two" || r.case === "double") {
+    const x1 = r.case === "two" ? r.r1.exact : r.r1.exact;
+    const x2 = r.case === "two" ? r.r2.exact : r.r1.exact;
+    const af = a === 1 ? "" : num(a) + "·";
+    html += stepBlock(5, "Παραγοντοποίηση",
+      '<span class="mono sub">a(x − x₁)(x − x₂)</span>'
+      + '<span class="mono">' + af + '(x − (' + x1 + '))(x − (' + x2 + '))</span>'
+      + (r.case === "double"
+          ? '<span class="mono sub">δηλαδή ' + af + '(x − (' + x1 + '))²</span>'
+          : ''));
+  } else {
+    html += stepBlock(5, "Παραγοντοποίηση",
+      '<div class="note">Στους πραγματικούς αριθμούς το τριώνυμο '
+      + '<b>δεν παραγοντοποιείται</b> (Δ < 0): είναι πάντα '
+      + (a > 0 ? 'θετικό' : 'αρνητικό') + ' και διατηρεί σταθερό πρόσημο.</div>');
+  }
+
+  stepsEl.innerHTML = html;
+}
+
+// Show the simplified √Δ line only when it actually simplifies (irrational case).
+function surdLine(D) {
+  const { k, m } = simplifySurd(D);
+  if (m === 1 || m === 0) return "";          // perfect square → nothing to show
+  if (k === 1) return '';                       // √m already simplest
+  return '<span class="mono sub">√' + D + ' = ' + surdString(D) + '</span>';
+}
+
+// Build the "≈ decimal" tag, suppressed when the exact form is already that integer.
+function approxTag(root, val) {
+  if (root.exact === approxClean(val)) return "";   // already exact integer
+  return ' <span class="approx">≈ ' + approx(val) + '</span>';
+}
+function approxClean(v) { v = clean(v); return isInt(v) ? String(v) : approx(v); }
+
+// For the linear case: exact fraction if integer inputs, else decimal.
+function fracOrNum(val, p, q) {
+  if (isInt(p) && isInt(q)) return fracString(p, q);
+  return approx(val);
+}
+
+/* ── 6. drawParabola() — DPR-crisp canvas plot ─────────────────────────── */
+
+const canvas = document.getElementById("graph");
+const ctx = canvas.getContext("2d");
+let lastResult = null;   // remember the current solution for redraw on resize
+
+// Read CSS custom properties so the canvas matches the live theme.
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function drawParabola(r) {
+  lastResult = r;
+  const css = {
+    bg2:  cssVar("--bg2"), border: cssVar("--border"), dim: cssVar("--dim"),
+    accent: cssVar("--accent"), pos: cssVar("--pos"), zero: cssVar("--zero"),
+    neg: cssVar("--neg"), text: cssVar("--text")
+  };
+
+  // DPR-crisp sizing from the element's rendered box.
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const W = Math.max(1, Math.round(rect.width));
+  const H = Math.max(1, Math.round(rect.height));
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+
+  // Nothing to plot if it's not a real parabola.
+  if (!r || r.kind !== "quadratic") {
+    drawEmpty(W, H, css, r);
+    return;
+  }
+
+  const a = r.a, b = r.b, c = r.c;
+  const vx = clean(-b / (2 * a));             // vertex x = −b/2a
+  const vy = clean(a * vx * vx + b * vx + c); // vertex y
+
+  // ----- Auto-scale the world window to include roots, vertex and y-intercept.
+  const xs = [vx, 0];                          // always include vertex & x=0
+  if (r.case === "two")  { xs.push(r.x1, r.x2); }
+  if (r.case === "double") { xs.push(r.x1); }
+  let xmin = Math.min.apply(null, xs), xmax = Math.max.apply(null, xs);
+  if (xmax - xmin < 1e-6) { xmin -= 3; xmax += 3; }  // degenerate spread
+  let xpad = (xmax - xmin) * 0.45 + 1;
+  xmin -= xpad; xmax += xpad;
+
+  // y-window: include vertex, y-intercept c, and the curve over [xmin,xmax].
+  const yAtEdges = [vy, c, a * xmin * xmin + b * xmin + c, a * xmax * xmax + b * xmax + c];
+  let ymin = Math.min.apply(null, yAtEdges), ymax = Math.max.apply(null, yAtEdges);
+  // Always keep the x-axis (y=0) visible so roots read clearly.
+  ymin = Math.min(ymin, 0); ymax = Math.max(ymax, 0);
+  if (ymax - ymin < 1e-6) { ymin -= 3; ymax += 3; }
+  const ypad = (ymax - ymin) * 0.15 + 0.5;
+  ymin -= ypad; ymax += ypad;
+
+  // World → screen transforms (small margin inside the canvas).
+  const M = 6;
+  const sx = x => M + (x - xmin) / (xmax - xmin) * (W - 2 * M);
+  const sy = y => H - M - (y - ymin) / (ymax - ymin) * (H - 2 * M);
+
+  // ----- Grid (nice round steps) -----
+  ctx.lineWidth = 1;
+  ctx.font = "10px 'Courier New', monospace";
+  const stepX = niceStep((xmax - xmin) / 6);
+  const stepY = niceStep((ymax - ymin) / 6);
+  ctx.strokeStyle = css.border;
+  ctx.fillStyle = css.dim;
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  for (let gx = Math.ceil(xmin / stepX) * stepX; gx <= xmax; gx += stepX) {
+    const px = sx(gx);
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath(); ctx.moveTo(px, M); ctx.lineTo(px, H - M); ctx.stroke();
+    ctx.globalAlpha = 1;
+    if (Math.abs(gx) > 1e-9) { ctx.fillText(fmtTick(gx), px, sy(0) + 3); }
+  }
+  ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  for (let gy = Math.ceil(ymin / stepY) * stepY; gy <= ymax; gy += stepY) {
+    const py = sy(gy);
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath(); ctx.moveTo(M, py); ctx.lineTo(W - M, py); ctx.stroke();
+    ctx.globalAlpha = 1;
+    if (Math.abs(gy) > 1e-9) { ctx.fillText(fmtTick(gy), sx(0) + 4, py); }
+  }
+
+  // ----- Axes (brighter) -----
+  ctx.strokeStyle = css.dim; ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.moveTo(M, sy(0)); ctx.lineTo(W - M, sy(0)); ctx.stroke(); // x-axis
+  ctx.beginPath(); ctx.moveTo(sx(0), M); ctx.lineTo(sx(0), H - M); ctx.stroke(); // y-axis
+
+  // ----- Axis of symmetry (dashed) at x = vx -----
+  ctx.save();
+  ctx.strokeStyle = css.dim; ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.globalAlpha = 0.8;
+  ctx.beginPath(); ctx.moveTo(sx(vx), M); ctx.lineTo(sx(vx), H - M); ctx.stroke();
+  ctx.restore();
+
+  // ----- The parabola curve (accent) -----
+  ctx.strokeStyle = css.accent; ctx.lineWidth = 2.2; ctx.beginPath();
+  let started = false;
+  const N = 240;
+  for (let i = 0; i <= N; i++) {
+    const wx = xmin + (xmax - xmin) * i / N;
+    const wy = a * wx * wx + b * wx + c;
+    const px = sx(wx), py = sy(wy);
+    if (!started) { ctx.moveTo(px, py); started = true; } else { ctx.lineTo(px, py); }
+  }
+  ctx.stroke();
+
+  // ----- Roots on the x-axis (green dots) -----
+  const markRoot = (x) => {
+    if (!isFinite(x)) return;
+    const px = sx(x), py = sy(0);
+    ctx.fillStyle = css.pos; ctx.beginPath(); ctx.arc(px, py, 4.5, 0, 2 * Math.PI); ctx.fill();
+    ctx.strokeStyle = css.bg2; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = css.pos; ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.fillText("x=" + fmtTick(x), px, py + 7);
+  };
+  if (r.case === "two")    { markRoot(r.x1); markRoot(r.x2); }
+  if (r.case === "double") { markRoot(r.x1); }
+
+  // ----- Vertex (yellow dot) -----
+  const vpx = sx(vx), vpy = sy(vy);
+  ctx.fillStyle = css.zero; ctx.beginPath(); ctx.arc(vpx, vpy, 4.5, 0, 2 * Math.PI); ctx.fill();
+  ctx.strokeStyle = css.bg2; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = css.zero;
+  ctx.textAlign = vx <= (xmin + xmax) / 2 ? "left" : "right";
+  ctx.textBaseline = a > 0 ? "top" : "bottom";
+  const voff = a > 0 ? 8 : -8;
+  ctx.fillText("K(" + fmtTick(vx) + ", " + fmtTick(vy) + ")", vpx + (vx <= (xmin + xmax) / 2 ? 6 : -6), vpy + voff);
+}
+
+// Friendly empty/placeholder graph for the non-quadratic (a = 0) cases.
+function drawEmpty(W, H, css, r) {
+  ctx.fillStyle = css.dim; ctx.font = "12px 'Courier New', monospace";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  const msg = (r && r.kind === "linear")
+    ? "a = 0 → ευθεία (όχι παραβολή)"
+    : "a = 0 → δεν ορίζεται παραβολή";
+  ctx.fillText(msg, W / 2, H / 2);
+}
+
+// Round a raw step up to a "nice" 1/2/5 × 10^k value for clean grid spacing.
+function niceStep(raw) {
+  if (raw <= 0 || !isFinite(raw)) return 1;
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+  const f = raw / pow;
+  const nice = f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10;
+  return nice * pow;
+}
+
+// Tick label: integers plain, else up to 2 dp without trailing zeros.
+function fmtTick(v) {
+  v = clean(v);
+  if (isInt(v)) return String(Math.round(v));
+  return parseFloat(v.toFixed(2)).toString();
+}
+
+/* ── 7. Examples, wiring, boot ─────────────────────────────────────────── */
+
+// Quick-example chips: label + coefficients.
+const EXAMPLES = [
+  { label: "x²−5x+6",  a: 1, b: -5, c: 6 },
+  { label: "x²−4",     a: 1, b: 0,  c: -4 },
+  { label: "x²+2x+1",  a: 1, b: 2,  c: 1 },
+  { label: "x²+x+1",   a: 1, b: 1,  c: 1 },   // μιγαδικές
+  { label: "2x²−7x+3", a: 2, b: -7, c: 3 },
+  { label: "x²−2",     a: 1, b: 0,  c: -2 }    // surds: ±√2
+];
+
+const inA = document.getElementById("a");
+const inB = document.getElementById("b");
+const inC = document.getElementById("c");
+
+function buildChips() {
+  const wrap = document.getElementById("chips");
+  wrap.innerHTML = EXAMPLES.map((e, i) =>
+    '<button class="chip" type="button" data-i="' + i + '">' + e.label + '</button>').join("");
+  wrap.addEventListener("click", e => {
+    const btn = e.target.closest(".chip");
+    if (!btn) return;
+    const ex = EXAMPLES[Number(btn.dataset.i)];
+    inA.value = ex.a; inB.value = ex.b; inC.value = ex.c;
+    recompute();
+  });
+}
+
+// Parse an input, flagging invalid (empty/NaN) fields visually. Empty → 0.
+function readCoef(input) {
+  const raw = input.value.trim();
+  if (raw === "") { input.classList.remove("bad"); return 0; }
+  const v = parseFloat(raw);
+  if (Number.isNaN(v)) { input.classList.add("bad"); return null; }
+  input.classList.remove("bad");
+  return v;
+}
+
+// Main entry: read coefficients, solve, render steps + graph.
+function recompute() {
+  const a = readCoef(inA), b = readCoef(inB), c = readCoef(inC);
+  if (a === null || b === null || c === null) return;  // wait for valid input
+  const r = solve(a, b, c);
+  renderSteps(r);
+  drawParabola(r);
+}
+
+// Live recompute on any input change.
+[inA, inB, inC].forEach(el => {
+  el.addEventListener("input", recompute);
+});
+
+// Redraw the (DPR-dependent) graph on resize/orientation change.
+let resizeRAF = null;
+window.addEventListener("resize", () => {
+  if (resizeRAF) cancelAnimationFrame(resizeRAF);
+  resizeRAF = requestAnimationFrame(() => { if (lastResult) drawParabola(lastResult); });
+});
+
+// Boot
+buildChips();
+recompute();
+</script>
+</body>
+</html>
