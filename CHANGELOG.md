@@ -2,7 +2,54 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Site is **LIVE in production** at [korifi-edu.gr](https://korifi-edu.gr) (Vercel hosting, custom domain, valid HTTPS). All major features shipped: bento-style content pages, hero carousel with seasonal slides, full admin CRUD with inline lessons + access codes, /martyries with weekly auto-sync from Drive, /epikoinonia with embedded Google Maps, **νέα ενότητα `/ergaleia` (Διαδραστικά Εργαλεία)**. SEO (per-content JSON-LD, sitemap, OG/Twitter), Vercel Analytics, security hardened. Κύριες εκκρεμότητες: Google Search Console verification (TXT record DNS), Google Business Profile setup, owner content updates, περισσότερα εργαλεία στο `/ergaleia` (βλ. λίστα προτάσεων στο entry 2026-06-21).
+> **Where we are now (latest):** Site is **LIVE in production** at [korifi-edu.gr](https://korifi-edu.gr) (Vercel hosting, custom domain, valid HTTPS). All major features shipped: bento-style content pages, hero carousel with seasonal slides, full admin CRUD with inline lessons + access codes, /martyries with weekly auto-sync from Drive, /epikoinonia with embedded Google Maps, **ενότητα `/ergaleia` με 12 Διαδραστικά Εργαλεία** (Χημεία/Μαθηματικά/Φυσική). SEO (per-content JSON-LD, sitemap, OG/Twitter), Vercel Analytics, security hardened. Κύριες εκκρεμότητες: Google Search Console verification (TXT record DNS), Google Business Profile setup, owner content updates, περισσότερα εργαλεία στο `/ergaleia` (βλ. λίστα ιδεών στο πρώτο entry 2026-06-21).
+
+---
+
+## 2026-06-21 (feature — Εργαλεία: επέκταση 4 → 12 + βελτιώσεις)
+
+Επέκταση της ενότητας `/ergaleia` από 4 σε **12 εργαλεία**, σε 3 PR. Όλα αυτόνομα
+HTML στο `public/ergaleia/`, καταχωρημένα στο `src/lib/ergaleia.ts` (single source
+of truth → αυτόματα σε hub + sitemap), με **ανεξάρτητη μαθηματική επαλήθευση σε Node
+πριν από κάθε merge** + Vercel production build PASS.
+
+**PR [#2](https://github.com/panoscoolman-beep/korifi-edu.gr/pull/2) — Τριγωνομετρικός κύκλος (βελτίωση):**
+- Πρόσημα ημ/συν/εφ ανά τεταρτημόριο (πίνακας + highlight στήλης + φωτεινή σκίαση τρέχοντος τεταρτημορίου).
+- Τύποι αναγωγής για τη γωνία θ (−θ, 90°−θ, 90°+θ, 180°−θ, 180°+θ) με ζωντανές τιμές + κουμπί «δες στον κύκλο» (οπτικό είδωλο). Verified 32/32.
+
+**PR [#3](https://github.com/panoscoolman-beep/korifi-edu.gr/pull/3) — Χημεία + Μαθηματικά (3 νέα):**
+- `moriaki-maza.html` — μοριακή μάζα/γραμμομόρια (recursive parser με ένυδρα/παρενθέσεις, % σύσταση, m↔mol↔σωματίδια· δεδομένα μαζών από τον περιοδικό πίνακα).
+- `isostathmisi-eksiswseon.html` — ισοστάθμιση εξισώσεων με **exact rational nullspace** (μηδέν floating point) + έλεγχος ισοζυγίου ατόμων.
+- `defterovathmia-eksiswsi.html` — δευτεροβάθμια με βήματα (Δ, πραγματικές/μιγαδικές ρίζες, απλοποίηση ριζών k√m, Vieta, παραγοντοποίηση, γράφημα). Verified 25/25.
+
+**PR [#4](https://github.com/panoscoolman-beep/korifi-edu.gr/pull/4) — Φυσική + Μαθηματικά (5 νέα):**
+- `sxima-horner.html` — συνθετική διαίρεση βήμα-βήμα, πηλίκο/υπόλοιπο/P(ρ) (**ρ δεξιά** από τους συντελεστές).
+- `paragwgos.html` — συμβολική παράγωγος βήμα-βήμα (tokenize→AST→differentiate→simplify, χωρίς eval).
+- `nomos-ohm.html` — V/I/R/P: δίνεις δύο, βρίσκει τα υπόλοιπα + τύπους.
+- `fyllo-typon-fysikis.html` — 67 τύποι Φυσικής, 12 κατηγορίες, με αναζήτηση.
+- `prosomoiosis-kinisis.html` — πλάγια βολή + απλή αρμονική ταλάντωση (canvas, closed-form, χωρίς drift).
+- Verified 34/34 (η παράγωγος: analytic = finite-diff σε 10 συναρτήσεις).
+
+**Σύνολο 12 εργαλεία:** Χημεία (Περιοδικός Πίνακας, Μοριακή Μάζα, Ισοστάθμιση) ·
+Μαθηματικά (Γραφική Παράσταση, Αριθμομηχανή, Τριγωνομετρικός Κύκλος, Δευτεροβάθμια,
+Σχήμα Horner, Παράγωγος) · Φυσική (Νόμος Ωμ, Φύλλο Τύπων, Προσομοιώσεις Κίνησης).
+
+#### 📋 Ιδέες για επόμενα εργαλεία (TODO)
+Άμεσα στη λίστα: **Ολοκληρώματα** (έντιμη έκδοση — πίνακας βασικών + ολοκλήρωση
+πολυωνύμων + ορισμένο με Simpson & οπτικοποίηση εμβαδού).
+Επιπλέον ιδέες (από συζήτηση 2026-06-21):
+- Μαθηματικά: Μετατροπέας μονάδων · Στατιστική (μέσος/διάμεσος/τυπική απόκλιση) ·
+  Συνδυαστική (διατάξεις/συνδυασμοί) · Σύστημα γραμμικών εξισώσεων · ΜΚΔ/ΕΚΠ &
+  παραγοντοποίηση αριθμών · Κλάσματα βήμα-βήμα · Όρια/ακολουθίες.
+- Χημεία: pH/συγκέντρωση διαλυμάτων · Quiz σθενών/ονοματολογίας · Στοιχειομετρία (mol→g→L).
+- Φυσική: Συνδεσμολογία αντιστάσεων (σειρά/παράλληλα) · Φακοί/κάτοπτρα · Διαγράμματα κίνησης (x–t/u–t).
+- Πανελλήνιες/καθοδήγηση: Υπολογισμός Μορίων (caveat: ετήσια συντελεστές) · Countdown.
+- Engagement/μελέτη: Flashcards/Quiz (γενικό σύστημα) · Pomodoro timer · Γεννήτρια ασκήσεων.
+
+### ⏸️ Session paused 2026-06-21 (β) — resume point
+Όλα committed + pushed + **LIVE** (12 εργαλεία). Επόμενο: «Ολοκληρώματα» ή όποιο
+άλλο από τη λίστα. Πρότυπο: 1 self-contained HTML στο `public/ergaleia/` + 1 εγγραφή
+στο `src/lib/ergaleia.ts`. Πάντα ανεξάρτητη επαλήθευση μαθηματικών σε Node πριν merge.
 
 ---
 
