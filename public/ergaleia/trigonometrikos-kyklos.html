@@ -23,6 +23,9 @@
       --sin: #ff6b6b;  /* ημθ — warm red, vertical projection */
       --cos: #69db7c;  /* συνθ — green, horizontal projection  */
       --tan: #ffd43b;  /* εφθ — amber, vertical tangent line   */
+      --ghost: #ffa94d; /* είδωλο γωνίας αναγωγής — orange      */
+      --pos: #69db7c;  /* θετικό πρόσημο */
+      --neg: #ff6b6b;  /* αρνητικό πρόσημο */
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html { background: var(--bg); }
@@ -69,6 +72,16 @@
     .lbl       { font-family: 'Courier New', Courier, monospace; font-size: 12px; }
     .lbl-axis  { font-family: 'Courier New', Courier, monospace; font-size: 11px; fill: var(--dim); }
 
+    /* Quadrant sign wedge (faint tint of the current quadrant) */
+    .quad-wedge { fill: var(--accent); opacity: .06; }
+
+    /* Ghost (reduction-formula related angle) overlay */
+    .radius-ghost { stroke: var(--ghost); stroke-width: 1.6; opacity: .9; }
+    .seg-ghost    { stroke: var(--ghost); stroke-width: 2.5; stroke-linecap: round; opacity: .85; }
+    .drop-ghost   { stroke: var(--ghost); stroke-width: 1; stroke-dasharray: 3 3; opacity: .55; }
+    .pt-ghost     { fill: var(--ghost); stroke: var(--bg); stroke-width: 2; }
+    .lbl-ghost    { font-family: 'Courier New', Courier, monospace; font-size: 11px; fill: var(--ghost); font-weight: bold; }
+
     /* ── Quadrant badge ─────────────────── */
     .quad { text-align: center; margin: 8px 0 4px; font-size: 10px; letter-spacing: .1em; color: var(--dim); }
     .quad b { color: var(--accent); }
@@ -85,6 +98,40 @@
     .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: center; margin: 12px 0 4px; }
     .leg-item { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: .04em; }
     .leg-swatch { width: 16px; height: 4px; border-radius: 2px; flex-shrink: 0; }
+
+    /* ── Section title (shared) ─────────── */
+    .sec-title { font-size: 9px; letter-spacing: .14em; color: var(--accent); text-transform: uppercase; margin: 16px 0 8px; text-align: center; }
+
+    /* ── Signs-per-quadrant table ───────── */
+    .signs { padding: 10px 12px; }
+    .signs table { width: 100%; border-collapse: collapse; }
+    .signs th, .signs td { text-align: center; padding: 6px 2px; font-size: 12px; }
+    .signs thead th { font-size: 9px; letter-spacing: .06em; color: var(--dim); font-weight: normal; }
+    .signs tbody th { text-align: left; font-size: 11px; font-weight: bold; white-space: nowrap; }
+    .signs .s-pos { color: var(--pos); font-weight: bold; }
+    .signs .s-neg { color: var(--neg); font-weight: bold; }
+    .signs td { border-left: 1px solid var(--border); }
+    .signs col.cur, .signs td.cur, .signs th.cur { background: rgba(126,200,227,.10); }
+    .signs th.cur { color: var(--accent); }
+    .signs-hint { font-size: 9px; color: var(--dim); text-align: center; margin-top: 7px; letter-spacing: .04em; line-height: 1.5; }
+
+    /* ── Reduction formulas panel ───────── */
+    .reduction { padding: 8px 10px 10px; }
+    .red-row { border-top: 1px solid var(--border); padding: 9px 2px 8px; }
+    .red-row:first-child { border-top: none; }
+    .red-row.active { background: rgba(255,169,77,.08); border-radius: 8px; }
+    .red-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+    .red-name { font-size: 12px; font-weight: bold; color: var(--text); }
+    .red-name small { color: var(--dim); font-weight: normal; letter-spacing: .03em; }
+    .red-deg { font-size: 11px; color: var(--ghost); font-weight: bold; }
+    .red-see { background: var(--bg3); border: 1px solid var(--border); color: var(--dim); border-radius: 14px; padding: 4px 9px; font-family: inherit; font-size: 9px; letter-spacing: .06em; cursor: pointer; white-space: nowrap; touch-action: manipulation; transition: color .15s, border-color .15s, background .15s; }
+    .red-see:hover { border-color: var(--ghost); color: var(--ghost); }
+    .red-row.active .red-see { background: rgba(255,169,77,.18); border-color: var(--ghost); color: var(--ghost); }
+    .red-ids { display: grid; grid-template-columns: 1fr; gap: 3px; }
+    .red-id { font-size: 11px; display: flex; justify-content: space-between; gap: 8px; }
+    .red-id .id-eq { color: var(--text); }
+    .red-id .id-num { color: var(--dim); font-size: 10px; white-space: nowrap; }
+    .red-id .hm { color: var(--sin); } .red-id .sn { color: var(--cos); } .red-id .ef { color: var(--tan); }
 
     /* ── Controls ───────────────────────── */
     .controls { margin-top: 14px; }
@@ -156,6 +203,10 @@
     <span class="leg-item"><span class="leg-swatch" style="background:var(--tan)"></span>εφθ (εφαπτομένη x=1)</span>
   </div>
 
+  <!-- Signs of trig functions per quadrant -->
+  <div class="sec-title">Πρόσημα ανά τεταρτημόριο</div>
+  <div class="panel signs" id="signsBox"></div>
+
   <!-- Live readout panel -->
   <div class="panel">
     <div class="rrow">
@@ -175,6 +226,11 @@
       <span class="rval" id="rTan" style="color:var(--tan)"></span>
     </div>
   </div>
+
+  <!-- Reduction (related-angle) formulas for the current θ -->
+  <div class="sec-title">Τύποι αναγωγής (για τη γωνία θ)</div>
+  <div class="panel reduction" id="redBox"></div>
+  <div class="signs-hint" id="redHint">Πάτα «δες στον κύκλο» σε έναν τύπο για να δεις το είδωλο της γωνίας (πορτοκαλί) και γιατί ισχύει.</div>
 
   <!-- Controls -->
   <div class="controls">
@@ -320,6 +376,40 @@ function radString(deg) {
   return (deg * DEG).toFixed(4) + " rad";
 }
 
+/* Sign of each trig function per quadrant (Q1..Q4).
+   Mnemonic (Greek): 1ο όλα + · 2ο μόνο ημ + · 3ο μόνο εφ + · 4ο μόνο συν +. */
+const QUAD_SIGNS = {
+  1: { sin: "+", cos: "+", tan: "+" },
+  2: { sin: "+", cos: "−", tan: "−" },
+  3: { sin: "−", cos: "−", tan: "+" },
+  4: { sin: "−", cos: "+", tan: "−" }
+};
+
+/* Reduction-formula related angles. `deg(θ)` gives the related angle; `id`
+   holds the textbook identity in terms of θ-functions. All verified correct:
+     −θ:      ημ=−ημθ, συν=συνθ,  εφ=−εφθ
+     90°−θ:   ημ=συνθ, συν=ημθ,   εφ=σφθ
+     90°+θ:   ημ=συνθ, συν=−ημθ,  εφ=−σφθ
+     180°−θ:  ημ=ημθ,  συν=−συνθ, εφ=−εφθ
+     180°+θ:  ημ=−ημθ, συν=−συνθ, εφ=εφθ                                       */
+const REL_DEFS = [
+  { key: "neg",  name: "−θ",     note: "αντίθετες",        deg: d => -d,     id: { sin: "−ημθ", cos: "συνθ",  tan: "−εφθ" } },
+  { key: "comp", name: "90°−θ",  note: "συμπληρωματικές",  deg: d => 90 - d, id: { sin: "συνθ",  cos: "ημθ",   tan: "σφθ"  } },
+  { key: "co90", name: "90°+θ",  note: "",                 deg: d => 90 + d, id: { sin: "συνθ",  cos: "−ημθ",  tan: "−σφθ" } },
+  { key: "supp", name: "180°−θ", note: "παραπληρωματικές", deg: d => 180 - d, id: { sin: "ημθ",  cos: "−συνθ", tan: "−εφθ" } },
+  { key: "p180", name: "180°+θ", note: "",                 deg: d => 180 + d, id: { sin: "−ημθ", cos: "−συνθ", tan: "εφθ"  } }
+];
+
+// Numeric value of a trig function at `deg`, cleaned; tan → "±∞" near cos=0.
+function trigNum(fn, deg) {
+  const rad = deg * DEG;
+  if (fn === "sin") return fmt(Math.sin(rad), 3);
+  if (fn === "cos") return fmt(Math.cos(rad), 3);
+  const c = clean(Math.cos(rad));
+  if (Math.abs(c) < 1e-9) return "±∞";
+  return fmt(Math.sin(rad) / Math.cos(rad), 3);
+}
+
 // SVG element factory.
 function el(tag, attrs) {
   const e = document.createElementNS(SVG_NS, tag);
@@ -370,6 +460,11 @@ function drawStatic() {
 function drawDynamic(deg) {
   layerDynamic.replaceChildren(); // clear
 
+  // Faint tint of the current quadrant (visual cue for "where we are")
+  drawQuadWedge(quadrantOf(deg));
+  // Ghost overlay for a selected reduction-formula related angle (under primary)
+  if (state.related) drawGhost(deg);
+
   const rad = deg * DEG;
   const cos = clean(Math.cos(rad));
   const sin = clean(Math.sin(rad));
@@ -419,12 +514,100 @@ function drawDynamic(deg) {
   layerDynamic.appendChild(lbl);
 }
 
+// Faint wedge tinting the current quadrant's 90° sector.
+function drawQuadWedge(q) {
+  if (q < 1 || q > 4) return;            // on an axis → no single quadrant
+  const a0 = (q - 1) * 90, a1 = q * 90;
+  const O  = w2s(0, 0);
+  const p0 = w2s(Math.cos(a0 * DEG), Math.sin(a0 * DEG));
+  const p1 = w2s(Math.cos(a1 * DEG), Math.sin(a1 * DEG));
+  // World-CCW appears CCW on the y-inverted screen → sweep-flag 0, small arc.
+  const d = `M ${O.x} ${O.y} L ${p0.x} ${p0.y} A ${R} ${R} 0 0 0 ${p1.x} ${p1.y} Z`;
+  layerDynamic.appendChild(el("path", { class: "quad-wedge", d }));
+}
+
+// Ghost overlay: the related angle φ for the selected reduction formula, so the
+// student SEES the symmetry (e.g. 180°−θ mirrored across the y-axis has equal ημ).
+function drawGhost(deg) {
+  const r = REL_DEFS.find(x => x.key === state.related);
+  if (!r) return;
+  const phi = normDeg(r.deg(deg));
+  const rad = phi * DEG;
+  const cos = clean(Math.cos(rad)), sin = clean(Math.sin(rad));
+  const P = w2s(cos, sin), F = w2s(cos, 0), O = w2s(0, 0);
+  layerDynamic.appendChild(el("line", { class: "drop-ghost",   x1: P.x, y1: P.y, x2: F.x, y2: F.y }));
+  layerDynamic.appendChild(el("line", { class: "seg-ghost",    x1: F.x, y1: F.y, x2: P.x, y2: P.y }));
+  layerDynamic.appendChild(el("line", { class: "radius-ghost", x1: O.x, y1: O.y, x2: P.x, y2: P.y }));
+  layerDynamic.appendChild(el("circle", { class: "pt-ghost", cx: P.x, cy: P.y, r: 5 }));
+  const t = el("text", { class: "lbl-ghost", x: P.x + (cos >= 0 ? 12 : -12), y: P.y + (sin >= 0 ? -10 : 18),
+                         "text-anchor": cos >= 0 ? "start" : "end" });
+  t.textContent = r.name;
+  layerDynamic.appendChild(t);
+}
+
 /* ── 5. Readout update ─────────────────────────────────────────────────── */
-const rAngle = document.getElementById("rAngle");
-const rSin   = document.getElementById("rSin");
-const rCos   = document.getElementById("rCos");
-const rTan   = document.getElementById("rTan");
-const quadEl = document.getElementById("quad");
+const rAngle   = document.getElementById("rAngle");
+const rSin     = document.getElementById("rSin");
+const rCos     = document.getElementById("rCos");
+const rTan     = document.getElementById("rTan");
+const quadEl   = document.getElementById("quad");
+const signsBox = document.getElementById("signsBox");
+const redBox   = document.getElementById("redBox");
+
+/* Build the signs-per-quadrant table once (data-driven). */
+function buildSigns() {
+  const fns = [
+    { key: "sin", label: "ημθ", color: "var(--sin)" },
+    { key: "cos", label: "συνθ", color: "var(--cos)" },
+    { key: "tan", label: "εφθ", color: "var(--tan)" }
+  ];
+  let head = '<thead><tr><th></th>';
+  for (let q = 1; q <= 4; q++) head += '<th data-q="' + q + '">Τετ. ' + q + '</th>';
+  head += '</tr></thead>';
+  let body = '<tbody>';
+  for (const f of fns) {
+    body += '<tr><th style="color:' + f.color + '">' + f.label + '</th>';
+    for (let q = 1; q <= 4; q++) {
+      const s = QUAD_SIGNS[q][f.key];
+      body += '<td data-q="' + q + '" class="' + (s === "+" ? "s-pos" : "s-neg") + '">' + s + '</td>';
+    }
+    body += '</tr>';
+  }
+  body += '</tbody>';
+  signsBox.innerHTML = '<table>' + head + body + '</table>'
+    + '<div class="signs-hint">Μνημονικό: 1ο όλα + · 2ο μόνο ημ + · 3ο μόνο εφ + · 4ο μόνο συν +</div>';
+}
+
+// Highlight the current quadrant's column (q = 0 on an axis → nothing).
+function updateSignsHighlight(q) {
+  signsBox.querySelectorAll("[data-q]").forEach(c =>
+    c.classList.toggle("cur", Number(c.dataset.q) === q)
+  );
+}
+
+// Rebuild the reduction-formula rows with live related angles + values.
+function updateReduction(deg) {
+  redBox.innerHTML = REL_DEFS.map(r => {
+    const phi = normDeg(r.deg(deg));
+    const phiTxt = (Math.abs(phi - Math.round(phi)) < 1e-9 ? String(Math.round(phi)) : phi.toFixed(1)) + "°";
+    const active = state.related === r.key;
+    const idLine = (cls, label, identity, num) =>
+      '<div class="red-id"><span class="id-eq"><span class="' + cls + '">' + label + '(' + r.name + ')</span> = ' + identity + '</span>'
+      + '<span class="id-num">≈ ' + num + '</span></div>';
+    return '<div class="red-row' + (active ? " active" : "") + '">'
+      + '<div class="red-head">'
+      +   '<span class="red-name">' + r.name + (r.note ? ' <small>(' + r.note + ')</small>' : "")
+      +     ' <span class="red-deg">= ' + phiTxt + '</span></span>'
+      +   '<button class="red-see" type="button" data-rel="' + r.key + '">' + (active ? "κρύψε ✕" : "δες στον κύκλο") + '</button>'
+      + '</div>'
+      + '<div class="red-ids">'
+      +   idLine("hm", "ημ", r.id.sin, trigNum("sin", phi))
+      +   idLine("sn", "συν", r.id.cos, trigNum("cos", phi))
+      +   idLine("ef", "εφ", r.id.tan, trigNum("tan", phi))
+      + '</div>'
+      + '</div>';
+  }).join("");
+}
 
 function quadrantOf(deg) {
   // Axis angles belong to no single quadrant; report the boundary instead.
@@ -551,8 +734,17 @@ function applyInput() {
 document.getElementById("setBtn").addEventListener("click", applyInput);
 angleInput.addEventListener("keydown", e => { if (e.key === "Enter") applyInput(); });
 
+// Reduction-formula "δες στον κύκλο" toggles (event-delegated; rows are rebuilt each update).
+redBox.addEventListener("click", e => {
+  const btn = e.target.closest(".red-see");
+  if (!btn) return;
+  const key = btn.dataset.rel;
+  state.related = (state.related === key) ? null : key;  // toggle off if same
+  update();
+});
+
 /* ── 8. State + main update ────────────────────────────────────────────── */
-const state = { deg: 30 };  // start at a friendly characteristic angle
+const state = { deg: 30, related: null };  // related = active reduction-formula key (ghost)
 
 // Set the angle, applying snapping if the toggle is on, then redraw.
 function setAngle(deg) {
@@ -567,6 +759,8 @@ function update() {
   const snapped = snapToggle.checked;
   drawDynamic(state.deg);
   updateReadout(state.deg, snapped);
+  updateSignsHighlight(quadrantOf(state.deg));
+  updateReduction(state.deg);
   // Keep the numeric input in sync unless it's focused (so typing isn't fought).
   if (document.activeElement !== angleInput) {
     angleInput.value = Math.abs(state.deg - Math.round(state.deg)) < 1e-9
@@ -577,6 +771,7 @@ function update() {
 
 // Boot
 drawStatic();
+buildSigns();
 update();
 </script>
 </body>
