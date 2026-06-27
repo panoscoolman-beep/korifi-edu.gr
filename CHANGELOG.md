@@ -6,6 +6,31 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-06-27 (db — RLS performance advisor cleanup, verified safe)
+
+Καθάρισμα των Supabase **performance** advisors μέσω 3 migrations (0009–0011),
+εφαρμοσμένα στο production με πλήρη επαλήθευση (anon reads πριν/μετά identical σε
+14 tables· readback των policies· live site 200).
+
+- **0009** — κάθε `admin write` policy ήταν `FOR ALL` (επικάλυπτε τα SELECT reads →
+  `multiple_permissive_policies`). Split σε `INSERT/UPDATE/DELETE` + wrap `is_admin()`
+  σε `(select is_admin())`. **Τα read policies έμειναν ανέγγιχτα** (public reads ασφαλή).
+- **0010** — wrap `auth.uid()`/`is_admin()` σε `(select …)` στα read policies
+  (lessons/profiles/enrollments) → `auth_rls_initplan` (semantics-preserving).
+- **0011** — merge των 2 permissive UPDATE policies του `profiles` σε μία ισοδύναμη
+  (κρατά τον role-escalation guard).
+
+**Αποτέλεσμα:** `multiple_permissive_policies` 75→0, `auth_rls_initplan` 4→0.
+Απομένουν 3 **INFO** (αβλαβή): 2 unused indexes σε άδειους πίνακες
+(gallery_photos/page_sections — θα χρησιμοποιηθούν με δεδομένα) + 1 unindexed FK σε
+admin-only πίνακα. ⚠️ Τα `is_admin()` EXECUTE grants ΔΕΝ πειράχτηκαν (βλ. pitfall #1).
+
+**Ακόμα εκκρεμεί (χειροκίνητα):** Leaked Password Protection (Supabase Dashboard →
+Authentication — απαιτεί πρόσβαση dashboard/token, δεν γίνεται από εδώ),
+Google Search Console / Business Profile, service-role key rotation.
+
+---
+
 ## 2026-06-27 (fix — Εξονυχιστικός site audit remediation: SEO · a11y · security · tests/CI)
 
 Διόρθωση **όλων** των ευρημάτων από τον πολυ-agent audit (branch
