@@ -47,4 +47,26 @@ describe("markdownSanitizeSchema", () => {
     expect(out).toContain('href="https://korifi-edu.gr"');
     expect(out).toContain("<table");
   });
+
+  // The CMS pages rely on Tailwind-classed raw HTML — these must survive.
+  it("preserves class on styled blocks (blue heading boxes / cards)", async () => {
+    const out = await render(
+      '<div class="not-prose bg-gradient-to-br from-brand-600 to-brand-800 text-white">Γεια</div>',
+    );
+    expect(out).toContain("<div");
+    expect(out).toContain("bg-gradient-to-br from-brand-600 to-brand-800");
+  });
+
+  it("preserves structural tags, tel: links and the maps iframe", async () => {
+    const sectionOut = await render('<section class="card"><header class="bg-brand-700">x</header></section>');
+    expect(sectionOut).toContain("<section");
+    expect(sectionOut).toContain("<header");
+
+    const telOut = await render('<a href="tel:+302253025080">κλήση</a>');
+    expect(telOut).toContain('href="tel:+302253025080"');
+
+    const iframeOut = await render('<iframe src="https://www.google.com/maps/embed?pb=1" title="map"></iframe>');
+    expect(iframeOut).toContain("<iframe");
+    expect(iframeOut).toContain("https://www.google.com/maps/embed");
+  });
 });
