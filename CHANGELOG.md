@@ -6,6 +6,22 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-06-27 (fix — Markdown sanitizer: restore CMS styling που είχε χαθεί)
+
+**Regression fix.** Το `rehype-sanitize` (από το προηγούμενο PR) με το default schema
+αφαιρούσε τα `class`/`style`, τα `tel:` links και το maps iframe από το **raw HTML των
+CMS σελίδων** (Γυμνάσιο, Α/Β/Γ Λυκείου, ΕΠΑΛ, Επικοινωνία, Προσανατολισμός, Online) →
+χάθηκαν τα **μπλε gradient heading boxes**, τα styled card/table sections και ο χάρτης.
+
+Το schema (`src/lib/markdown-schema.ts`) έγινε **presentation-permissive**: κρατά
+`class`/`style`/`id`, structural & table tags, `tel:`/`mailto:` links και iframe embeds —
+αλλά **εξακολουθεί να μπλοκάρει JS**: `<script>`, event handlers (`onerror`/`on*`),
+`javascript:` URLs. Επαληθεύτηκε σε `next build` + live render: `/gimnasio` (μπλε boxes,
+sections, 3 tables) & `/epikoinonia` (tel link + map iframe) επανήλθαν, `onerror`=0.
++2 unit tests (class/tel/iframe survive).
+
+---
+
 ## 2026-06-27 (db — RLS performance advisor cleanup, verified safe)
 
 Καθάρισμα των Supabase **performance** advisors μέσω 3 migrations (0009–0011),
