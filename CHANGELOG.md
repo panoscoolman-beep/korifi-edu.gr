@@ -6,6 +6,28 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-06-27 (fix — Home: self-host εικονίδια του strip «Χρήσιμα εργαλεία»)
+
+Τα 4 εικονίδια στο strip **«Χρήσιμα εργαλεία»** (στο `Footer`, άρα σε όλες τις σελίδες)
+φόρτωναν από το **παλιό WordPress CDN** `i0.wp.com/korifi-edu.gr/wp-content/uploads/2021/04/*`.
+Μετά τη μετάβαση σε Next.js το origin `/wp-content/*` επιστρέφει 403, οπότε ο Photon
+(Jetpack) σέρβιρε τις εικόνες από cache — που πλέον **έληξε** (`x-nc: EXPIRED`,
+*"remote data could not be fetched"*). Αποτέλεσμα: **3 από 4 εικονίδια έσπαγαν**
+(i0.wp.com 403 → Next image optimizer 502). Μόνο το `1.png` (πυξίδα «ΟΣ») ζούσε ακόμα
+ως cache HIT — ωρολογιακή βόμβα μέχρι να λήξει κι αυτό.
+
+**Fix:** self-hosted assets στο `public/resources/` (καμία εξάρτηση από εξωτερικό CDN):
+- `odigos-stadiodromias.png` — η αυθεντική πυξίδα «ΟΣ» (ανακτημένη όσο ζούσε ακόμα στο CDN).
+- `themata-panelladikon.svg`, `ypologismos-morion.svg`, `teleftaia-nea.svg` — νέα flat
+  εικονίδια (brand indigo + amber).
+- `ResourcesStrip.tsx`: τα `image:` paths → τοπικά + `unoptimized` στο `<Image>` ώστε τα
+  SVG να μην περνάνε από τον Next optimizer (χωρίς `dangerouslyAllowSVG`/CSP αλλαγές).
+
+Verified: `tsc` + `eslint` PASS, assets 200, render homepage με τα 4 τοπικά `src` & μηδέν
+`i0.wp.com`. Οι 4 εξωτερικοί σύνδεσμοι προς Stadiodromia (cid) έμειναν ως είχαν.
+
+---
+
 ## 2026-06-21 (feature — Εργαλεία: επέκταση 4 → 12 + βελτιώσεις)
 
 Επέκταση της ενότητας `/ergaleia` από 4 σε **12 εργαλεία**, σε 3 PR. Όλα αυτόνομα

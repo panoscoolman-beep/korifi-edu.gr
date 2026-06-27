@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 428 295" role="img" aria-label="Υπολογισμός Μορίων — αριθμομηχανή">
+  <!-- σώμα αριθμομηχανής -->
+  <rect x="154" y="50" width="120" height="196" rx="18" fill="#3730a3"/>
+  <rect x="154.5" y="50.5" width="119" height="195" rx="17.5" fill="none" stroke="#1e1b4b" stroke-width="1" opacity="0.45"/>
+  <!-- οθόνη -->
+  <rect x="168" y="66" width="92" height="40" rx="6" fill="#eef2ff"/>
+  <rect x="206" y="74" width="46" height="6" rx="3" fill="#4338ca"/>
+  <rect x="222" y="86" width="30" height="11" rx="3" fill="#f59e0b"/>
+  <!-- πλήκτρα 3×4 -->
+  <g fill="#c7d2fe">
+    <rect x="168" y="122" width="24" height="22" rx="5"/>
+    <rect x="202" y="122" width="24" height="22" rx="5"/>
+    <rect x="236" y="122" width="24" height="22" rx="5"/>
+    <rect x="168" y="152" width="24" height="22" rx="5"/>
+    <rect x="202" y="152" width="24" height="22" rx="5"/>
+    <rect x="236" y="152" width="24" height="22" rx="5"/>
+    <rect x="168" y="182" width="24" height="22" rx="5"/>
+    <rect x="202" y="182" width="24" height="22" rx="5"/>
+    <rect x="236" y="182" width="24" height="22" rx="5"/>
+    <rect x="168" y="212" width="24" height="22" rx="5"/>
+    <rect x="202" y="212" width="24" height="22" rx="5"/>
+  </g>
+  <!-- πλήκτρο "=" σε accent -->
+  <rect x="236" y="212" width="24" height="22" rx="5" fill="#f59e0b"/>
+</svg>

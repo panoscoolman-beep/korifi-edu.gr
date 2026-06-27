@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 428 295" role="img" aria-label="Τα τελευταία νέα των Πανελληνίων — εφημερίδα">
+  <!-- εφημερίδα -->
+  <rect x="144" y="64" width="140" height="158" rx="9" fill="#ffffff" stroke="#3730a3" stroke-width="3"/>
+  <!-- μάστχεντ -->
+  <rect x="148" y="68" width="132" height="34" rx="6" fill="#3730a3"/>
+  <rect x="148" y="90" width="132" height="12" fill="#3730a3"/>
+  <text x="214" y="92" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="22" letter-spacing="3" fill="#ffffff">ΝΕΑ</text>
+  <!-- κύρια εικόνα -->
+  <rect x="158" y="114" width="56" height="46" rx="4" fill="#c7d2fe"/>
+  <path d="M158 156 l16 -18 l12 12 l14 -16 l14 22 z" fill="#3730a3" opacity="0.5"/>
+  <circle cx="200" cy="126" r="6" fill="#f59e0b"/>
+  <!-- γραμμές δίπλα στην εικόνα -->
+  <g fill="#c7d2fe">
+    <rect x="222" y="116" width="50" height="6" rx="3"/>
+    <rect x="222" y="128" width="50" height="6" rx="3"/>
+    <rect x="222" y="140" width="38" height="6" rx="3"/>
+    <rect x="222" y="152" width="50" height="6" rx="3"/>
+  </g>
+  <!-- ετικέτα "έκτακτο" (accent) -->
+  <rect x="158" y="176" width="58" height="16" rx="4" fill="#f59e0b"/>
+  <!-- γραμμές κάτω -->
+  <g fill="#c7d2fe">
+    <rect x="158" y="200" width="114" height="6" rx="3"/>
+    <rect x="158" y="212" width="92" height="6" rx="3"/>
+  </g>
+</svg>

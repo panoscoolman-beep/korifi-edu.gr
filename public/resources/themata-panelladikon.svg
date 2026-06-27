@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 428 295" role="img" aria-label="Θέματα Πανελλαδικών — γραπτά">
+  <!-- πίσω φύλλο (ελαφρώς στραμμένο) -->
+  <g transform="rotate(-8 214 150)">
+    <rect x="150" y="64" width="118" height="168" rx="10" fill="#c7d2fe"/>
+  </g>
+  <!-- μπροστινό φύλλο -->
+  <rect x="160" y="56" width="118" height="176" rx="10" fill="#ffffff" stroke="#3730a3" stroke-width="3"/>
+  <!-- κεφαλίδα -->
+  <rect x="160" y="56" width="118" height="30" rx="10" fill="#3730a3"/>
+  <rect x="160" y="74" width="118" height="12" fill="#3730a3"/>
+  <rect x="174" y="64" width="66" height="6" rx="3" fill="#ffffff"/>
+  <rect x="174" y="75" width="42" height="5" rx="2.5" fill="#a5b4fc"/>
+  <!-- γραμμές κειμένου -->
+  <g fill="#c7d2fe">
+    <rect x="176" y="100" width="86" height="6" rx="3"/>
+    <rect x="176" y="114" width="86" height="6" rx="3"/>
+    <rect x="176" y="128" width="70" height="6" rx="3"/>
+    <rect x="176" y="148" width="86" height="6" rx="3"/>
+    <rect x="176" y="162" width="86" height="6" rx="3"/>
+    <rect x="176" y="176" width="54" height="6" rx="3"/>
+  </g>
+  <!-- σήμα ελέγχου (accent) -->
+  <circle cx="262" cy="212" r="23" fill="#f59e0b"/>
+  <circle cx="262" cy="212" r="23" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+  <path d="M250 212 l8 8 l16 -18" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -3,35 +3,36 @@ import Image from "next/image";
 // External links to Stadiodromia.gr platform (same partnership account as the legacy korifi-edu.gr).
 // `cid` is the Κορυφή customer id at Stadiodromia.
 const STADIODROMIA_CID = "FD7C31D3-576C-4DD7-8896-6FC03492112D";
-const IMG_BASE = "https://i0.wp.com/korifi-edu.gr/wp-content/uploads/2021/04";
 
+// Εικονίδια self-hosted στο /public/resources/ — δεν εξαρτώνται πια από το νεκρό
+// WordPress CDN (i0.wp.com). Βλ. CHANGELOG για το γιατί άλλαξαν.
 const RESOURCES = [
   {
     href: `https://odigos.stadiodromia.gr/login.php?cid=${STADIODROMIA_CID}`,
     title: "Οδηγός Σταδιοδρομίας",
     description: "Επιλογή σχολών, επαγγέλματα, πεδία.",
-    image: `${IMG_BASE}/1.png`,                          // πυξίδα + "ΟΣ"
+    image: "/resources/odigos-stadiodromias.png",        // πυξίδα + "ΟΣ"
     external: true,
   },
   {
     href: `https://public.stadiodromia.gr/8emata/index.php?cid=${STADIODROMIA_CID}`,
     title: "Θέματα Πανελλαδικών",
     description: "Αρχείο θεμάτων ανά έτος και μάθημα.",
-    image: `${IMG_BASE}/exams.png`,                      // exam papers
+    image: "/resources/themata-panelladikon.svg",        // exam papers
     external: true,
   },
   {
     href: `https://public.stadiodromia.gr/moria/index.php?cid=${STADIODROMIA_CID}`,
     title: "Υπολογισμός Μορίων",
     description: "Υπολόγισε τα μόριά σου για κάθε σχολή.",
-    image: `${IMG_BASE}/calculator2.png`,                // calculator
+    image: "/resources/ypologismos-morion.svg",          // calculator
     external: true,
   },
   {
     href: `https://public.stadiodromia.gr/load.php?cid=${STADIODROMIA_CID}`,
     title: "Τα τελευταία νέα των Πανελληνίων",
     description: "Ενημερώσεις, αλλαγές, ανακοινώσεις.",
-    image: `${IMG_BASE}/epikairotita2.png`,              // newspaper "ΝΕΑ"
+    image: "/resources/teleftaia-nea.svg",               // newspaper "ΝΕΑ"
     external: true,
   },
 ];
@@ -60,6 +61,7 @@ export function ResourcesStrip() {
                     src={r.image}
                     alt={r.title}
                     fill
+                    unoptimized
                     sizes="(min-width: 1024px) 280px, (min-width: 640px) 50vw, 100vw"
                     className="object-contain p-4 transition-transform group-hover:scale-105"
                   />
