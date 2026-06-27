@@ -10,7 +10,6 @@ export function JsonLd({ data }: { data: Record<string, unknown> | Array<Record<
   return (
     <script
       type="application/ld+json"
-      // eslint-disable-next-line react/no-danger -- safe: data is structured object, JSON.stringify escapes
       dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }}
     />
   );
@@ -151,6 +150,30 @@ export function eventLd(e: {
     },
     url: `${BASE_URL}/events/${e.slug}`,
     inLanguage: "el-GR",
+  };
+}
+
+/** WebSite node for the homepage (ties pages to the org via @id refs). */
+export const KORIFI_WEBSITE_LD = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${BASE_URL}/#website`,
+  name: "Φροντιστήριο Κορυφή",
+  url: BASE_URL,
+  inLanguage: "el-GR",
+  publisher: { "@id": `${BASE_URL}/#organization` },
+} as const;
+
+/** Generic WebPage node — for CMS pages & gallery albums that have no richer type. */
+export function webPageLd(p: { name: string; url: string; description?: string | null }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: p.name,
+    url: p.url.startsWith("http") ? p.url : `${BASE_URL}${p.url}`,
+    description: p.description ?? undefined,
+    inLanguage: "el-GR",
+    isPartOf: { "@id": `${BASE_URL}/#website` },
   };
 }
 

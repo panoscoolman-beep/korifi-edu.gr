@@ -43,8 +43,16 @@ const SECTIONS: Section[] = [
   },
 ];
 
-export function MobileMenu({ user, role }: { user: { email: string } | null; role: string | null }) {
+export function MobileMenu({
+  user, role, hasGallery = true,
+}: { user: { email: string } | null; role: string | null; hasGallery?: boolean }) {
   const [open, setOpen] = useState(false);
+
+  // Drop the "Φωτογραφίες" link when there are no published albums (matches the
+  // desktop navbar) so the menu never points to an empty page.
+  const sections = hasGallery
+    ? SECTIONS
+    : SECTIONS.map((s) => ({ ...s, links: s.links.filter((l) => l.href !== "/gallery") }));
 
   // Lock body scroll while open
   useEffect(() => {
@@ -99,7 +107,7 @@ export function MobileMenu({ user, role }: { user: { email: string } | null; rol
             </div>
 
             <nav className="flex-1 overflow-y-auto px-4 py-4">
-              {SECTIONS.map((s) => (
+              {sections.map((s) => (
                 <div key={s.label} className="mb-6">
                   <p className="px-2 text-xs font-semibold uppercase tracking-wider text-amber-700">
                     {s.label}

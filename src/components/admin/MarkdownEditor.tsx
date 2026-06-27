@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useTransition } from "react";
+import { useId, useState, useRef, useTransition } from "react";
 
 /**
  * Simple markdown editor: textarea + toolbar + live preview tab.
@@ -15,6 +15,7 @@ export function MarkdownEditor({
   const [busy, startTransition] = useTransition();
   const taRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const fieldId = useId();
 
   function insert(before: string, after = "") {
     const ta = taRef.current; if (!ta) return;
@@ -52,7 +53,7 @@ export function MarkdownEditor({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-slate-700">{label}</label>
+      <label htmlFor={fieldId} className="block text-sm font-medium text-slate-700">{label}</label>
       <input type="hidden" name={name} value={value} />
 
       <div className="mt-1 overflow-hidden rounded-md border border-slate-300">
@@ -68,6 +69,7 @@ export function MarkdownEditor({
         {/* Body */}
         {tab === "write" ? (
           <textarea
+            id={fieldId}
             ref={taRef} rows={rows} value={value}
             onChange={(e) => setValue(e.target.value)}
             onPaste={(e) => {
@@ -116,10 +118,8 @@ function TabBtn({ active, onClick, children }: { active: boolean; onClick: () =>
   );
 }
 
-function Toolbar({
-  insert, fileRef,
-}: { insert: (b: string, a?: string) => void; fileRef: React.RefObject<HTMLInputElement | null> }) {
-  const Btn = ({ title, onClick, children }: { title: string; onClick: () => void; children: React.ReactNode }) => (
+function Btn({ title, onClick, children }: { title: string; onClick: () => void; children: React.ReactNode }) {
+  return (
     <button
       type="button" title={title} onClick={onClick}
       className="rounded px-2 py-1 text-xs text-slate-600 hover:bg-white hover:text-slate-900"
@@ -127,6 +127,11 @@ function Toolbar({
       {children}
     </button>
   );
+}
+
+function Toolbar({
+  insert, fileRef,
+}: { insert: (b: string, a?: string) => void; fileRef: React.RefObject<HTMLInputElement | null> }) {
   return (
     <div className="flex items-center gap-0.5">
       <Btn title="H1"        onClick={() => insert("# ")}>H1</Btn>

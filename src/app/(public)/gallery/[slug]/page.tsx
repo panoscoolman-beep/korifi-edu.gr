@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Lightbox } from "./Lightbox";
+import { JsonLd, webPageLd, breadcrumbsLd } from "@/components/JsonLd";
 import { getAlbumBySlug, getPhotosByAlbum, getPublishedAlbums } from "@/lib/queries";
 
 type Params = Promise<{ slug: string }>;
@@ -17,7 +18,18 @@ export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
   const a = await getAlbumBySlug(slug);
   if (!a) return {};
-  return { title: a.title, description: a.description ?? undefined };
+  return {
+    title: a.title,
+    description: a.description ?? undefined,
+    alternates: { canonical: `/gallery/${a.slug}` },
+    openGraph: {
+      type: "article",
+      title: a.title,
+      description: a.description ?? undefined,
+      url: `/gallery/${a.slug}`,
+      images: [a.cover_image ?? "/og-default.png"],
+    },
+  };
 }
 
 export default async function AlbumPage({ params }: { params: Params }) {
@@ -29,6 +41,13 @@ export default async function AlbumPage({ params }: { params: Params }) {
 
   return (
     <article className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+      <JsonLd data={webPageLd({ name: a.title, url: `/gallery/${a.slug}`, description: a.description })} />
+      <JsonLd
+        data={breadcrumbsLd([
+          { name: "Φωτογραφίες", url: "/gallery" },
+          { name: a.title, url: `/gallery/${a.slug}` },
+        ])}
+      />
       <Link href="/gallery" className="text-sm font-medium text-brand-700 hover:text-brand-900">
         ← Όλα τα άλμπουμ
       </Link>

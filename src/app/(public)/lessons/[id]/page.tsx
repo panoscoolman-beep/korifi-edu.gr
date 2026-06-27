@@ -102,7 +102,7 @@ function PdfEmbed({ url, title }: { url: string; title: string }) {
 function PremiumGate({ lessonTitle, courseId }: { lessonTitle: string; courseId: string }) {
   return (
     <div className="mx-auto max-w-2xl px-4 py-20 sm:px-6 text-center">
-      <p className="text-sm font-medium uppercase tracking-wider text-accent-600">Premium περιεχόμενο</p>
+      <p className="text-sm font-medium uppercase tracking-wider text-amber-700">Premium περιεχόμενο</p>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{lessonTitle}</h1>
       <p className="mt-4 text-slate-600">
         Αυτή η ενότητα είναι διαθέσιμη μόνο σε εγγεγραμμένους μαθητές.

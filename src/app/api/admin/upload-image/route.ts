@@ -3,7 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { uploadFileToBucket } from "@/lib/supabase/storage";
 
 const MAX = 8 * 1024 * 1024; // 8MB
-const OK_TYPES = ["image/jpeg","image/png","image/webp","image/gif","image/svg+xml"];
+// SVG intentionally excluded: SVGs in the public bucket can carry inline
+// <script> and would execute if opened directly. Raster formats only.
+const OK_TYPES = ["image/jpeg","image/png","image/webp","image/gif"];
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();

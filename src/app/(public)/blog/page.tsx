@@ -6,6 +6,7 @@ import type { Article } from "@/types/database";
 export const metadata = {
   title: "Blog",
   description: "Άρθρα, σεμινάρια και συμβουλές από το Φροντιστήριο Κορυφή.",
+  alternates: { canonical: "/blog" },
 };
 
 export const revalidate = 3600;

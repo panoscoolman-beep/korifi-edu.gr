@@ -22,6 +22,14 @@ export async function generateMetadata({ params }: { params: Params }) {
   return {
     title: article.title,
     description: article.excerpt ?? undefined,
+    alternates: { canonical: `/blog/${article.slug}` },
+    openGraph: {
+      type: "article",
+      title: article.title,
+      description: article.excerpt ?? undefined,
+      url: `/blog/${article.slug}`,
+      images: [article.cover_image ?? "/og-default.png"],
+    },
   };
 }
 

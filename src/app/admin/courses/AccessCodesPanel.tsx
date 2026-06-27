@@ -34,23 +34,23 @@ export function AccessCodesPanel({
       <form action={formAction} className="mt-5 grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
         <input type="hidden" name="course_id" value={courseId} />
         <div className="sm:col-span-3">
-          <label className="block text-xs font-medium text-slate-600">Σχόλιο (προαιρετικό)</label>
+          <label htmlFor="ac-description" className="block text-xs font-medium text-slate-600">Σχόλιο (προαιρετικό)</label>
           <input
-            name="description" type="text" placeholder="π.χ. Α' Λυκείου, τμήμα Δευτέρας"
+            id="ac-description" name="description" type="text" placeholder="π.χ. Α' Λυκείου, τμήμα Δευτέρας"
             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600">Μέγιστες χρήσεις</label>
+          <label htmlFor="ac-max-uses" className="block text-xs font-medium text-slate-600">Μέγιστες χρήσεις</label>
           <input
-            name="max_uses" type="number" min="1" placeholder="απεριόριστο"
+            id="ac-max-uses" name="max_uses" type="number" min="1" placeholder="απεριόριστο"
             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600">Λήξη (προαιρετικό)</label>
+          <label htmlFor="ac-expires-at" className="block text-xs font-medium text-slate-600">Λήξη (προαιρετικό)</label>
           <input
-            name="expires_at" type="date"
+            id="ac-expires-at" name="expires_at" type="date"
             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
           />
         </div>

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { revalidateTag, revalidatePath } from "next/cache";
+import { safeBearerEqual } from "@/lib/security";
 
 /**
  * Internal cache-invalidation endpoint.
@@ -24,9 +25,12 @@ import { revalidateTag, revalidatePath } from "next/cache";
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  const auth = req.headers.get("authorization") ?? "";
-  const expected = `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY ?? ""}`;
-  if (auth !== expected) {
+  const secret = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!secret) {
+    // Fail closed instead of accepting a bare "Bearer " when the key is unset.
+    return NextResponse.json({ error: "server misconfigured" }, { status: 503 });
+  }
+  if (!safeBearerEqual(req.headers.get("authorization"), secret)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

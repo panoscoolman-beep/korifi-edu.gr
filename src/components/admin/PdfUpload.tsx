@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useId, useState, useRef } from "react";
 
 export function PdfUpload({
   name, label, defaultUrl,
@@ -9,6 +9,7 @@ export function PdfUpload({
   const [busy,   setBusy]   = useState(false);
   const [error,  setError]  = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fieldId = useId();
 
   async function handleFile(file: File) {
     setError(null); setBusy(true);
@@ -28,7 +29,7 @@ export function PdfUpload({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-slate-700">{label}</label>
+      <label htmlFor={fieldId} className="block text-sm font-medium text-slate-700">{label}</label>
       <input type="hidden" name={name} value={url ?? ""} />
 
       <div
@@ -36,7 +37,7 @@ export function PdfUpload({
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
       >
-        <input ref={inputRef} type="file" accept="application/pdf,.pdf" className="hidden"
+        <input id={fieldId} ref={inputRef} type="file" accept="application/pdf,.pdf" className="hidden"
           onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
 
         {url ? (

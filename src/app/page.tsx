@@ -1,14 +1,17 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   getSubjects, getCoursesWithLessons,
   getArticlesWithCovers, getPublishedTestimonials,
 } from "@/lib/queries";
-import { JsonLd, KORIFI_LOCAL_BUSINESS_LD } from "@/components/JsonLd";
+import type { Metadata } from "next";
+import { JsonLd, KORIFI_LOCAL_BUSINESS_LD, KORIFI_WEBSITE_LD } from "@/components/JsonLd";
 import { SeasonalHero } from "@/components/SeasonalHero";
 import { TestimonialsClient } from "@/components/TestimonialsClient";
 import type { Subject, Course, Testimonial } from "@/types/database";
 import LatestArticles from "@/components/LatestArticles";
+
+// Self-canonical for the homepage (root layout no longer sets a global one).
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 // ISR: revalidate every hour. Admin mutations bust this via updateTag.
 export const revalidate = 3600;
@@ -24,6 +27,7 @@ export default async function HomePage() {
   return (
     <>
       <JsonLd data={KORIFI_LOCAL_BUSINESS_LD} />
+      <JsonLd data={KORIFI_WEBSITE_LD} />
       <SeasonalHero />
       <SubjectsSection subjects={subjects} />
       <FeaturedCoursesSection courses={featured} />

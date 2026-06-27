@@ -6,6 +6,7 @@ import { getPageBySlug, getPublishedTeachers } from "@/lib/queries";
 export const metadata = {
   title: "Για εμάς",
   description: "Η φιλοσοφία και η ομάδα του Φροντιστηρίου Κορυφή.",
+  alternates: { canonical: "/gia-emas" },
 };
 
 export const revalidate = 3600;

@@ -6,6 +6,56 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-06-27 (fix — Εξονυχιστικός site audit remediation: SEO · a11y · security · tests/CI)
+
+Διόρθωση **όλων** των ευρημάτων από τον πολυ-agent audit (branch
+`fix/site-audit-remediation` → PR → merge στο main). Όλα verified με
+`tsc` + `eslint` (0 errors) + 10 unit tests + `next build` PASS +
+live έλεγχο σε `next start`.
+
+**🔴 SEO/social (κρίσιμα):**
+- **Per-page canonical** — αφαιρέθηκε το global `alternates.canonical:"/"` από το
+  root layout (έκανε κάθε σελίδα να φαίνεται διπλότυπο της αρχικής). Κάθε route
+  ορίζει πλέον self-canonical (home, blog/[slug], courses/[slug], events/[slug],
+  gallery/[slug], [slug] CMS, + στατικές λίστες).
+- **og:image** — δημιουργήθηκε branded `public/og-default.png` (1200×630, ήταν 404)·
+  τα dynamic routes βάζουν per-page OpenGraph (cover_image ή το default).
+- **Ένα `<h1>` στην αρχική** — ο hero carousel render-άρει h1 μόνο στο 1ο slide.
+
+**🟠 A11y & security:**
+- **Desktop nav dropdowns** ξαναγράφτηκαν ως click-toggle disclosure
+  (`NavMenus.tsx`, client) με `aria-haspopup/aria-expanded`, Esc + outside-click —
+  ήταν hover-only (απρόσιτα από πληκτρολόγιο/screen reader).
+- **Markdown sanitizer** — προστέθηκε `rehype-sanitize` (schema στο
+  `lib/markdown-schema.ts`) μετά το `rehype-raw` → κλείνει το stored-XSS sink σε
+  όλα τα public Markdown routes.
+- **Security headers** (`next.config.ts` `headers()`): X-Content-Type-Options,
+  X-Frame-Options, CSP `frame-ancestors 'self'`, Referrer-Policy,
+  Permissions-Policy, + σκληρό HSTS (includeSubDomains; preload).
+- **`/api/internal/revalidate`** — constant-time auth (`lib/security.ts`
+  `safeBearerEqual` + `timingSafeEqual`) + fail-closed (503) όταν λείπει το secret.
+- **Admin image upload** — αφαιρέθηκε το `image/svg+xml` (SVG σε public bucket).
+- **Skip-to-content link** + `<main id="main">`· hero pagination dots σε 24×24 tap
+  target· amber kicker contrast (amber-600 → amber-700)· footer copyright
+  (slate-400 → slate-300) + `aria-hidden` στα διακοσμητικά emoji· admin form
+  labels (`htmlFor`/`id`) σε ImageUpload/PdfUpload/MarkdownEditor/AccessCodes.
+
+**🟡 Λοιπά:**
+- JSON-LD: WebSite node στην αρχική· WebPage + BreadcrumbList σε CMS `/[slug]` &
+  `/gallery/[slug]`.
+- **`/gallery`** link κρύβεται από nav + mobile menu όταν δεν υπάρχουν published άλμπουμ.
+- Καθαρίστηκαν τα dead `wp-content`/`i0.wp.com` `remotePatterns`.
+
+**🧪 Tests/CI (νέο):** προστέθηκε **vitest** + 10 tests (`safeBearerEqual`,
+markdown-sanitize schema) και **`.github/workflows/ci.yml`** (gate: typecheck +
+lint + test σε PR & push). Scripts: `typecheck`, `test`, `test:watch`.
+
+**Εκτός PR (χειροκίνητα/DB — βλ. επόμενο entry):** Supabase RLS perf lints,
+Leaked Password Protection toggle, Google Search Console / Business Profile,
+service-role key rotation.
+
+---
+
 ## 2026-06-27 (fix — Home: self-host εικονίδια του strip «Χρήσιμα εργαλεία»)
 
 Τα 4 εικονίδια στο strip **«Χρήσιμα εργαλεία»** (στο `Footer`, άρα σε όλες τις σελίδες)

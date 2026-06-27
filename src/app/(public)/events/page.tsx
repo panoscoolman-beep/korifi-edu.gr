@@ -6,6 +6,7 @@ import type { Event as EventType } from "@/types/database";
 export const metadata = {
   title: "Εκδηλώσεις",
   description: "Σεμινάρια, διαδικτυακές εκδηλώσεις και συναντήσεις του Φροντιστηρίου Κορυφή.",
+  alternates: { canonical: "/events" },
 };
 
 export const revalidate = 600;
