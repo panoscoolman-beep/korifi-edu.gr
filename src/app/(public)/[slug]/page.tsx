@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Markdown } from "@/components/Markdown";
+import { JsonLd, webPageLd, breadcrumbsLd } from "@/components/JsonLd";
 import { getPageBySlug, getAllPublishedPageSlugs } from "@/lib/queries";
 
 type Params = Promise<{ slug: string }>;
@@ -29,6 +30,14 @@ export async function generateMetadata({ params }: { params: Params }) {
   return {
     title: page.title,
     description: page.meta_description ?? undefined,
+    alternates: { canonical: `/${slug}` },
+    openGraph: {
+      type: "article",
+      title: page.title,
+      description: page.meta_description ?? undefined,
+      url: `/${slug}`,
+      images: ["/og-default.png"],
+    },
   };
 }
 
@@ -41,8 +50,10 @@ export default async function DynamicPage({ params }: { params: Params }) {
 
   return (
     <article className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+      <JsonLd data={webPageLd({ name: p.title, url: `/${slug}`, description: p.meta_description })} />
+      <JsonLd data={breadcrumbsLd([{ name: p.title, url: `/${slug}` }])} />
       <header className="mb-12 border-b-2 border-amber-300 pb-8">
-        <p className="text-sm font-semibold uppercase tracking-widest text-amber-600">
+        <p className="text-sm font-semibold uppercase tracking-widest text-amber-700">
           Φροντιστήριο Κορυφή
         </p>
         <h1 className="mt-3 bg-gradient-to-br from-brand-700 via-brand-800 to-slate-900 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">

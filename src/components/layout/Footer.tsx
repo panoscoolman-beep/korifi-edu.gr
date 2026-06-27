@@ -32,13 +32,13 @@ export function Footer() {
               <li>{CONTACT.address}</li>
               <li>
                 <a href={CONTACT.phoneHref} className="inline-flex items-center gap-2 hover:text-amber-300">
-                  <span className="text-pink-400">📞</span>
+                  <span className="text-pink-400" aria-hidden="true">📞</span>
                   <span>{CONTACT.phone}</span>
                 </a>
               </li>
               <li>
                 <a href={CONTACT.emailHref} className="inline-flex items-center gap-2 hover:text-amber-300">
-                  <span className="text-pink-400">✉️</span>
+                  <span className="text-pink-400" aria-hidden="true">✉️</span>
                   <span>{CONTACT.email}</span>
                 </a>
               </li>
@@ -105,7 +105,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-slate-400 sm:px-6">
+        <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-slate-300 sm:px-6">
           © {year} Φροντιστήριο Κορυφή — Καλλονή Λέσβου · Με επιφύλαξη παντός δικαιώματος.
         </div>
       </footer>

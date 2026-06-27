@@ -1,0 +1,25 @@
+name: CI
+
+# Quality gate for PRs and pushes to main: type-check, lint and unit tests.
+# (The production build itself runs on Vercel, which has the Supabase env vars.)
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Type-check
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Unit tests
+        run: npm test

@@ -19,7 +19,19 @@ export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
   const e = await getEventBySlug(slug);
   if (!e) return {};
-  return { title: e.title, description: e.description_md.slice(0, 150) };
+  const description = e.description_md.slice(0, 150);
+  return {
+    title: e.title,
+    description,
+    alternates: { canonical: `/events/${e.slug}` },
+    openGraph: {
+      type: "article",
+      title: e.title,
+      description,
+      url: `/events/${e.slug}`,
+      images: [e.cover_image ?? "/og-default.png"],
+    },
+  };
 }
 
 export default async function EventPage({ params }: { params: Params }) {

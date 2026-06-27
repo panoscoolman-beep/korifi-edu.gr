@@ -21,7 +21,18 @@ export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
   const c = await getCourseBySlug(slug);
   if (!c) return {};
-  return { title: c.title, description: c.description ?? undefined };
+  return {
+    title: c.title,
+    description: c.description ?? undefined,
+    alternates: { canonical: `/courses/${c.slug}` },
+    openGraph: {
+      type: "article",
+      title: c.title,
+      description: c.description ?? undefined,
+      url: `/courses/${c.slug}`,
+      images: ["/og-default.png"],
+    },
+  };
 }
 
 export default async function CoursePage({ params }: { params: Params }) {

@@ -65,7 +65,11 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
       onBlur={() => setPaused(false)}
     >
       <div className="relative h-[28rem] w-full sm:h-[32rem] lg:h-[36rem]">
-        {slides.map((s, i) => (
+        {slides.map((s, i) => {
+          // Only the first slide's headline is a real <h1> — the rest render as
+          // <p> so the page has exactly one h1 in the DOM (crawlers read all slides).
+          const Headline = i === 0 ? "h1" : "p";
+          return (
           <div
             key={i}
             aria-hidden={i !== active}
@@ -86,7 +90,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
               <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-200 backdrop-blur-sm sm:text-sm">
                 {s.kicker}
               </p>
-              <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight drop-shadow-md sm:text-5xl lg:text-6xl">
+              <Headline className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight drop-shadow-md sm:text-5xl lg:text-6xl">
                 {s.headline}
                 {s.highlight && (
                   <>
@@ -96,7 +100,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                     </span>
                   </>
                 )}
-              </h1>
+              </Headline>
               {s.sub && (
                 <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-100 drop-shadow-sm sm:text-lg">
                   {s.sub}
@@ -120,7 +124,8 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {slides.length > 1 && (
@@ -147,8 +152,9 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             </svg>
           </button>
 
-          {/* Dots */}
-          <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2">
+          {/* Dots — each button is a 24×24 tap target (WCAG 2.5.8) with an
+              inner visual dot. */}
+          <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 items-center">
             {slides.map((_, i) => (
               <button
                 key={i}
@@ -156,10 +162,14 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 onClick={() => goTo(i)}
                 aria-label={`Πήγαινε στη διαφάνεια ${i + 1}`}
                 aria-current={i === active}
-                className={`h-2 rounded-full transition-all ${
-                  i === active ? "w-8 bg-amber-300" : "w-2 bg-white/50 hover:bg-white/80"
-                }`}
-              />
+                className="group flex h-6 w-6 items-center justify-center"
+              >
+                <span
+                  className={`block h-2 rounded-full transition-all ${
+                    i === active ? "w-8 bg-amber-300" : "w-2 bg-white/50 group-hover:bg-white/80"
+                  }`}
+                />
+              </button>
             ))}
           </div>
         </>

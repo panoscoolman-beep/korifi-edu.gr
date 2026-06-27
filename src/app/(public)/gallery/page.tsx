@@ -5,6 +5,7 @@ import { getPublishedAlbums, getPhotoCountsByAlbum } from "@/lib/queries";
 export const metadata = {
   title: "Φωτογραφίες",
   description: "Δράσεις, εκδηλώσεις και στιγμές από το φροντιστήριο Κορυφή.",
+  alternates: { canonical: "/gallery" },
 };
 
 export const revalidate = 3600;

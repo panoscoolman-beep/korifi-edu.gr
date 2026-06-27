@@ -5,6 +5,7 @@ import { getPageBySlug, getPublishedPartners } from "@/lib/queries";
 export const metadata = {
   title: "Συνεργάτες",
   description: "Οι φορείς και οι ομάδες με τις οποίες συνεργάζεται η Κορυφή.",
+  alternates: { canonical: "/synergates" },
 };
 
 export const revalidate = 3600;

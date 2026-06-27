@@ -5,6 +5,7 @@ import { TestimonialsClient } from "@/components/TestimonialsClient";
 export const metadata = {
   title: "Μαρτυρίες",
   description: "Τι λένε οι μαθητές και οι γονείς για το φροντιστήριο Κορυφή.",
+  alternates: { canonical: "/martyries" },
 };
 
 export const revalidate = 3600;
@@ -15,7 +16,7 @@ export default async function MartyriesPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
       <header className="mb-12 border-b-2 border-amber-300 pb-8">
-        <p className="text-sm font-semibold uppercase tracking-widest text-amber-600">
+        <p className="text-sm font-semibold uppercase tracking-widest text-amber-700">
           Φροντιστήριο Κορυφή
         </p>
         <h1 className="mt-3 bg-gradient-to-br from-brand-700 via-brand-800 to-slate-900 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">
