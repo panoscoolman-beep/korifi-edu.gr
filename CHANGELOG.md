@@ -6,6 +6,29 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-07-03 (fix — /events/[slug] & /gallery/[slug]: 500 → 404 σε άγνωστα slugs)
+
+**Live bug fix.** Κάθε άγνωστο slug στα δύο routes επέστρεφε **HTTP 500**
+(digest `DYNAMIC_SERVER_USAGE`) αντί για 404 — 33 πραγματικά hits από 11
+χρήστες μέσω παλιών indexed WordPress URLs (π.χ. `/events/eduma-autumn-2015`).
+Αιτία: SSG με `generateStaticParams` που επιστρέφει **[]** (οι πίνακες
+`events`/`gallery_albums` είναι άδειοι) — στο Next 16.2.4 το on-demand render
+πρώτης επίσκεψης σκάει αντί να σερβίρει 404 (στο dev δούλευε σωστά, μόνο
+production build το χτυπούσε). Το `/blog/[slug]` δεν επηρεαζόταν επειδή έχει
+non-empty params.
+
+**Fix:** τα δύο detail pages έγιναν server-rendered on demand (ƒ) — όπως ήδη
+είναι οι λίστες `/events` και `/gallery` — αφαιρώντας τα
+`generateStaticParams`/`dynamicParams`/`revalidate`. Τα δεδομένα μένουν
+cached/tag-revalidated μέσω `unstable_cache` (queries.ts), οπότε το κόστος
+render είναι αμελητέο. Επαληθεύτηκε σε τοπικό production build: άγνωστα slugs
+→ 404, λίστες → 200, `vitest` 12/12, `tsc` καθαρό.
+
+Παράπλευρο cleanup: σκοτώθηκαν 2 ξεχασμένα τοπικά `next start` processes
+(ports 3020/3021) από debug session της 27/6 — το site τρέχει μόνο στο Vercel.
+
+---
+
 ## 2026-06-27 (fix — Markdown sanitizer: restore CMS styling που είχε χαθεί)
 
 **Regression fix.** Το `rehype-sanitize` (από το προηγούμενο PR) με το default schema

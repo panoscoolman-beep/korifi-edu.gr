@@ -2,17 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Lightbox } from "./Lightbox";
 import { JsonLd, webPageLd, breadcrumbsLd } from "@/components/JsonLd";
-import { getAlbumBySlug, getPhotosByAlbum, getPublishedAlbums } from "@/lib/queries";
+import { getAlbumBySlug, getPhotosByAlbum } from "@/lib/queries";
 
 type Params = Promise<{ slug: string }>;
 
-export const revalidate = 3600;
-export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  const albums = await getPublishedAlbums();
-  return albums.map((a) => ({ slug: a.slug }));
-}
+// Server-rendered on demand (ƒ), όπως και η λίστα /gallery — ΟΧΙ SSG.
+// Ίδιο πρόβλημα με το events/[slug]: άδειος πίνακας → generateStaticParams
+// [] → 500/DYNAMIC_SERVER_USAGE σε άγνωστα slugs σε production αντί 404.
+// Δεδομένα cached/tag-revalidated μέσω unstable_cache στο queries.ts.
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;

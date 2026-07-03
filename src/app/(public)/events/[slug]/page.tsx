@@ -3,17 +3,16 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Markdown } from "@/components/Markdown";
 import { JsonLd, eventLd, breadcrumbsLd } from "@/components/JsonLd";
-import { getEventBySlug, getPublishedEvents } from "@/lib/queries";
+import { getEventBySlug } from "@/lib/queries";
 
 type Params = Promise<{ slug: string }>;
 
-export const revalidate = 600;
-export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  const events = await getPublishedEvents();
-  return events.map((e) => ({ slug: e.slug }));
-}
+// Server-rendered on demand (ƒ), όπως και η λίστα /events — ΟΧΙ SSG.
+// Με άδειο πίνακα events το generateStaticParams επέστρεφε [] και το
+// on-demand render άγνωστων slugs 500άριζε σε production με
+// DYNAMIC_SERVER_USAGE αντί για 404 (Next 16.2.4 — παλιά WP URLs το
+// χτυπούσαν καθημερινά). Τα δεδομένα μένουν cached/tag-revalidated
+// μέσω unstable_cache στο queries.ts, οπότε το render μένει φθηνό.
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
