@@ -6,6 +6,28 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-07-29 (seo — τοπικό SEO πακέτο: σελίδα Λέσβου, 3 άρθρα, GSC live)
+
+**Στόχος:** ορατότητα σε island-wide αναζητήσεις (η Κορυφή δεν εμφανιζόταν σε
+«φροντιστήρια Μυτιλήνη/Λέσβος») + ενεργοποίηση Search Console (εκκρεμότητα από 21/6).
+
+- **Νέα CMS σελίδα `/frontistirio-lesvos`** («Φροντιστήριο στη Λέσβο») — δια ζώσης
+  Καλλονή + online/υβριδικά σε όλο το νησί, 21 επιτυχίες 2026, CTA διαγνωστικό.
+  Insert via Supabase MCP· μπήκε και στο nav «Περισσότερα» (Navbar.tsx).
+- **3 SEO άρθρα στο blog** (inserts στη `articles`): πώς να διαλέξεις φροντιστήριο
+  στη Λέσβο · Πανελλήνιες 2027 τι αλλάζει (ΥΑ Φ.253/47419/Α5) · γιατί τμήματα έως 5.
+- **Google Search Console: ΕΠΑΛΗΘΕΥΤΗΚΕ** (URL-prefix https://korifi-edu.gr/, μέθοδος
+  HTML file `public/google6d169962a1d750e0.html` — ΜΗΝ διαγραφεί). **Sitemap
+  υποβλήθηκε επιτυχώς** (/sitemap.xml, κατάσταση «Επιτυχία»).
+- Σημ.: το LocalBusiness JSON-LD + geo/τίτλοι υπήρχαν ήδη (audit 21/6) — δεν χρειάστηκαν.
+- **Εκκρεμεί:** Google Business Profile — το υπάρχον προφίλ (5,0/60+ reviews)
+  φαίνεται να ανήκει σε άλλον Google λογαριασμό· θέλει τον σωστό λογαριασμό για
+  website link/posts. Directory listings (vrisko/11888/xo.gr) επίσης εκκρεμούν.
+
+Έγινε από Cowork session (cloud) μέσω GitHub web upload + Supabase/Vercel MCP.
+
+---
+
 ## 2026-07-29 (feat — hero: περίοδος «Εγγραφές 2026-27», 20/7→14/9)
 
 Νέα **εποχή "enrollment"** στο `SeasonalHero` (commit `7c66ba5`): το `pickSeason`
