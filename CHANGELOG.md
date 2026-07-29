@@ -2,7 +2,26 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Site is **LIVE in production** at [korifi-edu.gr](https://korifi-edu.gr) (Vercel hosting, custom domain, valid HTTPS). All major features shipped: bento-style content pages, hero carousel with seasonal slides, full admin CRUD with inline lessons + access codes, /martyries with weekly auto-sync from Drive, /epikoinonia with embedded Google Maps, **ενότητα `/ergaleia` με 12 Διαδραστικά Εργαλεία** (Χημεία/Μαθηματικά/Φυσική). SEO (per-content JSON-LD, sitemap, OG/Twitter), Vercel Analytics, security hardened. Κύριες εκκρεμότητες: Google Search Console verification (TXT record DNS), Google Business Profile setup, owner content updates, περισσότερα εργαλεία στο `/ergaleia` (βλ. λίστα ιδεών στο πρώτο entry 2026-06-21).
+> **Where we are now (latest):** Site is **LIVE in production** at [korifi-edu.gr](https://korifi-edu.gr) (Vercel hosting, custom domain, valid HTTPS). All major features shipped: bento-style content pages, hero carousel with seasonal slides, full admin CRUD with inline lessons + access codes, /martyries with weekly auto-sync from Drive, /epikoinonia with embedded Google Maps, **ενότητα `/ergaleia` με 12 Διαδραστικά Εργαλεία** (Χημεία/Μαθηματικά/Φυσική). SEO (per-content JSON-LD, sitemap, OG/Twitter), Vercel Analytics, security hardened. **Νέο (29/7):** μόνιμη «περίοδος εγγραφών» στο seasonal hero (20/7→14/9 κάθε χρόνο) — φέτος «Εγγραφές 2026-27, μαθήματα από Δευτ 14/9» + slide «21 επιτυχίες 2026». Κύριες εκκρεμότητες: Google Search Console verification (TXT record DNS), Google Business Profile setup, owner content updates, περισσότερα εργαλεία στο `/ergaleia` (βλ. λίστα ιδεών στο πρώτο entry 2026-06-21).
+
+---
+
+## 2026-07-29 (feat — hero: περίοδος «Εγγραφές 2026-27», 20/7→14/9)
+
+Νέα **εποχή "enrollment"** στο `SeasonalHero` (commit `7c66ba5`): το `pickSeason`
+απέκτησε day-level παράθυρο **20/7 → 14/9** (επαναλαμβανόμενο κάθε χρόνο) που
+υπερισχύει των summer/autumn· στις 15/9 γυρνά αυτόματα στο «Νέα σχολική χρονιά».
+
+3 slides: **(1)** «Εγγραφές 2026-27 — άνοιξαν / Κράτησε τη θέση σου για τη νέα
+χρονιά» — έως 5/τμήμα, υβριδικό, Δωρεάν Διαγνωστικό, μαθήματα από **Δευτέρα 14/9**
++ εβδομάδα διαγνωστικών 7–13/9, CTA `/epikoinonia` «Κλείσε Δωρεάν Διαγνωστικό»·
+**(2)** «21 επιτυχίες σε ΑΕΙ & Σχολές» — Πανελλήνιες 2026, 3η θέση πανελλαδικά
+στην Ιατρική· **(3)** υβριδικό μοντέλο. Νέο overlay `OVERLAYS.enrollment`
+(brand navy → amber).
+
+Verified: `tsc` καθαρό, `vitest` 12/12, `eslint` 0 errors· live render επιβεβαιωμένο
+στο korifi-edu.gr μετά το deploy. Η αλλαγή έγινε από Cowork session (cloud) μέσω
+GitHub web upload — το τοπικό clone στον υπολογιστή θέλει `git pull`.
 
 ---
 
