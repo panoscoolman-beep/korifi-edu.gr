@@ -113,6 +113,27 @@ export const getAllPublishedArticleSlugs = unstable_cache(
   { tags: ["articles"], revalidate: HOUR }
 );
 
+/* -------------------- Sitemap (slug + real lastmod) -------------------- */
+export const getSitemapPages = unstable_cache(
+  async (): Promise<{ slug: string; updated_at: string }[]> => {
+    const sb = createPublicClient();
+    const { data } = await sb.from("pages").select("slug, updated_at").eq("is_published", true);
+    return (data as { slug: string; updated_at: string }[]) ?? [];
+  },
+  ["sitemap-pages"],
+  { tags: ["pages"], revalidate: HOUR }
+);
+
+export const getSitemapArticles = unstable_cache(
+  async (): Promise<{ slug: string; updated_at: string }[]> => {
+    const sb = createPublicClient();
+    const { data } = await sb.from("articles").select("slug, updated_at").eq("is_published", true);
+    return (data as { slug: string; updated_at: string }[]) ?? [];
+  },
+  ["sitemap-articles"],
+  { tags: ["articles"], revalidate: HOUR }
+);
+
 /* -------------------- Events -------------------- */
 export const getPublishedEvents = unstable_cache(
   async (): Promise<EventModel[]> => {
