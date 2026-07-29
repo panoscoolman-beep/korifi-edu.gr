@@ -9,7 +9,7 @@ import { HeroCarousel, type HeroSlide } from "./HeroCarousel";
  * Add a new slide: drop a photo there, append to the relevant `SEASONS[key]`.
  */
 
-type SeasonKey = "spring-panellinies" | "summer" | "autumn-start" | "winter-exams";
+type SeasonKey = "spring-panellinies" | "summer" | "enrollment" | "autumn-start" | "winter-exams";
 
 const STORAGE = "https://zasshnqnexnuzmplolnu.supabase.co/storage/v1/object/public/images/hero";
 
@@ -22,6 +22,7 @@ const SUMMER  = `${STORAGE}/summer.jpg`;
 const OVERLAYS = {
   panellinies: "bg-gradient-to-br from-rose-900/85 via-brand-900/70 to-amber-900/55",
   summer:      "bg-gradient-to-br from-sky-900/75 via-emerald-900/55 to-amber-700/45",
+  enrollment:  "bg-gradient-to-br from-brand-900/85 via-slate-900/65 to-amber-800/45",
   autumn:      "bg-gradient-to-br from-orange-900/80 via-amber-900/65 to-brand-900/55",
   winter:      "bg-gradient-to-br from-slate-900/85 via-brand-900/70 to-blue-900/60",
 } as const;
@@ -96,6 +97,42 @@ const SEASONS: Record<SeasonKey, HeroSlide[]> = {
       overlayClass: OVERLAYS.summer,
     },
   ],
+  // Παράθυρο εγγραφών: ~20 Ιουλίου → 14 Σεπτεμβρίου (βλ. pickSeason).
+  "enrollment": [
+    {
+      image: KALLONI,
+      alt: "Φροντιστήριο Κορυφή — εγγραφές νέας χρονιάς στην Καλλονή Λέσβου",
+      kicker: "Εγγραφές 2026-27 — άνοιξαν",
+      headline: "Κράτησε τη θέση σου για",
+      highlight: "τη νέα χρονιά",
+      sub: "Τμήματα έως 5 μαθητών, υβριδικό μοντέλο, Δωρεάν Διαγνωστικό. Μαθήματα από Δευτέρα 14/9 — εβδομάδα διαγνωστικών 7–13/9.",
+      cta: { href: "/epikoinonia", label: "Κλείσε Δωρεάν Διαγνωστικό" },
+      secondaryCta: { href: "/courses", label: "Δες τα τμήματα" },
+      overlayClass: OVERLAYS.enrollment,
+    },
+    {
+      image: KALLONI,
+      alt: "Επιτυχίες 2026 του φροντιστηρίου Κορυφή",
+      kicker: "Πανελλήνιες 2026",
+      headline: "21 επιτυχίες σε",
+      highlight: "ΑΕΙ & Σχολές",
+      sub: "Μαζί και μια 3η θέση πανελλαδικά στην Ιατρική. Μια χρονιά μεθοδικής δουλειάς σε μικρά τμήματα — αποτελέσματα που μιλούν μόνα τους.",
+      cta: { href: "/gia-emas", label: "Γνώρισέ μας" },
+      secondaryCta: { href: "/epikoinonia", label: "Ξεκίνα κι εσύ" },
+      overlayClass: OVERLAYS.enrollment,
+    },
+    {
+      image: HYBRID,
+      alt: "Υβριδική διδασκαλία στο Κορυφή",
+      kicker: "Υβριδικό μοντέλο",
+      headline: "Δια ζώσης ή online,",
+      highlight: "ίδιο μάθημα",
+      sub: "Υβριδικές αίθουσες — παρακολουθείς από την Καλλονή ή από όπου βρίσκεσαι, χωρίς να χάνεις τίποτα.",
+      cta: { href: "/online-mathimata", label: "Πώς λειτουργεί" },
+      secondaryCta: { href: "/epikoinonia", label: "Κλείσε θέση" },
+      overlayClass: OVERLAYS.enrollment,
+    },
+  ],
   "autumn-start": [
     {
       image: KALLONI,
@@ -146,6 +183,9 @@ const SEASONS: Record<SeasonKey, HeroSlide[]> = {
 
 export function pickSeason(date = new Date()): SeasonKey {
   const m = date.getMonth(); // 0..11
+  const d = date.getDate();
+  // Παράθυρο εγγραφών: ~20 Ιουλίου → 14 Σεπτεμβρίου (πριν την έναρξη μαθημάτων).
+  if ((m === 6 && d >= 20) || m === 7 || (m === 8 && d <= 14)) return "enrollment";
   if (m === 10 || m === 11 || m === 0 || m === 1) return "winter-exams";
   if (m >= 2 && m <= 4) return "spring-panellinies";
   if (m >= 5 && m <= 7) return "summer";
