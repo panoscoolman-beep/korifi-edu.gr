@@ -18,6 +18,7 @@ const MORE_LINKS = [
   { href: "/gallery",    label: "Φωτογραφίες" },
   { href: "/martyries",  label: "Μαρτυρίες" },
   { href: "/synergates", label: "Συνεργάτες" },
+  { href: "/frontistirio-lesvos", label: "Φροντιστήριο στη Λέσβο" },
 ];
 
 export async function Navbar() {
