@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Course } from "@/types/database";
 
-export const metadata = { title: "Ο λογαριασμός μου" };
+export const metadata = { title: "Ο λογαριασμός μου", robots: { index: false, follow: false } };
 
 export default async function DashboardPage() {
   const supabase = await createClient();
