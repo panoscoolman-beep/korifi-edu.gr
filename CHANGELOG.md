@@ -6,6 +6,19 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-07-30 (seo — αξιολόγηση εξωτερικού SEO prompt: llms.txt + noindex σε private routes)
+
+Αξιολογήθηκε εξωτερικό SEO audit prompt (από φίλο του Πάνου). Συμπέρασμα: το ~85% ήταν ήδη υλοποιημένο (metadata/canonicals ανά σελίδα, OG/Twitter, native sitemap με σωστό lastModified, robots.ts, RSS με ?from/?to, JSON-LD Article/LocalBusiness). Υλοποιήθηκαν τα 2 πραγματικά κενά:
+
+- **`public/llms.txt`** (commit `71978a1`): AI-discovery αρχείο — σύνοψη του φροντιστηρίου (EL+EN), βασικές σελίδες, blog/RSS, στοιχεία (Καλλονή, 2019, τμήματα έως 5, υβριδικό). Μόνο επαληθευμένα στοιχεία από το ίδιο το site.
+- **Page-level `noindex`** σε private routes (commits `a558eb3`, `bead812`, `7085076`): νέο `src/app/(auth)/layout.tsx` (login/register/forgot-password), robots metadata σε `admin/layout.tsx` και `dashboard/page.tsx`. Μέχρι τώρα υπήρχε μόνο robots.txt disallow — anti-pattern: η Google μπορεί να δείξει URL χωρίς crawl αν δεν δει ποτέ το noindex. Verified live: το /login σερβίρει noindex στο HTML.
+
+**Απορρίφθηκαν ως μη συμφέροντα** για site ~50 URLs: κεντρικό typed SEO config module (refactoring churn χωρίς όφελος κατάταξης), sitemap index (όριο 50k), changeFrequency/priority tuning (τα αγνοεί η Google), pagination canonicals (δεν υπάρχει pagination). Σημείωση: το prompt δεν κάλυπτε καθόλου local SEO (GBP/reviews/citations) — που για φροντιστήριο μετράει περισσότερο.
+
+Verified: tsc καθαρό, vitest 12/12, llms.txt + noindex live.
+
+---
+
 ## 2026-07-30 (content — brand covers στα 3 SEO άρθρα + 2η διόρθωση Πανελληνίων: ΣΣΑΣ)
 
 - **Cover images στα 3 νέα blog άρθρα** (Λέσβος/κριτήρια, Πανελλήνιες 2027, τμήματα έως 5): brand-styled 1600×900 (navy `#1a2e4a` / cream / gold, DejaVu Serif), ένα ανά άρθρο με δικό του μοτίβο. Ανέβηκαν μέσω admin form (`/api/admin/upload-image` → Storage `images/admin/`), οπότε το `updateTag("articles")` έτρεξε αυτόματα. Verified live στο /blog. Χρησιμεύουν και ως OG images.
