@@ -1,0 +1,30 @@
+# Φροντιστήριο Κορυφή
+
+> Φροντιστήριο Μέσης Εκπαίδευσης στην Καλλονή Λέσβου (από το 2019). Τμήματα έως 5 μαθητών, υβριδική διδασκαλία (δια ζώσης ή online στο ίδιο μάθημα), δωρεάν διαγνωστικό τεστ. Προετοιμασία για Γυμνάσιο, Λύκειο, ΕΠΑΛ και Πανελλαδικές. 21 επιτυχίες σε ΑΕΙ και Σχολές στις Πανελλαδικές 2026.
+
+Secondary tutoring school ("frontistirio") in Kalloni, Lesvos, Greece. Classes of up to 5 students, hybrid in-person/online teaching, free diagnostic test. Established 2019.
+
+## Βασικές σελίδες
+
+- [Αρχική](https://korifi-edu.gr/): Παρουσίαση του φροντιστηρίου και εγγραφές
+- [Φροντιστήριο στη Λέσβο](https://korifi-edu.gr/frontistirio-lesvos): Δια ζώσης στην Καλλονή και online/υβριδικά σε όλο το νησί
+- [Μαθήματα & Τμήματα](https://korifi-edu.gr/courses): Όλα τα τμήματα ανά τάξη
+- [Online μαθήματα](https://korifi-edu.gr/online-mathimata): Πώς λειτουργεί το υβριδικό μοντέλο
+- [Πρόγραμμα Γ' Λυκείου & Πανελλήνιες](https://korifi-edu.gr/glikeiou): Προετοιμασία Πανελλαδικών
+- [Επαγγελματικός Προσανατολισμός](https://korifi-edu.gr/epaggelmatikos-prosanatolismos): Υπηρεσία προσανατολισμού με τον Οδηγό Σταδιοδρομίας
+- [Για εμάς](https://korifi-edu.gr/gia-emas): Ιστορία, ομάδα και μέθοδος
+- [Μαρτυρίες](https://korifi-edu.gr/martyries): Απόψεις μαθητών και γονέων
+- [Επικοινωνία](https://korifi-edu.gr/epikoinonia): Στοιχεία επικοινωνίας, χάρτης, κράτηση δωρεάν διαγνωστικού
+
+## Blog & Νέα
+
+- [Blog](https://korifi-edu.gr/blog): Άρθρα για Πανελλαδικές, μηχανογραφικό και σχολική προετοιμασία
+- [RSS feed](https://korifi-edu.gr/feed.xml): RSS 2.0 (υποστηρίζει ?from=YYYY-MM-DD&to=YYYY-MM-DD)
+
+## Στοιχεία
+
+- Τοποθεσία: Καλλονή, Λέσβος, Ελλάδα
+- Έτος ίδρυσης: 2019
+- Μέγεθος τμημάτων: έως 5 μαθητές
+- Μοντέλο: υβριδικό (δια ζώσης + σύγχρονη online παρακολούθηση)
+- Ιστότοπος: https://korifi-edu.gr
