@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/(auth)/actions";
 
-export const metadata = { title: "Διαχείριση" };
+// noindex: το admin δεν πρέπει να εμφανίζεται σε αποτελέσματα αναζήτησης
+export const metadata = { title: "Διαχείριση", robots: { index: false, follow: false } };
 
 const NAV: { href: string; label: string; group?: string }[] = [
   { href: "/admin",              label: "Πίνακας",   group: "Επισκόπηση" },
