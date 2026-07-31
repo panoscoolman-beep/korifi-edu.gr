@@ -6,6 +6,19 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-07-31 (content — θερινές διακοπές 3–23/8: banner επικοινωνίας, IG post+story, GBP ωράριο+ανάρτηση)
+
+Ανακοίνωση κλεισίματος για τις καλοκαιρινές διακοπές, με τις εγγραφές να συνεχίζονται κατόπιν τηλεφωνικού ραντεβού. Υλοποιήθηκε σε όλα τα κανάλια:
+
+- **Banner στη σελίδα `/epikoinonia`** (Supabase `pages` row `epikoinonia`): amber κάρτα «Κλειστά 3–23 Αυγούστου», click-to-call κουμπιά `tel:+306941689194` (Πάνος) & `tel:+306949125284` (Μάικ), «Επιστρέφουμε 24 Αυγούστου · Μαθήματα από Δευτέρα 14/9». Guarded prepend (`AND content_md NOT LIKE '%Θερινές διακοπές%'`). Cache-bust με admin re-save· verified live.
+- **IG assets** (skill korifi-content, brand navy/cream/gold): `post-therines-diakopes-navy.png` (1080×1080) + `story-therines-diakopes-navy.png` (1080×1920) + `caption.txt` (και τα δύο κινητά, hashtags ≤10, workflow Σαβ 1/8 11:00 post → story+link sticker → highlight → Δευτ 3/8 reminder). Παραδόθηκαν στον Πάνο.
+- **Google Calendar events**: «IG Post: Θερινές διακοπές 3–23/8» 1/8 11:00 (colorId 6) + «IG Story reminder» 3/8 10:00 (colorId 5), Europe/Athens, με reminders.
+- **GBP (Google Business Profile)** — στο σωστό προφίλ Καλλονής (5,0★/65 reviews): (α) **Ειδικό ωράριο** 3–23 Αυγ 2026 όλες οι μέρες «Κλειστά» (μαζί & 15/8 Κοίμηση Θεοτόκου)· verified στο panel. (β) **Ανάρτηση/Ενημέρωση** με τις ημερομηνίες κλεισίματος + τα δύο κινητά για ραντεβού — υποβλήθηκε (κατάσταση «Σε εκκρεμότητα/έλεγχο» από τη Google). Έγινε μετά από ρητό ΟΚ του Πάνου.
+
+Σημ. ασφαλείας/κανόνας: το προφίλ που επεξεργαζόμαστε είναι ΜΟΝΟ αυτό της Καλλονής (μέσω stick/mat URL) — υπάρχει συνώνυμο «ΚΟΡΥΦΗ» στις Σέρρες που ΔΕΝ αγγίζουμε.
+
+---
+
 ## 2026-07-30 (seo — αξιολόγηση εξωτερικού SEO prompt: llms.txt + noindex σε private routes)
 
 Αξιολογήθηκε εξωτερικό SEO audit prompt (από φίλο του Πάνου). Συμπέρασμα: το ~85% ήταν ήδη υλοποιημένο (metadata/canonicals ανά σελίδα, OG/Twitter, native sitemap με σωστό lastModified, robots.ts, RSS με ?from/?to, JSON-LD Article/LocalBusiness). Υλοποιήθηκαν τα 2 πραγματικά κενά:
