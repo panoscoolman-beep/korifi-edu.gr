@@ -18,6 +18,8 @@ export const dynamicParams = true;
 const REPLACED_BY: Record<string, string> = {
   "i-metavasi-apo-to-gymnasio-sto-lykeio": "a-lykeiou-ti-allazei",
   "geniko-i-epaggelmatiko-lykeio-mia-pro": "epal-lesvou-tomeis-eidikotites",
+  "i-koyrtina-toy-agchoys": "agchos-exetaseon-odigos",
+  "panellinies-odigies-epiviosis-gia-to": "agchos-exetaseon-odigos",
 };
 
 async function replacementFor(slug: string): Promise<string | null> {
