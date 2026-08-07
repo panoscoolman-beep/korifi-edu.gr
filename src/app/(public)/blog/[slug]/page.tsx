@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Markdown } from "@/components/Markdown";
 import { JsonLd, articleLd, breadcrumbsLd } from "@/components/JsonLd";
 import { getArticleBySlug, getAllPublishedArticleSlugs } from "@/lib/queries";
@@ -10,6 +10,22 @@ type Params = Promise<{ slug: string }>;
 export const revalidate = 3600;
 export const dynamicParams = true;
 
+/**
+ * Παλιά άρθρα που αντικαταστάθηκαν από νεότερα, ενημερωμένα με επίσημες πηγές.
+ * Το redirect ενεργοποιείται ΜΟΝΟ όταν το νέο άρθρο έχει δημοσιευτεί — μέχρι
+ * τότε το παλιό σερβίρεται κανονικά, ώστε να μη μείνει ποτέ κενό URL.
+ */
+const REPLACED_BY: Record<string, string> = {
+  "i-metavasi-apo-to-gymnasio-sto-lykeio": "a-lykeiou-ti-allazei",
+  "geniko-i-epaggelmatiko-lykeio-mia-pro": "epal-lesvou-tomeis-eidikotites",
+};
+
+async function replacementFor(slug: string): Promise<string | null> {
+  const target = REPLACED_BY[slug];
+  if (!target) return null;
+  return (await getArticleBySlug(target)) ? target : null;
+}
+
 export async function generateStaticParams() {
   const slugs = await getAllPublishedArticleSlugs();
   return slugs.map((slug) => ({ slug }));
@@ -17,6 +33,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
+  const replacement = await replacementFor(slug);
+  if (replacement) return { alternates: { canonical: `/blog/${replacement}` } };
   const article = await getArticleBySlug(slug);
   if (!article) return {};
   return {
@@ -35,6 +53,8 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function ArticlePage({ params }: { params: Params }) {
   const { slug } = await params;
+  const replacement = await replacementFor(slug);
+  if (replacement) permanentRedirect(`/blog/${replacement}`);
   const article = await getArticleBySlug(slug);
   if (!article) notFound();
 
