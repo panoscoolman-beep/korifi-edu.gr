@@ -6,6 +6,36 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-08-07 (content + seo + security — 4 άρθρα με επίσημες πηγές, covers, 301 redirects, dependabot)
+
+Μεγάλο πακέτο περιεχομένου και συντήρησης. Τα «δύσκολα» άρθρα που είχαν μείνει πίσω επειδή απαιτούσαν διασταύρωση με ΦΕΚ γράφτηκαν και προγραμματίστηκαν.
+
+- **4 νέα άρθρα** (Supabase `articles`, `is_published=false`, publish 09:00 Αθήνας μέσω pg_cron):
+  `a-lykeiou-ti-allazei` (08/09), `b-lykeiou-omades-prosanatolismou` (22/09),
+  `epal-lesvou-tomeis-eidikotites` (06/10), `pos-ypologizontai-ta-moria` (20/10).
+  Πηγές (κανόνας διασταύρωσης §0): ΥΑ 43684/Δ2/2026 (ΦΕΚ Β΄ 2106) ωρολόγια προγράμματα Α΄/Β΄/Γ΄ ΓΕΛ·
+  Αρ.Πρωτ. 56598/ΓΔ4/2026 Τράπεζα Θεμάτων· άρθρο 112 ν.4610/2019 όπως τροπ. άρθρο 37 ν.5237/2025
+  (ΦΕΚ Α΄ 176) προαγωγή/ειδική εξεταστική Σεπτεμβρίου· ΥΑ Φ20/61664/Δ4/2026 (ΦΕΚ Β΄ 2922) Τομείς &
+  Ειδικότητες ΕΠΑΛ ανά σχολείο (ΔΔΕ Λέσβου)· ΥΑ Φ.253.1/168266/Α5/2025 (ΦΕΚ Β΄ 7145) συντελεστές
+  βαρύτητας· ΥΑ Φ.253/160742/Α5/2025 συντελεστές ΕΒΕ.
+- **Cover images**: 12 εξώφυλλα 1200×630 (navy/gold, DejaVu) σε `images/covers/<slug>.png` στο Supabase
+  Storage — καλύπτουν και τα 12 προγραμματισμένα άρθρα, που μέχρι τώρα είχαν `cover_image = NULL`.
+- **301 redirects** (`src/app/(public)/blog/[slug]/page.tsx`): data-driven `REPLACED_BY` map + `permanentRedirect`.
+  Το redirect ενεργοποιείται ΜΟΝΟ όταν το νέο άρθρο έχει δημοσιευτεί, οπότε δεν υπάρχει ποτέ παράθυρο με 404.
+  Χαρτογράφηση: `i-metavasi-apo-to-gymnasio-sto-lykeio` → `a-lykeiou-ti-allazei`,
+  `geniko-i-epaggelmatiko-lykeio-mia-pro` → `epal-lesvou-tomeis-eidikotites`,
+  `i-koyrtina-toy-agchoys` + `panellinies-odigies-epiviosis-gia-to` → `agchos-exetaseon-odigos`.
+- **Security**: merged dependabot PRs #11 (next 16.2.4 → 16.3.0 + postcss), #8 (js-yaml), #7 (ws).
+  Το #11 κλείνει δύο High alerts στο Next.js — SSRF σε WebSocket upgrades και middleware/proxy bypass
+  στο App Router με Turbopack (ακριβώς η δική μας ρύθμιση).
+- **Instagram**: 8 assets + captions για τα 4 άρθρα, 12 νέες αναρτήσεις Οκτ–Νοε (3 carousels, 2 reel briefs),
+  20 events στο Google Calendar, νέο highlight «Blog» στο προφίλ, διόρθωση 4 ημερών με διπλοκλεισμένο slot 19:00.
+
+Εκκρεμεί (θέλει τον Πάνο): αλλαγή κωδικού CRM που είχε διαρρεύσει σε συνομιλία· αλλαγή κωδικού βάσης
+`korifi-crm` (υπάρχει στο git history)· γύρισμα 2 reels (13/10, 03/11)· διαγραφή δοκιμαστικού άρθρου `huhiuh`.
+
+---
+
 ## 2026-07-31 (content — θερινές διακοπές 3–23/8: banner επικοινωνίας, IG post+story, GBP ωράριο+ανάρτηση)
 
 Ανακοίνωση κλεισίματος για τις καλοκαιρινές διακοπές, με τις εγγραφές να συνεχίζονται κατόπιν τηλεφωνικού ραντεβού. Υλοποιήθηκε σε όλα τα κανάλια:
