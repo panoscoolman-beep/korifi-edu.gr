@@ -125,6 +125,44 @@ GitHub web upload — το τοπικό clone στον υπολογιστή θέ
 
 ---
 
+## 2026-08-08 (seo — 308 redirects για τα URLs του παλιού WordPress + fix νεκρού PDF link)
+
+**Αφορμή:** 2 email του Search Console (7/8): (α) επικυρώθηκε η διόρθωση του
+noindex (28 σελίδες ΟΚ), (β) νέος λόγος μη καταλογοποίησης «Δεν βρέθηκε (404)».
+Έρευνα με Vercel logs + Wayback CDX (1896 ιστορικά URLs): τα 404 είναι τα URLs
+του παλιού WordPress — παλιά ελληνικά permalinks άρθρων, ταξινομίες
+(`/course-category/*`, `/category|tag|author/*`), date archives, demo events
+του Eduma theme, και **spam URLs από παραβίαση του παλιού WP** (1xbet/casino
+κ.λπ. — αυτά μένουν σκόπιμα 404 για να αποκαταλογοποιηθούν).
+
+**Fix 1 — `legacy-redirects.ts`** (imported στο `next.config.ts`): 46 μόνιμα
+(308) redirects — 35 παλιά ελληνικά permalinks → `/blog/<ascii-slug>` (πηγή:
+`scripts/scrape/articles.json`), αρχειακές διαδρομές → `/blog`,
+`/course-category/:grade` → `/:grade`, 8 demo event slugs → `/events` (αυτά
+είχαν 33 πραγματικά hits, βλ. entry 2026-07-03). **Gotcha:** το Next.js
+ταιριάζει τα sources με το percent-encoded pathname — τα ελληνικά slugs
+γράφονται κωδικοποιημένα (`%CE...`), decoded μορφή σε σχόλιο δίπλα.
+
+**Fix 2 — άρθρο `prosomoiosi-mathimatikon-maios-2024`:** το link «τελικη
+προσομοιωση» έδειχνε στο νεκρό
+`wp-content/uploads/2024/05/τελικη-προσομοιωση.pdf` (403/404). Root cause: το
+`migrate_article_images.py` μετέφερε μόνο εικόνες (το regex δεν έπιανε `.pdf`)
+— το αντίστοιχο PDF της Βιολογίας υπάρχει στο Storage
+(`pdfs/articles/diagonisma-prosomoiosis-viologia-g-l.pdf`), των Μαθηματικών
+ξεχάστηκε. Το αρχείο ΔΕΝ ανακτήθηκε (ούτε Wayback ούτε τοπικά backups — μόνο
+στη WordPress.com Media Library ίσως). Το link αντικαταστάθηκε με παραπομπή
+στη `/epikoinonia` (SQL UPDATE). Αν βρεθεί το PDF: upload σε
+`pdfs/articles/prosomoiosi-mathimatikon-maios-2024.pdf` + restore link.
+
+**Σημείωση:** το `.env.local` αυτού του μηχανήματος έχει το ΠΑΛΙΟ (προ
+rotation) `SUPABASE_SERVICE_ROLE_KEY` — το `/api/internal/revalidate`
+απαντά 401 από εδώ. Sync από Vercel env όταν χρειαστεί.
+
+Επαλήθευση: τοπικό prod build — 12/12 redirect cases ΟΚ (και spam→404,
+site→200), `vitest` 12/12, `tsc` καθαρό. Live verification μετά το deploy.
+
+---
+
 ## 2026-07-03 (fix — /events/[slug] & /gallery/[slug]: 500 → 404 σε άγνωστα slugs)
 
 **Live bug fix.** Κάθε άγνωστο slug στα δύο routes επέστρεφε **HTTP 500**

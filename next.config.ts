@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { legacyRedirects } from "./legacy-redirects";
 
 // Security headers applied to every route. No full script-src CSP yet (the site
 // uses inline JSON-LD, Vercel Analytics and a Google Maps iframe, so a strict
@@ -22,6 +23,10 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
+  },
+  // Μόνιμα (308) redirects για τα URLs του παλιού WordPress site — βλ. legacy-redirects.ts
+  async redirects() {
+    return legacyRedirects;
   },
 };
 
