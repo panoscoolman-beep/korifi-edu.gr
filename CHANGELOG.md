@@ -154,9 +154,13 @@ noindex (28 σελίδες ΟΚ), (β) νέος λόγος μη καταλογο
 στη `/epikoinonia` (SQL UPDATE). Αν βρεθεί το PDF: upload σε
 `pdfs/articles/prosomoiosi-mathimatikon-maios-2024.pdf` + restore link.
 
-**Σημείωση:** το `.env.local` αυτού του μηχανήματος έχει το ΠΑΛΙΟ (προ
-rotation) `SUPABASE_SERVICE_ROLE_KEY` — το `/api/internal/revalidate`
-απαντά 401 από εδώ. Sync από Vercel env όταν χρειαστεί.
+**Σημείωση (Linux box):** το `.env.local` εδώ έχει ΜΟΝΟ τα 2 public vars
+(URL + anon key) — ΔΕΝ υπάρχει `SUPABASE_SERVICE_ROLE_KEY` ούτε
+`SUPABASE_ACCESS_TOKEN`, ούτε vercel/supabase CLI login. Άρα το
+`/api/internal/revalidate` (401) και το `vercel env pull` ΔΕΝ δουλεύουν από
+εδώ — ο πίνακας πρόσβασης του CLAUDE.md ισχύει πλήρως μόνο στο Windows
+μηχάνημα. Μετά από direct DB write από εδώ, η αλλαγή φαίνεται με το TTL
+της cache (1h) — ή τρέξε revalidate από το Windows box.
 
 Επαλήθευση: τοπικό prod build — 12/12 redirect cases ΟΚ (και spam→404,
 site→200), `vitest` 12/12, `tsc` καθαρό. Live verification μετά το deploy.
