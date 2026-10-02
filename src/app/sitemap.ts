@@ -3,6 +3,7 @@ import {
   getSitemapPages, getSitemapArticles,
   getPublishedEvents, getCourses, getPublishedAlbums,
 } from "@/lib/queries";
+import { REPLACED_BY } from "@/lib/article-redirects";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://korifi-edu.gr";
 
@@ -68,8 +69,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-  // Blog — πραγματικό updated_at από τη βάση.
-  const articlePages: MetadataRoute.Sitemap = articles.map((a) => ({
+  // Blog — πραγματικό updated_at από τη βάση. Παραλείπουμε τα παλιά άρθρα που
+  // κάνουν ήδη redirect σε δημοσιευμένο αντικαταστάτη (δεν δηλώνουμε redirects).
+  const publishedSlugs = new Set(articles.map((a) => a.slug));
+  const articlePages: MetadataRoute.Sitemap = articles
+    .filter((a) => !(REPLACED_BY[a.slug] && publishedSlugs.has(REPLACED_BY[a.slug])))
+    .map((a) => ({
     url: `${BASE_URL}/blog/${a.slug}`,
     lastModified: a.updated_at ? new Date(a.updated_at) : STATIC_LASTMOD,
     changeFrequency: "yearly" as const,

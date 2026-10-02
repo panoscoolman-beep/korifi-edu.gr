@@ -114,25 +114,21 @@ export const getAllPublishedArticleSlugs = unstable_cache(
 );
 
 /* -------------------- Sitemap (slug + real lastmod) -------------------- */
-export const getSitemapPages = unstable_cache(
-  async (): Promise<{ slug: string; updated_at: string }[]> => {
-    const sb = createPublicClient();
-    const { data } = await sb.from("pages").select("slug, updated_at").eq("is_published", true);
-    return (data as { slug: string; updated_at: string }[]) ?? [];
-  },
-  ["sitemap-pages"],
-  { tags: ["pages"], revalidate: HOUR }
-);
+// ΧΩΡΙΣ unstable_cache: το sitemap.xml είναι ήδη ISR (revalidate 3600), οπότε
+// χτυπάει τη βάση το πολύ μία φορά την ώρα. Με unstable_cache το sitemap έμενε
+// «κολλημένο» — τα άρθρα που δημοσιεύει το pg_cron (χωρίς revalidateTag) δεν
+// εμφανίζονταν για εβδομάδες (Οκτ 2026: έλειπαν 8 άρθρα από 13/8 και μετά).
+export async function getSitemapPages(): Promise<{ slug: string; updated_at: string }[]> {
+  const sb = createPublicClient();
+  const { data } = await sb.from("pages").select("slug, updated_at").eq("is_published", true);
+  return (data as { slug: string; updated_at: string }[]) ?? [];
+}
 
-export const getSitemapArticles = unstable_cache(
-  async (): Promise<{ slug: string; updated_at: string }[]> => {
-    const sb = createPublicClient();
-    const { data } = await sb.from("articles").select("slug, updated_at").eq("is_published", true);
-    return (data as { slug: string; updated_at: string }[]) ?? [];
-  },
-  ["sitemap-articles"],
-  { tags: ["articles"], revalidate: HOUR }
-);
+export async function getSitemapArticles(): Promise<{ slug: string; updated_at: string }[]> {
+  const sb = createPublicClient();
+  const { data } = await sb.from("articles").select("slug, updated_at").eq("is_published", true);
+  return (data as { slug: string; updated_at: string }[]) ?? [];
+}
 
 /* -------------------- Events -------------------- */
 export const getPublishedEvents = unstable_cache(

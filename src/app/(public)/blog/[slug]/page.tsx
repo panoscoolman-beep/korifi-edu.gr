@@ -4,23 +4,12 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { Markdown } from "@/components/Markdown";
 import { JsonLd, articleLd, breadcrumbsLd } from "@/components/JsonLd";
 import { getArticleBySlug, getAllPublishedArticleSlugs } from "@/lib/queries";
+import { REPLACED_BY } from "@/lib/article-redirects";
 
 type Params = Promise<{ slug: string }>;
 
 export const revalidate = 3600;
 export const dynamicParams = true;
-
-/**
- * Παλιά άρθρα που αντικαταστάθηκαν από νεότερα, ενημερωμένα με επίσημες πηγές.
- * Το redirect ενεργοποιείται ΜΟΝΟ όταν το νέο άρθρο έχει δημοσιευτεί — μέχρι
- * τότε το παλιό σερβίρεται κανονικά, ώστε να μη μείνει ποτέ κενό URL.
- */
-const REPLACED_BY: Record<string, string> = {
-  "i-metavasi-apo-to-gymnasio-sto-lykeio": "a-lykeiou-ti-allazei",
-  "geniko-i-epaggelmatiko-lykeio-mia-pro": "epal-lesvou-tomeis-eidikotites",
-  "i-koyrtina-toy-agchoys": "agchos-exetaseon-odigos",
-  "panellinies-odigies-epiviosis-gia-to": "agchos-exetaseon-odigos",
-};
 
 async function replacementFor(slug: string): Promise<string | null> {
   const target = REPLACED_BY[slug];
@@ -48,6 +37,12 @@ export async function generateMetadata({ params }: { params: Params }) {
       title: article.title,
       description: article.excerpt ?? undefined,
       url: `/blog/${article.slug}`,
+      images: [article.cover_image ?? "/og-default.png"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.excerpt ?? undefined,
       images: [article.cover_image ?? "/og-default.png"],
     },
   };

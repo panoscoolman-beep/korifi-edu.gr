@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { safeNext } from "@/lib/security";
 
 /**
  * OAuth + email verification redirect handler.
@@ -15,7 +16,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: NextRequest) {
   const url   = new URL(request.url);
   const code  = url.searchParams.get("code");
-  const next  = url.searchParams.get("next") ?? "/dashboard";
+  const next  = safeNext(url.searchParams.get("next"));
   const error = url.searchParams.get("error_description") ?? url.searchParams.get("error");
 
   if (error) {

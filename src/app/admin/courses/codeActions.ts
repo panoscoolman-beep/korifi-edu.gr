@@ -48,7 +48,8 @@ export async function generateAccessCode(_prev: unknown, fd: FormData): Promise<
       code,
       description,
       max_uses:    maxUsesRaw === "" ? null : Number(maxUsesRaw),
-      expires_at:  expiresRaw === "" ? null : new Date(expiresRaw).toISOString(),
+      // <input type="date"> → ισχύει ΟΛΗ τη μέρα (ώρα Ελλάδας), όχι μέχρι 03:00.
+      expires_at:  expiresRaw === "" ? null : endOfAthensDay(expiresRaw),
       created_by:  user.id,
     });
     if (!error) {
@@ -105,4 +106,15 @@ export async function redeemAccessCode(_prev: unknown, fd: FormData): Promise<{ 
   updateTag("lessons");
   revalidatePath(`/courses`, "layout");
   return { success: true };
+}
+
+/** "2026-10-10" → τελευταίο δευτερόλεπτο της 10/10 σε ώρα Ελλάδας (EET/EEST), ως ISO UTC. */
+function endOfAthensDay(ymd: string): string {
+  // Βρίσκουμε το offset της Αθήνας εκείνη τη μέρα (+2 χειμώνα, +3 καλοκαίρι).
+  const noonUtc = new Date(`${ymd}T12:00:00Z`);
+  const athensHour = Number(
+    new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", hour: "2-digit", hour12: false }).format(noonUtc),
+  );
+  const offsetH = athensHour - 12;
+  return new Date(Date.parse(`${ymd}T23:59:59Z`) - offsetH * 3600_000).toISOString();
 }
