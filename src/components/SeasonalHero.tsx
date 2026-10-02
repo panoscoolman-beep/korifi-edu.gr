@@ -27,6 +27,22 @@ const OVERLAYS = {
   winter:      "bg-gradient-to-br from-slate-900/85 via-brand-900/70 to-blue-900/60",
 } as const;
 
+// Slide αποτελεσμάτων — εμφανίζεται όλη τη χρονιά (εγγραφές, φθινόπωρο, χειμώνας).
+// Ανανέωση κάθε Ιούλιο με τα νέα αποτελέσματα.
+function results2026(overlayClass: string): HeroSlide {
+  return {
+    image: KALLONI,
+    alt: "Επιτυχίες 2026 του φροντιστηρίου Κορυφή",
+    kicker: "Πανελλήνιες 2026",
+    headline: "21 επιτυχίες σε",
+    highlight: "ΑΕΙ & Σχολές",
+    sub: "Μαζί και μια 3η θέση πανελλαδικά στην Ιατρική. Μια χρονιά μεθοδικής δουλειάς σε μικρά τμήματα — αποτελέσματα που μιλούν μόνα τους.",
+    cta: { href: "/gia-emas", label: "Γνώρισέ μας" },
+    secondaryCta: { href: "/epikoinonia", label: "Ξεκίνα κι εσύ" },
+    overlayClass,
+  };
+}
+
 const SEASONS: Record<SeasonKey, HeroSlide[]> = {
   "spring-panellinies": [
     {
@@ -110,17 +126,7 @@ const SEASONS: Record<SeasonKey, HeroSlide[]> = {
       secondaryCta: { href: "/courses", label: "Δες τα τμήματα" },
       overlayClass: OVERLAYS.enrollment,
     },
-    {
-      image: KALLONI,
-      alt: "Επιτυχίες 2026 του φροντιστηρίου Κορυφή",
-      kicker: "Πανελλήνιες 2026",
-      headline: "21 επιτυχίες σε",
-      highlight: "ΑΕΙ & Σχολές",
-      sub: "Μαζί και μια 3η θέση πανελλαδικά στην Ιατρική. Μια χρονιά μεθοδικής δουλειάς σε μικρά τμήματα — αποτελέσματα που μιλούν μόνα τους.",
-      cta: { href: "/gia-emas", label: "Γνώρισέ μας" },
-      secondaryCta: { href: "/epikoinonia", label: "Ξεκίνα κι εσύ" },
-      overlayClass: OVERLAYS.enrollment,
-    },
+    results2026(OVERLAYS.enrollment),
     {
       image: HYBRID,
       alt: "Υβριδική διδασκαλία στο Κορυφή",
@@ -140,11 +146,12 @@ const SEASONS: Record<SeasonKey, HeroSlide[]> = {
       kicker: "Νέα σχολική χρονιά",
       headline: "Καλωσήρθες στην",
       highlight: "Κορυφή",
-      sub: "Έναρξη μαθημάτων Σεπτέμβριο. Εγγραφές ανοιχτές για όλες τις τάξεις — Γυμνάσιο, Λύκειο, ΕΠΑΛ.",
-      cta: { href: "/courses", label: "Δες όλα τα τμήματα" },
-      secondaryCta: { href: "/epikoinonia", label: "Κλείσε ραντεβού" },
+      sub: "Τα μαθήματα τρέχουν ήδη — δεν είναι αργά να μπεις. Ξεκινάμε με Δωρεάν Διαγνωστικό, για να δούμε από πού ξεκινάς. Γυμνάσιο, Λύκειο, ΕΠΑΛ.",
+      cta: { href: "/epikoinonia", label: "Κλείσε Δωρεάν Διαγνωστικό" },
+      secondaryCta: { href: "/courses", label: "Δες τα τμήματα" },
       overlayClass: OVERLAYS.autumn,
     },
+    results2026(OVERLAYS.autumn),
     {
       image: HYBRID,
       alt: "Υβριδική διδασκαλία στο Κορυφή",
@@ -178,6 +185,7 @@ const SEASONS: Record<SeasonKey, HeroSlide[]> = {
       cta: { href: "/gia-emas", label: "Γνώρισέ μας" },
       overlayClass: OVERLAYS.winter,
     },
+    results2026(OVERLAYS.winter),
   ],
 };
 

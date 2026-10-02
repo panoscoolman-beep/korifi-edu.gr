@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCourseBySlug, getSubjectById, getLessonsByCourse, getCourses } from "@/lib/queries";
+import { getCourseBySlug, getSubjectById, getLessonsByCourse, getLessonCountByCourse, getCourses } from "@/lib/queries";
 import { createClient } from "@/lib/supabase/server";
 import { JsonLd, courseLd, breadcrumbsLd } from "@/components/JsonLd";
 import { RedeemCodeForm } from "./RedeemCodeForm";
@@ -40,9 +40,9 @@ export default async function CoursePage({ params }: { params: Params }) {
   const c = await getCourseBySlug(slug);
   if (!c) notFound();
 
-  const [sub, ls] = await Promise.all([
+  const [sub, lessonCount] = await Promise.all([
     getSubjectById(c.subject_id),
-    getLessonsByCourse(c.id),
+    getLessonCountByCourse(c.id),
   ]);
 
   // Auth + enrollment check (dynamic — uses cookies)
@@ -58,6 +58,8 @@ export default async function CoursePage({ params }: { params: Params }) {
       .maybeSingle();
     enrolled = !!e;
   }
+  // Το υλικό το βλέπει μόνο όποιος έχει πρόσβαση (RLS: admin ή εγγεγραμμένος).
+  const ls = user ? await getLessonsByCourse(supabase, c.id) : [];
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
@@ -92,7 +94,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
       <section className="mt-10">
         <h2 className="text-xl font-semibold text-slate-900">
-          Περιεχόμενα <span className="text-slate-400">({ls.length} {ls.length === 1 ? "ενότητα" : "ενότητες"})</span>
+          Περιεχόμενα <span className="text-slate-400">({lessonCount} {lessonCount === 1 ? "ενότητα" : "ενότητες"})</span>
         </h2>
 
         {!user ? (

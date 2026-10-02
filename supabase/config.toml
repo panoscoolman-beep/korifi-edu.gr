@@ -158,7 +158,10 @@ site_url = "https://korifi-edu.gr"
 additional_redirect_urls = [
   "https://korifi-edu.gr/**",
   "https://www.korifi-edu.gr/**",
-  "https://*.vercel.app/**",
+  # Μόνο τα δικά μας previews — ΟΧΙ "*.vercel.app" (οποιοδήποτε site στο Vercel
+  # θα μπορούσε να λάβει τον κωδικό ενός reset link → κλοπή λογαριασμού).
+  "https://korifi-edu-gr.vercel.app/**",
+  "https://korifi-edu-gr-*-panoscoolman-beeps-projects.vercel.app/**",
   "http://localhost:3000/**",
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
