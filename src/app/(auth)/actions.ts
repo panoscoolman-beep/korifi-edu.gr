@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
+import { safeNext } from "@/lib/security";
+import { passwordProblem } from "@/lib/password";
 
 type ActionState = { error?: string; ok?: string } | null;
 
@@ -16,7 +18,7 @@ function getSiteOrigin(reqHeaders: Headers): string {
 export async function signInWithPassword(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const email    = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
-  const next     = String(formData.get("next") ?? "/dashboard");
+  const next     = safeNext(String(formData.get("next") ?? ""));
 
   if (!email || !password) return { error: "Συμπληρώστε email και κωδικό." };
 
@@ -29,7 +31,7 @@ export async function signInWithPassword(_prev: ActionState, formData: FormData)
   }
 
   revalidatePath("/", "layout");
-  redirect(next || "/dashboard");
+  redirect(next);
 }
 
 export async function signUpWithPassword(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -38,7 +40,8 @@ export async function signUpWithPassword(_prev: ActionState, formData: FormData)
   const fullName  = String(formData.get("full_name") ?? "").trim();
 
   if (!email || !password || !fullName) return { error: "Συμπληρώστε όλα τα πεδία." };
-  if (password.length < 8)              return { error: "Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες." };
+  const weak = passwordProblem(password);
+  if (weak) return { error: weak };
 
   const supabase = await createClient();
   const origin   = getSiteOrigin(await headers());
@@ -73,11 +76,30 @@ export async function sendPasswordReset(_prev: ActionState, formData: FormData):
   const supabase = await createClient();
   const origin   = getSiteOrigin(await headers());
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback`,
+    // Μετά το link, ο χρήστης πρέπει να ορίσει ΝΕΟ κωδικό — όχι απλώς να συνδεθεί.
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
   });
   if (error) return { error: `Σφάλμα: ${error.message}` };
 
   return { ok: "Σου στείλαμε σύνδεσμο επαναφοράς. Ελέγξε τα εισερχόμενά σου." };
+}
+
+export async function updatePassword(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const password = String(formData.get("password") ?? "");
+  const confirm  = String(formData.get("confirm") ?? "");
+  if (password !== confirm) return { error: "Οι δύο κωδικοί δεν ταιριάζουν." };
+  const weak = passwordProblem(password);
+  if (weak) return { error: weak };
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Ο σύνδεσμος επαναφοράς έληξε. Ζήτησε νέο από τη σελίδα «Ξέχασα τον κωδικό»." };
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: `Σφάλμα: ${error.message}` };
+
+  revalidatePath("/", "layout");
+  redirect("/dashboard");
 }
 
 export async function signOut(): Promise<void> {

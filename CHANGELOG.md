@@ -6,6 +6,49 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-10-03 (audit + fix — sitemap, επαναφορά κωδικού, κλείδωμα υλικού μαθημάτων, hero φθινοπώρου)
+
+Γενικός έλεγχος κώδικα και live site μετά από αίτημα του Πάνου (PR #20). Πλήρης αναφορά ευρημάτων
+και ιδεών ανάπτυξης στο vault: `audit-site-kai-idees-2026-10.md`.
+
+- **Sitemap (bug):** το `/sitemap.xml` δεν είχε κανένα από τα 8 άρθρα που δημοσίευσε το pg_cron από 13/8
+  (επιτυχίες 2026, κόστος, διαγνωστικό, Α΄/Β΄ Λυκείου, online, Γυμνάσιο) ούτε τη σελίδα `/diagnostiko`,
+  ενώ δήλωνε παλιό URL που κάνει redirect. Αιτία: τα sitemap queries περνούσαν από `unstable_cache` και
+  το pg_cron δεν καλεί `revalidateTag`. Τώρα διαβάζουν απευθείας τη βάση σε κάθε ISR regeneration (1h)
+  και εξαιρούν τα άρθρα με δημοσιευμένο αντικαταστάτη (`src/lib/article-redirects.ts`, κοινό `REPLACED_BY`).
+  **Εκκρεμεί:** resubmit του sitemap στο Search Console.
+- **Auth:** νέα σελίδα `/reset-password` + action `updatePassword` — το link «ξέχασα τον κωδικό» απλώς
+  συνέδεε τον χρήστη χωρίς να ζητά νέο κωδικό. `safeNext()` (`src/lib/security.ts`) σε login και
+  `/auth/callback`: κλείνει open redirect (`/login?next=https://evil.com`, `//evil.com`). Κανόνες κωδικού
+  εγγραφής ίδιοι με το Supabase (`src/lib/password.ts`: 10+, πεζά/κεφαλαία/αριθμός, μήνυμα στα ελληνικά).
+- **Κλείδωμα υλικού μαθημάτων (απόφαση Πάνου 3/10):** τα 21 εισαγόμενα lessons ήταν `is_free=true` και το
+  bucket `pdfs` δημόσιο, άρα όλα άνοιγαν από οποιονδήποτε με το link. Τώρα τα lessons φορτώνονται με τον
+  client του χρήστη (RLS: admin ή εγγεγραμμένος με κωδικό), χωρίς cache. Τα PDF σερβίρονται μόνο μέσω
+  `/api/lessons/[id]/pdf` → signed URL 10 λεπτών (service role, `src/lib/supabase/admin.ts`). Ο αριθμός
+  ενοτήτων ανά μάθημα και τα «μαθήματα με υλικό» της αρχικής μετριούνται με service role (μόνο
+  `course_id`). Migration `0019_lock_lessons_and_private_pdfs.sql` (is_free=false, ιδιωτικό bucket,
+  anon listing μόνο `images`) — **εφαρμόζεται ΜΕΤΑ το production deploy**, αλλιώς τα PDF σπάνε.
+  Το backup script δουλεύει κανονικά (service role παρακάμπτει το RLS).
+- **Hero φθινοπώρου:** έλεγε «Έναρξη μαθημάτων Σεπτέμβριο»· τώρα «Τα μαθήματα τρέχουν ήδη — δεν είναι
+  αργά» με CTA δωρεάν διαγνωστικό. Το slide «21 επιτυχίες» (υπήρχε μόνο στο `enrollment`, χανόταν 15/9)
+  έγινε κοινή συνάρτηση `results2026()` και μπαίνει και στο `autumn-start` και στο `winter-exams`.
+  Υπενθύμιση: ανανέωση των slides «Εγγραφές 2026-27» / «Καλοκαίρι 2026» πριν τις 20/7/2027.
+- **Μικρότερα:** twitter card ανά άρθρο· λήξη κωδικών πρόσβασης στο τέλος της μέρας (ώρα Ελλάδας, όχι
+  03:00)· `upload-pdf` απαιτεί `application/pdf` ΚΑΙ `.pdf`· `saveResource`/`deleteResource` δέχονται
+  μόνο γνωστούς πίνακες· `supabase/config.toml` χωρίς `https://*.vercel.app/**` (μόνο τα previews του
+  project — **εκκρεμεί** η ίδια αλλαγή στο Supabase dashboard, Authentication → URL Configuration).
+- **Content (DB, χωρίς deploy):** αφαιρέθηκε το banner «Κλειστά 3–23 Αυγούστου» από τη σελίδα
+  `/epikoinonia` (`pages.content_md`, guarded UPDATE).
+
+Verified: tsc καθαρό, lint 0 errors, vitest 16/16 (νέα tests `safeNext`/`passwordProblem`), `next build`,
+preview deployment (sitemap με όλα τα άρθρα, hero, `/api/lessons/[id]/pdf` → 307 signed URL).
+
+Από τον audit **δεν** έγιναν (θέλουν απόφαση/ξεχωριστή δουλειά): ώρες events σε UTC αντί Athens στο
+JSON-LD· leaked password protection (Supabase dashboard)· navbar διαβάζει cookies → κάθε σελίδα
+dynamic· `elementor-12592` (σκουπίδι από WordPress) ακόμα δημοσιευμένο.
+
+---
+
 ## 2026-08-07 (content + seo + security — 4 άρθρα με επίσημες πηγές, covers, 301 redirects, dependabot)
 
 Μεγάλο πακέτο περιεχομένου και συντήρησης. Τα «δύσκολα» άρθρα που είχαν μείνει πίσω επειδή απαιτούσαν διασταύρωση με ΦΕΚ γράφτηκαν και προγραμματίστηκαν.

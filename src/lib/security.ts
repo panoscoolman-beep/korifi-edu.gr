@@ -19,3 +19,17 @@ export function safeBearerEqual(
   if (got.length !== expected.length) return false;
   return timingSafeEqual(got, expected);
 }
+
+/**
+ * Επιστρέφει ασφαλή εσωτερική διαδρομή για redirect μετά από login/callback.
+ * Δέχεται μόνο σχετικά paths του ίδιου site («/…»). Απορρίπτει «//evil.com»
+ * και «/\\evil.com» (οι browsers τα ερμηνεύουν ως άλλο host) και κάθε απόλυτο URL,
+ * ώστε ένα link `/login?next=https://evil.com` να μη γίνει open redirect.
+ */
+export function safeNext(next: string | null | undefined, fallback = "/dashboard"): string {
+  if (!next || !next.startsWith("/")) return fallback;
+  if (next.startsWith("//") || next.startsWith("/\\")) return fallback;
+  if (/[\u0000-\u001f]/.test(next)) return fallback;
+  return next;
+}
+

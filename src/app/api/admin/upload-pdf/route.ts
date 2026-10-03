@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const file = form.get("file");
   if (!(file instanceof File)) return NextResponse.json({ error: "No file" }, { status: 400 });
   if (file.size > MAX)         return NextResponse.json({ error: "Πολύ μεγάλο (>50MB)" }, { status: 400 });
-  if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+  if (file.type !== "application/pdf" || !file.name.toLowerCase().endsWith(".pdf")) {
     return NextResponse.json({ error: "Μόνο PDF" }, { status: 400 });
   }
 

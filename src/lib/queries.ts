@@ -15,6 +15,8 @@
  */
 import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
+import { createAdminClient } from "@/lib/supabase/admin";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   Subject, Course, Article, Page, Teacher, Testimonial, Partner,
   Event as EventModel, Lesson, GalleryAlbum, GalleryPhoto,
@@ -114,25 +116,21 @@ export const getAllPublishedArticleSlugs = unstable_cache(
 );
 
 /* -------------------- Sitemap (slug + real lastmod) -------------------- */
-export const getSitemapPages = unstable_cache(
-  async (): Promise<{ slug: string; updated_at: string }[]> => {
-    const sb = createPublicClient();
-    const { data } = await sb.from("pages").select("slug, updated_at").eq("is_published", true);
-    return (data as { slug: string; updated_at: string }[]) ?? [];
-  },
-  ["sitemap-pages"],
-  { tags: ["pages"], revalidate: HOUR }
-);
+// ΧΩΡΙΣ unstable_cache: το sitemap.xml είναι ήδη ISR (revalidate 3600), οπότε
+// χτυπάει τη βάση το πολύ μία φορά την ώρα. Με unstable_cache το sitemap έμενε
+// «κολλημένο» — τα άρθρα που δημοσιεύει το pg_cron (χωρίς revalidateTag) δεν
+// εμφανίζονταν για εβδομάδες (Οκτ 2026: έλειπαν 8 άρθρα από 13/8 και μετά).
+export async function getSitemapPages(): Promise<{ slug: string; updated_at: string }[]> {
+  const sb = createPublicClient();
+  const { data } = await sb.from("pages").select("slug, updated_at").eq("is_published", true);
+  return (data as { slug: string; updated_at: string }[]) ?? [];
+}
 
-export const getSitemapArticles = unstable_cache(
-  async (): Promise<{ slug: string; updated_at: string }[]> => {
-    const sb = createPublicClient();
-    const { data } = await sb.from("articles").select("slug, updated_at").eq("is_published", true);
-    return (data as { slug: string; updated_at: string }[]) ?? [];
-  },
-  ["sitemap-articles"],
-  { tags: ["articles"], revalidate: HOUR }
-);
+export async function getSitemapArticles(): Promise<{ slug: string; updated_at: string }[]> {
+  const sb = createPublicClient();
+  const { data } = await sb.from("articles").select("slug, updated_at").eq("is_published", true);
+  return (data as { slug: string; updated_at: string }[]) ?? [];
+}
 
 /* -------------------- Events -------------------- */
 export const getPublishedEvents = unstable_cache(
@@ -224,21 +222,41 @@ export const getCourses = unstable_cache(
  */
 export const getCoursesWithLessons = unstable_cache(
   async (limit?: number): Promise<Course[]> => {
-    const sb = createPublicClient();
-    // Inner-join trick: select courses where at least one lesson exists.
-    // PostgREST: `lessons!inner(id)` requires at least one matching row.
-    let q = sb
+    // Τα lessons είναι κλειδωμένα με RLS (μόνο εγγεγραμμένοι), οπότε ο anon
+    // client δεν τα βλέπει. Τα course_id τα παίρνουμε με service role —
+    // επιστρέφουμε μόνο ποια μαθήματα έχουν υλικό, όχι το ίδιο το υλικό.
+    const ids = Object.keys(await lessonCounts());
+    if (ids.length === 0) return [];
+    let q = createPublicClient()
       .from("courses")
-      .select("*, lessons!inner(id)")
+      .select("*")
+      .in("id", ids)
       .order("created_at", { ascending: false });
     if (limit) q = q.limit(limit);
     const { data } = await q;
-    if (!data) return [];
-    // Strip the joined `lessons` array — we only needed it for filtering.
-    return data.map(({ lessons: _l, ...rest }) => rest as Course);
+    return (data as Course[]) ?? [];
   },
   ["courses-with-lessons"],
   { tags: ["courses", "lessons"], revalidate: HOUR }
+);
+
+async function lessonCounts(): Promise<Record<string, number>> {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error("lessonCounts: SUPABASE_SERVICE_ROLE_KEY missing — course lesson counts unavailable");
+    return {};
+  }
+  const { data, error } = await createAdminClient().from("lessons").select("course_id");
+  if (error) throw error; // μην «κλειδώσεις» στο cache ένα κενό αποτέλεσμα
+  const counts: Record<string, number> = {};
+  for (const r of data ?? []) counts[r.course_id] = (counts[r.course_id] ?? 0) + 1;
+  return counts;
+}
+
+/** Πλήθος ενοτήτων ανά μάθημα (δημόσια πληροφορία, για «Περιεχόμενα (N ενότητες)»). */
+export const getLessonCountByCourse = unstable_cache(
+  async (courseId: string): Promise<number> => (await lessonCounts())[courseId] ?? 0,
+  ["lesson-count-by-course"],
+  { tags: ["lessons"], revalidate: HOUR }
 );
 
 export const getCourseBySlug = unstable_cache(
@@ -261,29 +279,21 @@ export const getCourseById = unstable_cache(
   { tags: ["courses"], revalidate: HOUR }
 );
 
-export const getLessonsByCourse = unstable_cache(
-  async (courseId: string): Promise<Lesson[]> => {
-    const sb = createPublicClient();
-    const { data } = await sb
-      .from("lessons")
-      .select("*")
-      .eq("course_id", courseId)
-      .order("order", { ascending: true });
-    return (data as Lesson[]) ?? [];
-  },
-  ["lessons-by-course"],
-  { tags: ["lessons"], revalidate: HOUR }
-);
+// Lessons: ΧΩΡΙΣ cache και με τον client του χρήστη (cookies), ώστε το RLS
+// να αποφασίζει ποιος βλέπει τι (admin ή εγγεγραμμένος στο μάθημα).
+export async function getLessonsByCourse(sb: SupabaseClient, courseId: string): Promise<Lesson[]> {
+  const { data } = await sb
+    .from("lessons")
+    .select("*")
+    .eq("course_id", courseId)
+    .order("order", { ascending: true });
+  return (data as Lesson[]) ?? [];
+}
 
-export const getLessonById = unstable_cache(
-  async (id: string): Promise<Lesson | null> => {
-    const sb = createPublicClient();
-    const { data } = await sb.from("lessons").select("*").eq("id", id).maybeSingle();
-    return (data as Lesson) ?? null;
-  },
-  ["lesson-by-id"],
-  { tags: ["lessons"], revalidate: HOUR }
-);
+export async function getLessonById(sb: SupabaseClient, id: string): Promise<Lesson | null> {
+  const { data } = await sb.from("lessons").select("*").eq("id", id).maybeSingle();
+  return (data as Lesson) ?? null;
+}
 
 /* -------------------- Testimonials + Partners -------------------- */
 export const getPublishedTestimonials = unstable_cache(

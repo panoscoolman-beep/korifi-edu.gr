@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { signUpWithPassword, signInWithGoogle } from "../actions";
+import { PASSWORD_HINT } from "@/lib/password";
 
 export function RegisterForm() {
   const [state, action, pending] = useActionState(signUpWithPassword, null);
@@ -54,10 +55,10 @@ export function RegisterForm() {
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-slate-700">Κωδικός</label>
             <input
-              id="password" name="password" type="password" autoComplete="new-password" required minLength={8}
+              id="password" name="password" type="password" autoComplete="new-password" required minLength={10}
               className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
-            <p className="mt-1 text-xs text-slate-500">Τουλάχιστον 8 χαρακτήρες.</p>
+            <p className="mt-1 text-xs text-slate-500">{PASSWORD_HINT}</p>
           </div>
 
           {state?.error && (

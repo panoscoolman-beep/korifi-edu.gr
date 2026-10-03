@@ -147,8 +147,14 @@ export async function deletePhoto(photoId: string, albumId: string) {
   revalidatePath(`/admin/gallery/${albumId}`, "page");
 }
 
+/** Το `table` έρχεται από τον client (bound arg) — δεχόμαστε μόνο γνωστούς πίνακες. */
+function configFor(table: Table) {
+  if (!Object.hasOwn(RESOURCE_CONFIG, table)) throw new Error(`Unknown resource: ${String(table)}`);
+  return RESOURCE_CONFIG[table];
+}
+
 export async function saveResource(table: Table, id: string | null, _prev: unknown, fd: FormData) {
-  const cfg = RESOURCE_CONFIG[table];
+  const cfg = configFor(table);
   const supabase = await assertAdmin();
   const payload  = fdToObject(fd, cfg);
 
@@ -171,7 +177,7 @@ export async function saveResource(table: Table, id: string | null, _prev: unkno
 }
 
 export async function deleteResource(table: Table, id: string) {
-  const cfg = RESOURCE_CONFIG[table];
+  const cfg = configFor(table);
   const supabase = await assertAdmin();
   const { error } = await supabase.from(table).delete().eq("id", id);
   if (error) throw new Error(error.message);
