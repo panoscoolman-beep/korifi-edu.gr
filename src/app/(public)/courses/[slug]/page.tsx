@@ -4,6 +4,8 @@ import { getCourseBySlug, getSubjectById, getLessonsByCourse, getLessonCountByCo
 import { createClient } from "@/lib/supabase/server";
 import { JsonLd, courseLd, breadcrumbsLd } from "@/components/JsonLd";
 import { RedeemCodeForm } from "./RedeemCodeForm";
+import { LeadForm } from "@/components/LeadForm";
+import { guessGrade } from "@/lib/leads";
 
 type Params = Promise<{ slug: string }>;
 
@@ -136,6 +138,15 @@ export default async function CoursePage({ params }: { params: Params }) {
           </ol>
         )}
       </section>
+
+      <LeadForm
+        source={`/courses/${c.slug}`}
+        sourceLabel={c.title}
+        grade={guessGrade(sub?.name)}
+        interest={c.title}
+        title="Θες βοήθεια σε αυτό το μάθημα;"
+        intro="Άφησε το κινητό σου και σε καλούμε εμείς για ένα δωρεάν διαγνωστικό: 30 λεπτά για να δούμε από πού ξεκινάς και τι χρειάζεται."
+      />
     </div>
   );
 }

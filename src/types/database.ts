@@ -172,3 +172,29 @@ export type GalleryPhoto = {
   sort_order: number
   created_at: string
 }
+
+export type LeadStatus = 'new' | 'contacted' | 'booked' | 'enrolled' | 'lost'
+
+export type Lead = {
+  id: string
+  created_at: string
+  name: string
+  phone: string
+  grade: string | null
+  interest: string | null
+  source_path: string | null
+  source_label: string | null
+  status: LeadStatus
+  notes: string | null
+  notified_at: string | null
+}
+
+export type SiteEventName = 'call_click' | 'whatsapp_click' | 'viber_click' | 'lead_submit'
+
+export type SiteEvent = {
+  id: number
+  created_at: string
+  name: SiteEventName
+  path: string | null
+  place: string | null
+}
