@@ -21,7 +21,8 @@ Chronological log όλων των αλλαγών — διαβάζεται από
   υπάρχουν `RESEND_API_KEY` + `LEADS_NOTIFY_TO` (προαιρετικά `LEADS_NOTIFY_FROM`) στο Vercel.
 - **Κουμπί «Μίλα μας»** (`src/components/ContactFab.tsx`): σταθερό κάτω δεξιά, WhatsApp / Viber / κλήση,
   με προσυμπληρωμένο μήνυμα που λέει ποια σελίδα έβλεπε ο γονιός. Κρυφό σε admin/dashboard/login/lessons.
-  Ο αριθμός ζει στο `src/lib/site.ts` (`CONTACT.messagingE164`, προς το παρόν 6941 689 194).
+  Αριθμοί στο `src/lib/site.ts`: WhatsApp Business = σταθερό **22530 25080** (επιβεβαίωση Πάνου 3/10),
+  Viber = 6941 689 194 (προς επιβεβαίωση).
 - **Μετρήσεις χωρίς cookies**: `trackEvent()` (`src/lib/track.ts`) → Vercel Analytics custom event +
   `POST /api/track` → πίνακας `site_events` (name, path, place — χωρίς IP/cookie). Μετράει κάθε κλικ σε
   `tel:` link της σελίδας (και μέσα στο περιεχόμενο από τη βάση), WhatsApp, Viber, υποβολή φόρμας.
@@ -34,7 +35,7 @@ Verified: tsc καθαρό, lint 0 errors, vitest 25/25 (`src/lib/__tests__/lead
 `/blog/epitychies-2026-21-paidia`, `/epikoinonia`. **Δεν δοκιμάστηκε υποβολή της φόρμας** από το sandbox
 (το proxy κόβει POST προς vercel.app) — θέλει μία δοκιμαστική υποβολή από κινητό.
 
-Εκκρεμεί: επιβεβαίωση αριθμού WhatsApp/Viber· Resend env στο Vercel· το `/diagnostiko` κρατά ακόμα το
+Εκκρεμεί: επιβεβαίωση αριθμού Viber· Resend env στο Vercel· το `/diagnostiko` κρατά ακόμα το
 Google Form (αντικατάσταση με `{{lead-form}}` όταν το πει ο Πάνος)· Google Ads conversion tag **δεν**
 μπήκε — θέλει πρώτα cookie consent banner (το gtag βάζει cookies).
 
