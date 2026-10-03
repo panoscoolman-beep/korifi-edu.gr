@@ -6,6 +6,40 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-10-03 (marketing στο site — φόρμα διαγνωστικού, κουμπί WhatsApp/Viber, μετρήσεις) — PR #22
+
+Πρώτο βήμα του «στήσιμο marketing» (απόφαση Πάνου 3/10): το site αρχίζει να μαζεύει leads και να
+μετράει τι φέρνει επαφές. Σχεδιασμός στην αναφορά `audit-site-kai-idees-2026-10.md` §3 (⭐1–3).
+
+- **Φόρμα «Κλείσε δωρεάν διαγνωστικό»** (`src/components/LeadForm.tsx`): όνομα, κινητό, τάξη, μάθημα.
+  Μπαίνει αυτόματα στο τέλος κάθε `/courses/[slug]` (προσυμπληρωμένο μάθημα/τάξη), κάθε άρθρου
+  `/blog/[slug]` και στις σελίδες `gimnasio, alikeiou, blikeiou, glikeiou, epal, online-mathimata,
+  epikoinonia`. Σε οποιαδήποτε άλλη σελίδα της βάσης μπαίνει με τη γραμμή `{{lead-form}}` στο κείμενο.
+  Αποθήκευση στον νέο πίνακα `leads` (migration `0020_leads_and_site_events.sql`, **εφαρμοσμένη 3/10**,
+  μόνο προσθήκες) μέσω server action με service role (`src/app/(public)/leadActions.ts`)· RLS μόνο admin.
+  Honeypot + απόρριψη υποβολής < 3" + dedupe 10' ανά τηλέφωνο. Ειδοποίηση email μέσω Resend **μόνο αν**
+  υπάρχουν `RESEND_API_KEY` + `LEADS_NOTIFY_TO` (προαιρετικά `LEADS_NOTIFY_FROM`) στο Vercel.
+- **Κουμπί «Μίλα μας»** (`src/components/ContactFab.tsx`): σταθερό κάτω δεξιά, WhatsApp / Viber / κλήση,
+  με προσυμπληρωμένο μήνυμα που λέει ποια σελίδα έβλεπε ο γονιός. Κρυφό σε admin/dashboard/login/lessons.
+  Ο αριθμός ζει στο `src/lib/site.ts` (`CONTACT.messagingE164`, προς το παρόν 6941 689 194).
+- **Μετρήσεις χωρίς cookies**: `trackEvent()` (`src/lib/track.ts`) → Vercel Analytics custom event +
+  `POST /api/track` → πίνακας `site_events` (name, path, place — χωρίς IP/cookie). Μετράει κάθε κλικ σε
+  `tel:` link της σελίδας (και μέσα στο περιεχόμενο από τη βάση), WhatsApp, Viber, υποβολή φόρμας.
+- **`/admin/leads`**: leads με κατάσταση (Νέο / Μιλήσαμε / Κλείστηκε διαγνωστικό / Εγγράφηκε / Δεν προχώρησε)
+  και σημειώσεις, μετρήσεις 30 ημερών ανά τύπο και ανά σελίδα. Νέα ομάδα «Marketing» στο admin menu.
+- Στοιχεία επικοινωνίας σε μία πηγή (`src/lib/site.ts`)· το footer διαβάζει από εκεί.
+
+Verified: tsc καθαρό, lint 0 errors, vitest 25/25 (`src/lib/__tests__/leads.test.ts`: τηλέφωνο, validation,
+μάντεμα τάξης), `next build`, preview deployment: φόρμα + κουμπί σε `/courses/algebra-a-lykeiou`,
+`/blog/epitychies-2026-21-paidia`, `/epikoinonia`. **Δεν δοκιμάστηκε υποβολή της φόρμας** από το sandbox
+(το proxy κόβει POST προς vercel.app) — θέλει μία δοκιμαστική υποβολή από κινητό.
+
+Εκκρεμεί: επιβεβαίωση αριθμού WhatsApp/Viber· Resend env στο Vercel· το `/diagnostiko` κρατά ακόμα το
+Google Form (αντικατάσταση με `{{lead-form}}` όταν το πει ο Πάνος)· Google Ads conversion tag **δεν**
+μπήκε — θέλει πρώτα cookie consent banner (το gtag βάζει cookies).
+
+---
+
 ## 2026-10-03 (audit + fix — sitemap, επαναφορά κωδικού, κλείδωμα υλικού μαθημάτων, hero φθινοπώρου)
 
 Γενικός έλεγχος κώδικα και live site μετά από αίτημα του Πάνου (PR #20). Πλήρης αναφορά ευρημάτων
