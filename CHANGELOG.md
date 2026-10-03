@@ -2,7 +2,7 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Site is **LIVE in production** at [korifi-edu.gr](https://korifi-edu.gr) (Vercel hosting, custom domain, valid HTTPS). All major features shipped: bento-style content pages, hero carousel with seasonal slides, full admin CRUD with inline lessons + access codes, /martyries with weekly auto-sync from Drive, /epikoinonia with embedded Google Maps, **ενότητα `/ergaleia` με 12 Διαδραστικά Εργαλεία** (Χημεία/Μαθηματικά/Φυσική). SEO (per-content JSON-LD, sitemap, OG/Twitter), Vercel Analytics, security hardened. **Νέο (29/7):** μόνιμη «περίοδος εγγραφών» στο seasonal hero (20/7→14/9 κάθε χρόνο) — φέτος «Εγγραφές 2026-27, μαθήματα από Δευτ 14/9» + slide «21 επιτυχίες 2026». Κύριες εκκρεμότητες: Google Search Console verification (TXT record DNS), Google Business Profile setup, owner content updates, περισσότερα εργαλεία στο `/ergaleia` (βλ. λίστα ιδεών στο πρώτο entry 2026-06-21).
+> **Where we are now (latest):** Site is **LIVE in production** at [korifi-edu.gr](https://korifi-edu.gr) (Vercel hosting, custom domain, valid HTTPS). All major features shipped: bento-style content pages, hero carousel with seasonal slides, full admin CRUD with inline lessons + access codes, /martyries with weekly auto-sync from Drive, /epikoinonia with embedded Google Maps, **ενότητα `/ergaleia` με 12 Διαδραστικά Εργαλεία** (Χημεία/Μαθηματικά/Φυσική). SEO (per-content JSON-LD, sitemap, OG/Twitter), Vercel Analytics, security hardened. **Νέο (29/7):** μόνιμη «περίοδος εγγραφών» στο seasonal hero (20/7→14/9 κάθε χρόνο) — φέτος «Εγγραφές 2026-27, μαθήματα από Δευτ 14/9» + slide «21 επιτυχίες 2026». **Νέο (3/10):** υλικό μαθημάτων/PDF μόνο για εγγεγραμμένους με κωδικό πρόσβασης (signed URLs), hero φθινοπώρου «Τα μαθήματα τρέχουν ήδη», `/reset-password`. Κύριες εκκρεμότητες: Google Search Console verification (TXT record DNS), Google Business Profile setup, owner content updates, περισσότερα εργαλεία στο `/ergaleia` (βλ. λίστα ιδεών στο πρώτο entry 2026-06-21).
 
 ---
 
@@ -27,7 +27,10 @@ Chronological log όλων των αλλαγών — διαβάζεται από
   `/api/lessons/[id]/pdf` → signed URL 10 λεπτών (service role, `src/lib/supabase/admin.ts`). Ο αριθμός
   ενοτήτων ανά μάθημα και τα «μαθήματα με υλικό» της αρχικής μετριούνται με service role (μόνο
   `course_id`). Migration `0019_lock_lessons_and_private_pdfs.sql` (is_free=false, ιδιωτικό bucket,
-  anon listing μόνο `images`) — **εφαρμόζεται ΜΕΤΑ το production deploy**, αλλιώς τα PDF σπάνε.
+  anon listing μόνο `images`) **εφαρμόστηκε 3/10 μετά το production deploy** — μέσω `execute_sql`, γιατί το
+  `apply_migration` του MCP κολλάει στο `drop policy` (χρησιμοποιήθηκε `alter policy`)· καταγράφηκε στο
+  `schema_migrations` ως `20261003055929`. Verified live: anon στο `/api/lessons/<id>/pdf` και στο
+  `/lessons/<id>` → `/login?next=…`, το παλιό public URL του bucket → 400.
   Το backup script δουλεύει κανονικά (service role παρακάμπτει το RLS).
 - **Hero φθινοπώρου:** έλεγε «Έναρξη μαθημάτων Σεπτέμβριο»· τώρα «Τα μαθήματα τρέχουν ήδη — δεν είναι
   αργά» με CTA δωρεάν διαγνωστικό. Το slide «21 επιτυχίες» (υπήρχε μόνο στο `enrollment`, χανόταν 15/9)
@@ -42,6 +45,9 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 Verified: tsc καθαρό, lint 0 errors, vitest 16/16 (νέα tests `safeNext`/`passwordProblem`), `next build`,
 preview deployment (sitemap με όλα τα άρθρα, hero, `/api/lessons/[id]/pdf` → 307 signed URL).
+PR #20 έγινε merge (squash) 3/10 και το production deploy βγήκε READY· έλεγχος live: sitemap με τα νέα
+άρθρα, νέο hero, banner Αυγούστου εκτός, 3 μαθήματα με υλικό στην αρχική, `/courses/<slug>` δείχνει
+αριθμό ενοτήτων + προτροπή σύνδεσης.
 
 Από τον audit **δεν** έγιναν (θέλουν απόφαση/ξεχωριστή δουλειά): ώρες events σε UTC αντί Athens στο
 JSON-LD· leaked password protection (Supabase dashboard)· navbar διαβάζει cookies → κάθε σελίδα
