@@ -7,10 +7,8 @@ export const CONTACT = {
   phone: "22530 25080",
   phoneE164: "+302253025080",
   email: "frontistiriokorifh@gmail.com",
-  /** WhatsApp Business: στο σταθερό 22530 25080 (επιβεβαίωση Πάνου 3/10/2026). */
+  /** WhatsApp Business: στο σταθερό 22530 25080 (επιβεβαίωση Πάνου 3/10/2026). Viber δεν υπάρχει (Πάνος 4/10/2026). */
   whatsappE164: "+302253025080",
-  /** Viber: κινητό 6941 689 194 (προς επιβεβαίωση). */
-  viberE164: "+306941689194",
   instagram: "https://www.instagram.com/frontistiriakorifh/",
 } as const;
 
@@ -22,7 +20,3 @@ export function whatsappHref(text?: string): string {
   return `https://wa.me/${number}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
 }
 
-/** Deep link Viber (δουλεύει όπου είναι εγκατεστημένο το Viber). */
-export function viberHref(): string {
-  return `viber://chat?number=${encodeURIComponent(CONTACT.viberE164)}`;
-}

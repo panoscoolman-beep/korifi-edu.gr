@@ -2,7 +2,7 @@ import { track as vercelTrack } from "@vercel/analytics";
 import type { SiteEventName } from "@/types/database";
 
 /**
- * Μέτρηση μετατροπών (κλικ τηλεφώνου / WhatsApp / Viber / υποβολή φόρμας).
+ * Μέτρηση μετατροπών (κλικ τηλεφώνου / WhatsApp / υποβολή φόρμας).
  *
  * Στέλνει το event σε δύο μέρη:
  *  1. Vercel Analytics custom event (όπου το πλάνο το υποστηρίζει).

@@ -6,7 +6,7 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
-## 2026-10-03 (marketing στο site — φόρμα διαγνωστικού, κουμπί WhatsApp/Viber, μετρήσεις) — PR #22
+## 2026-10-03 (marketing στο site — φόρμα διαγνωστικού, κουμπί WhatsApp, μετρήσεις) — PR #22
 
 Πρώτο βήμα του «στήσιμο marketing» (απόφαση Πάνου 3/10): το site αρχίζει να μαζεύει leads και να
 μετράει τι φέρνει επαφές. Σχεδιασμός στην αναφορά `audit-site-kai-idees-2026-10.md` §3 (⭐1–3).
@@ -19,13 +19,14 @@ Chronological log όλων των αλλαγών — διαβάζεται από
   μόνο προσθήκες) μέσω server action με service role (`src/app/(public)/leadActions.ts`)· RLS μόνο admin.
   Honeypot + απόρριψη υποβολής < 3" + dedupe 10' ανά τηλέφωνο. Ειδοποίηση email μέσω Resend **μόνο αν**
   υπάρχουν `RESEND_API_KEY` + `LEADS_NOTIFY_TO` (προαιρετικά `LEADS_NOTIFY_FROM`) στο Vercel.
-- **Κουμπί «Μίλα μας»** (`src/components/ContactFab.tsx`): σταθερό κάτω δεξιά, WhatsApp / Viber / κλήση,
+- **Κουμπί «Μίλα μας»** (`src/components/ContactFab.tsx`): σταθερό κάτω δεξιά, WhatsApp / κλήση,
   με προσυμπληρωμένο μήνυμα που λέει ποια σελίδα έβλεπε ο γονιός. Κρυφό σε admin/dashboard/login/lessons.
-  Αριθμοί στο `src/lib/site.ts`: WhatsApp Business = σταθερό **22530 25080** (επιβεβαίωση Πάνου 3/10),
-  Viber = 6941 689 194 (προς επιβεβαίωση).
+  Αριθμοί στο `src/lib/site.ts`: WhatsApp Business = σταθερό **22530 25080** (επιβεβαίωση Πάνου 3/10).
+  Viber **δεν** υπάρχει (Πάνος 4/10) — αφαιρέθηκε από το κουμπί και τις μετρήσεις· ο περιορισμός
+  `site_events.name` στη βάση δέχεται ακόμη το `viber_click` (αβλαβές, δεν στέλνεται πια).
 - **Μετρήσεις χωρίς cookies**: `trackEvent()` (`src/lib/track.ts`) → Vercel Analytics custom event +
   `POST /api/track` → πίνακας `site_events` (name, path, place — χωρίς IP/cookie). Μετράει κάθε κλικ σε
-  `tel:` link της σελίδας (και μέσα στο περιεχόμενο από τη βάση), WhatsApp, Viber, υποβολή φόρμας.
+  `tel:` link της σελίδας (και μέσα στο περιεχόμενο από τη βάση), WhatsApp, υποβολή φόρμας.
 - **`/admin/leads`**: leads με κατάσταση (Νέο / Μιλήσαμε / Κλείστηκε διαγνωστικό / Εγγράφηκε / Δεν προχώρησε)
   και σημειώσεις, μετρήσεις 30 ημερών ανά τύπο και ανά σελίδα. Νέα ομάδα «Marketing» στο admin menu.
 - Στοιχεία επικοινωνίας σε μία πηγή (`src/lib/site.ts`)· το footer διαβάζει από εκεί.
@@ -35,7 +36,7 @@ Verified: tsc καθαρό, lint 0 errors, vitest 25/25 (`src/lib/__tests__/lead
 `/blog/epitychies-2026-21-paidia`, `/epikoinonia`. **Δεν δοκιμάστηκε υποβολή της φόρμας** από το sandbox
 (το proxy κόβει POST προς vercel.app) — θέλει μία δοκιμαστική υποβολή από κινητό.
 
-Εκκρεμεί: επιβεβαίωση αριθμού Viber· Resend env στο Vercel· το `/diagnostiko` κρατά ακόμα το
+Εκκρεμεί: Resend env στο Vercel· το `/diagnostiko` κρατά ακόμα το
 Google Form (αντικατάσταση με `{{lead-form}}` όταν το πει ο Πάνος)· Google Ads conversion tag **δεν**
 μπήκε — θέλει πρώτα cookie consent banner (το gtag βάζει cookies).
 

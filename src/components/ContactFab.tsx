@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { CONTACT, DEFAULT_MESSAGE, viberHref, whatsappHref } from "@/lib/site";
+import { CONTACT, DEFAULT_MESSAGE, whatsappHref } from "@/lib/site";
 import { trackEvent } from "@/lib/track";
 
 /** Σελίδες όπου το κουμπί δεν έχει νόημα (διαχείριση, σύνδεση, υλικό μαθημάτων). */
@@ -12,7 +12,7 @@ const HIDDEN_PREFIXES = [
 ];
 
 /**
- * Σταθερό κουμπί «Μίλα μας» κάτω δεξιά: WhatsApp, Viber, κλήση. Οι γονείς
+ * Σταθερό κουμπί «Μίλα μας» κάτω δεξιά: WhatsApp και κλήση. Οι γονείς
  * στη Λέσβο γράφουν πιο εύκολα παρά τηλεφωνούν, ειδικά το βράδυ.
  *
  * Μετράει επίσης κάθε κλικ σε `tel:` link οπουδήποτε στη σελίδα (footer,
@@ -65,19 +65,6 @@ export function ContactFab() {
               </svg>
             </span>
             WhatsApp
-          </a>
-          <a
-            role="menuitem"
-            href={viberHref()}
-            onClick={() => trackEvent("viber_click", { path: pathname, place: "fab" })}
-            className={item}
-          >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-600 text-white" aria-hidden="true">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2.5c-2.4 0-5.6.4-7.4 2.1C3 6.2 2.5 8.6 2.5 11.5c0 2.6.4 5 2 6.6.6.6 1.4 1 2.2 1.3V22l2.7-2.3c.9.1 1.8.1 2.6.1 2.4 0 5.6-.4 7.4-2.1 1.6-1.6 2.1-4 2.1-6.9s-.5-5.3-2.1-6.9C17.6 2.9 14.4 2.5 12 2.5zm3.9 13.1c-.2.6-1.1 1.1-1.6 1.2-.4.1-.9.1-1.5-.1a13 13 0 0 1-4.9-3.4 12.6 12.6 0 0 1-2.5-4.2c-.2-.6-.1-1.2.3-1.7l.6-.6c.3-.3.7-.3 1 0l1.1 1.4c.2.3.2.7 0 1l-.5.6c.4.8 1 1.6 1.6 2.2.6.6 1.4 1.2 2.2 1.6l.6-.5c.3-.2.7-.2 1 0l1.4 1.1c.3.3.3.7.1 1.1l.1.3z" />
-              </svg>
-            </span>
-            Viber
           </a>
           <a
             role="menuitem"

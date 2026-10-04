@@ -189,7 +189,7 @@ export type Lead = {
   notified_at: string | null
 }
 
-export type SiteEventName = 'call_click' | 'whatsapp_click' | 'viber_click' | 'lead_submit'
+export type SiteEventName = 'call_click' | 'whatsapp_click' | 'lead_submit'
 
 export type SiteEvent = {
   id: number

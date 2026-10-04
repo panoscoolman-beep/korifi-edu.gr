@@ -25,13 +25,12 @@ export const LEAD_STATUS_LABEL: Record<LeadStatus, string> = {
 };
 
 export const SITE_EVENT_NAMES: readonly SiteEventName[] = [
-  "call_click", "whatsapp_click", "viber_click", "lead_submit",
+  "call_click", "whatsapp_click", "lead_submit",
 ];
 
 export const SITE_EVENT_LABEL: Record<SiteEventName, string> = {
   call_click: "Κλικ τηλεφώνου",
   whatsapp_click: "Κλικ WhatsApp",
-  viber_click: "Κλικ Viber",
   lead_submit: "Φόρμες",
 };
 
