@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Το πρόγραμμά μου: εβδομαδιαίο πρόγραμμα μελέτης | Φροντιστήριο Κορυφή</title>
+<meta name="description" content="Δωρεάν εβδομαδιαίο πρόγραμμα μελέτης για μαθητές Γυμνασίου και Λυκείου: σχολείο, φροντιστήριο, διάβασμα και ελεύθερος χρόνος σε μία σελίδα, με στόχους εβδομάδας και μήνυμα για τους γονείς. Χωρίς λογαριασμό. Φροντιστήριο Κορυφή, Καλλονή Λέσβου.">
+<link rel="canonical" href="https://korifi-edu.gr/ergaleia/programma-meletis.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="el_GR">
+<meta property="og:site_name" content="Φροντιστήριο Κορυφή">
+<meta property="og:title" content="Το πρόγραμμά μου · Φροντιστήριο Κορυφή">
+<meta property="og:description" content="Στήσε την εβδομάδα σου σε πέντε λεπτά: σχολείο, φροντιστήριο, διάβασμα και ελεύθερος χρόνος σε μία σελίδα. Δωρεάν, χωρίς λογαριασμό.">
+<meta property="og:url" content="https://korifi-edu.gr/ergaleia/programma-meletis.html">
+<meta property="og:image" content="https://korifi-edu.gr/og-default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f5f5fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f0f1c" media="(prefers-color-scheme: dark)">
+<script>
+/* Εφαρμόζει το αποθηκευμένο θέμα πριν ζωγραφιστεί η σελίδα, ώστε να μην αναβοσβήνει */
+try{var __p=JSON.parse(localStorage.getItem("korifi-programma-meletis")||"null");if(__p&&(__p.theme==="light"||__p.theme==="dark"))document.documentElement.setAttribute("data-theme",__p.theme);}catch(e){}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Literata:ital,opsz,wght@0,7..72,500;1,7..72,400&display=swap">
+<style>
+/* ============================================================
+   «Το πρόγραμμά μου» · εβδομαδιαίο πρόγραμμα μελέτης (korifi-edu.gr/ergaleia)
+   ------------------------------------------------------------
+   The week grid is the hero, typeset like a printed timetable.
+   One ornament only: the masthead (serif title, italic week
+   line, hairline rule with a small peak mark). Everything else
+   is quiet: hairline rules, generous whitespace, indigo-tinted
+   neutrals (never pure grey).
+
+   Type roles
+     Literata (serif, Greek)   title, section heads, big figures
+     Inter                     UI text, labels, block titles
+     JetBrains Mono            times and hour figures (tabular)
+
+   Palette: indigo is the anchor (brand 600 #4338ca in light,
+   lifted to #a5b4fc on the dark ground). Activity colours:
+   slate (school), indigo (Κορυφή), teal (διάβασμα), sky
+   (επανάληψη), rose (διαγώνισμα), amber (ελεύθερος χρόνος).
+   Dark theme is re-tuned, not inverted.
+
+   Layout: max 1240px, 16px+ gutter. Masthead -> toolbar ->
+   board (7 columns from 900px, one day at a time below that,
+   with a sticky day strip and a «+» in the sticky day header)
+   -> three hairline-separated columns (summary with SVG arcs,
+   goals, parent message) -> four tips -> quiet footnote.
+   ============================================================ */
+:root{
+  color-scheme:light;
+  --bg:#f5f5fb; --surface:#ffffff; --surface-2:#eeeef7; --surface-3:#e4e4f1;
+  --fg:#1b1a3a; --fg-2:#454768; --muted:#62648a; --faint:#75779a;
+  --line:#d9d9ea; --hair:#e1e1ee; --hair-2:#ebebf5; --seg-on:#ffffff;
+  --blk-hover:brightness(.97); --blk-active:brightness(.94);
+  --accent:#4338ca; --accent-strong:#3730a3; --accent-ink:#ffffff; --accent-soft:#eef2ff;
+  --today:#f5f4fe; --today-line:#c7c6ee;
+  --danger:#b4203f; --danger-soft:#fbe9ee;
+  --scrim:rgba(24,22,56,.55);
+  --shadow:0 18px 50px rgba(27,26,58,.18), 0 2px 6px rgba(27,26,58,.08);
+  --shadow-sm:0 1px 2px rgba(27,26,58,.14);
+  --toast-bg:#1b1a3a; --toast-fg:#ffffff; --toast-ok:#5eead4;
+  --a-school:#64748b; --a-school-bg:#eceff4; --a-school-ink:#334155;
+  --a-korifi:#4338ca; --a-korifi-bg:#e7e9fb; --a-korifi-ink:#2b2683;
+  --a-study:#0e8f84; --a-study-bg:#e0f3f0; --a-study-ink:#0c5e57;
+  --a-review:#0369a1; --a-review-bg:#e2eff9; --a-review-ink:#084f78;
+  --a-test:#be123c; --a-test-bg:#fbe6ec; --a-test-ink:#8f1033;
+  --a-free:#c2610a; --a-free-bg:#fbf1e5; --a-free-ink:#7e3f06;
+  --serif:"Literata","Noto Serif",Georgia,"Times New Roman",serif;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --row:48px; --gutter:clamp(16px,4vw,40px); --strip:0px;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#0f0f1c; --surface:#161627; --surface-2:#1d1d32; --surface-3:#26263e;
+  --fg:#ececf8; --fg-2:#c2c3da; --muted:#9496b6; --faint:#8385a8;
+  --line:#2d2d48; --hair:#2b2b47; --hair-2:#232340; --seg-on:#2b2b4a;
+  --blk-hover:brightness(1.18); --blk-active:brightness(1.3);
+  --accent:#a5b4fc; --accent-strong:#c7d2fe; --accent-ink:#15143a; --accent-soft:#23234b;
+  --today:#1a1a35; --today-line:#3d3d6b;
+  --danger:#fb7185; --danger-soft:#3a1824;
+  --scrim:rgba(4,4,14,.7);
+  --shadow:0 18px 50px rgba(0,0,0,.6), 0 2px 6px rgba(0,0,0,.4);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.5);
+  --toast-bg:#ececf8; --toast-fg:#15143a; --toast-ok:#0e8f84;
+  --a-school:#94a3b8; --a-school-bg:#242b38; --a-school-ink:#d6dde8;
+  --a-korifi:#7b84f0; --a-korifi-bg:#26284f; --a-korifi-ink:#dfe3ff;
+  --a-study:#1aa596; --a-study-bg:#12302e; --a-study-ink:#c6f1ea;
+  --a-review:#4fb3ec; --a-review-bg:#10293b; --a-review-ink:#cfe9fa;
+  --a-test:#f06a86; --a-test-bg:#3b1926; --a-test-ink:#ffd6de;
+  --a-free:#c97c15; --a-free-bg:#33261a; --a-free-ink:#fbe2c3;
+  color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0f0f1c; --surface:#161627; --surface-2:#1d1d32; --surface-3:#26263e;
+  --fg:#ececf8; --fg-2:#c2c3da; --muted:#9496b6; --faint:#8385a8;
+  --line:#2d2d48; --hair:#2b2b47; --hair-2:#232340; --seg-on:#2b2b4a;
+  --blk-hover:brightness(1.18); --blk-active:brightness(1.3);
+  --accent:#a5b4fc; --accent-strong:#c7d2fe; --accent-ink:#15143a; --accent-soft:#23234b;
+  --today:#1a1a35; --today-line:#3d3d6b;
+  --danger:#fb7185; --danger-soft:#3a1824;
+  --scrim:rgba(4,4,14,.7);
+  --shadow:0 18px 50px rgba(0,0,0,.6), 0 2px 6px rgba(0,0,0,.4);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.5);
+  --toast-bg:#ececf8; --toast-fg:#15143a; --toast-ok:#0e8f84;
+  --a-school:#94a3b8; --a-school-bg:#242b38; --a-school-ink:#d6dde8;
+  --a-korifi:#7b84f0; --a-korifi-bg:#26284f; --a-korifi-ink:#dfe3ff;
+  --a-study:#1aa596; --a-study-bg:#12302e; --a-study-ink:#c6f1ea;
+  --a-review:#4fb3ec; --a-review-bg:#10293b; --a-review-ink:#cfe9fa;
+  --a-test:#f06a86; --a-test-bg:#3b1926; --a-test-ink:#ffd6de;
+  --a-free:#c97c15; --a-free-bg:#33261a; --a-free-ink:#fbe2c3;
+  color-scheme:dark }
+
+*,*::before,*::after{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body.is-locked{overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select,textarea{font:inherit}
+svg{display:block}
+.page{max-width:1240px;margin:0 auto;padding-inline:var(--gutter);padding-block:28px 56px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* focus */
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.seg input:focus-visible + label,.types input:focus-visible + label{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- masthead ---------- */
+.mast{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 32px;align-items:start;margin-bottom:22px}
+.mast-text{min-width:0}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--fg-2);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px 5px 10px;margin:0 0 18px}
+.back:hover{color:var(--accent);border-color:var(--accent)}
+.back svg{width:14px;height:14px;flex:none}
+.eyebrow a{color:inherit;text-decoration:none}
+.eyebrow a:hover{text-decoration:underline;text-underline-offset:3px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(38px,6vw,64px);line-height:1.02;letter-spacing:-.015em;margin:0;text-wrap:balance}
+.weekline{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--fg-2);margin:12px 0 0}
+.lede{margin:14px 0 0;color:var(--fg-2);max-width:58ch;font-size:15.5px}
+.mast-side{display:flex;flex-direction:column;align-items:flex-end;gap:14px;min-width:0}
+.actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.ornament{display:flex;align-items:center;gap:14px;color:var(--faint);margin:22px 0 26px}
+.ornament::before,.ornament::after{content:"";height:1px;background:var(--line);flex:1}
+.ornament::after{flex:12}
+.ornament svg{flex:none;color:var(--accent)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--faint);background:var(--surface);color:var(--fg);border-radius:8px;padding:8px 14px;min-height:38px;font-weight:500;font-size:14px;line-height:1.3;white-space:nowrap}
+.btn svg{width:15px;height:15px;flex:none}
+a.btn{text-decoration:none}
+.btn:hover{border-color:var(--muted);background:var(--surface-2)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--fg-2)}
+.btn.ghost:hover{background:var(--surface-2);border-color:transparent;color:var(--fg)}
+.btn.ghost.danger:hover{color:var(--danger);background:var(--danger-soft)}
+.btn.is-armed{border-color:var(--danger);color:var(--danger);background:var(--danger-soft)}
+.btn.is-armed:hover{background:var(--danger-soft);border-color:var(--danger)}
+.btn.small{padding:5px 11px;min-height:32px;font-size:13px;border-radius:7px}
+#btnClear{text-align:center;max-width:100%}
+.lbl-short{display:none}
+
+/* theme switch (segmented) */
+.theme{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;font-size:12.5px;color:var(--muted)}
+.theme > span{min-width:0}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--faint);border-radius:999px;padding:3px;gap:2px;min-width:0}
+.seg input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.seg label{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 12px;min-height:30px;border-radius:999px;font-size:12.5px;font-weight:500;color:var(--fg-2);cursor:pointer;user-select:none;line-height:1.2;white-space:nowrap}
+.seg label svg{width:14px;height:14px;flex:none}
+.seg label:hover{color:var(--fg);background:var(--surface-3)}
+.seg label:active{transform:scale(.98)}
+.seg input:checked + label{background:var(--seg-on);color:var(--fg);box-shadow:var(--shadow-sm)}
+.seg input:checked + label svg{color:var(--accent)}
+
+/* ---------- toolbar ---------- */
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 24px;margin-bottom:12px}
+.picker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0}
+.picker label{font-size:13px;font-weight:500;color:var(--fg-2)}
+.select{appearance:none;-webkit-appearance:none;border:1px solid var(--faint);background-color:var(--surface);color:var(--fg);border-radius:8px;padding:8px 32px 8px 12px;min-height:38px;font-size:14px;line-height:1.3;min-width:0;max-width:100%;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 17px) 55%,calc(100% - 12px) 55%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+.select:hover{border-color:var(--muted)}
+.tool-hint{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:0}
+
+/* ---------- board ---------- */
+.board{background:var(--surface);border:1px solid var(--line);border-radius:10px;clip-path:inset(0 round 10px)}
+.week{display:grid;grid-template-columns:58px repeat(var(--cols,7),minmax(0,1fr));min-width:0}
+.week.is-day{grid-template-columns:52px minmax(0,1fr)}
+.corner{position:sticky;top:env(safe-area-inset-top,0px);z-index:32;background:var(--surface);border-bottom:1px solid var(--line)}
+.dayh{position:sticky;top:env(safe-area-inset-top,0px);z-index:31;background:var(--surface);padding:12px 10px 10px;border-bottom:1px solid var(--line);border-left:1px solid var(--hair);min-width:0}
+.dayh-name{display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;line-height:1.2;white-space:nowrap}
+.dayh-name .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
+.dayh-hours{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dayh-hours b{font-weight:500;color:var(--fg-2)}
+.dayh-hours .tag{display:inline-block;margin-left:6px;font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.dayh.today{background:var(--today);border-bottom-color:var(--today-line)}
+.dayh.today .dayh-name{color:var(--accent)}
+.times{background:var(--surface);border-right:1px solid var(--hair)}
+.time{height:var(--row);font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;padding-right:8px;padding-top:3px;line-height:1;font-variant-numeric:tabular-nums}
+.col{position:relative;border-left:1px solid var(--hair);min-width:0;isolation:isolate}
+.col.today{background:var(--today)}
+.slot{display:block;width:100%;height:var(--row);border:0;border-top:1px solid var(--hair);background:transparent;padding:0;margin:0;position:relative;
+  background-image:linear-gradient(var(--hair-2),var(--hair-2));background-size:100% 1px;background-position:0 50%;background-repeat:no-repeat}
+.slot:hover,.slot:focus-visible{background-color:var(--accent-soft)}
+.slot:hover::after,.slot:focus-visible::after{content:"+";position:absolute;inset:0;display:grid;place-items:center;color:var(--accent);font-weight:600;font-size:16px}
+.slot:active{background-color:var(--surface-3)}
+.slot:focus-visible{outline-offset:-2px;border-radius:0}
+.col.today .slot{border-top-color:color-mix(in srgb,var(--fg) 11%,transparent);background-image:linear-gradient(color-mix(in srgb,var(--fg) 6%,transparent),color-mix(in srgb,var(--fg) 6%,transparent))}
+.blk{position:absolute;display:flex;flex-direction:column;gap:1px;border:0;border-left:3px solid var(--stripe);background:var(--tint);color:var(--ink);border-radius:3px 5px 5px 3px;padding:3px 7px 3px 6px;text-align:left;overflow:hidden;font-size:12px;line-height:1.25;z-index:var(--z,1);min-width:0}
+.blk:hover{filter:var(--blk-hover);z-index:20}
+.blk:active{filter:var(--blk-active)}
+.blk:focus-visible{z-index:21;outline-offset:0}
+.blk-head{display:flex;align-items:flex-start;gap:5px;min-width:0}
+.blk-head svg{width:12px;height:12px;flex:none;opacity:.85;margin-top:1px}
+.blk-head b{font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-width:0;overflow-wrap:break-word}
+.blk-time{display:flex;flex-wrap:wrap;align-items:center;gap:2px 5px;font-family:var(--mono);font-size:10.5px;opacity:.85;font-variant-numeric:tabular-nums;white-space:nowrap;min-width:0}
+.blk-time .once{font-family:var(--sans);font-size:10.5px;font-weight:600;letter-spacing:.02em;border:1px solid currentColor;border-radius:3px;padding:0 3px;line-height:1.3;flex:none}
+.blk-goal{font-style:italic;font-family:var(--serif);font-size:11.5px;opacity:.9;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.blk.short .blk-head b,.blk.tiny .blk-head b{display:block;white-space:nowrap;text-overflow:ellipsis}
+.blk.short .blk-goal{display:none}
+.blk.short .blk-head svg{display:none}
+.blk.tiny{min-height:16px;padding:0 5px;gap:0;line-height:16px;overflow:hidden}
+.blk.tiny .blk-head{align-items:center}
+.blk.tiny .blk-head svg{display:none}
+.blk.tiny .blk-time,.blk.tiny .blk-goal{display:none}
+.blk.tiny .blk-head b{font-size:11px;line-height:16px}
+.board.is-phone .blk.tiny{padding-block:4px}
+/* Ίδια ώρα έναρξης: ίσες στήλες, κείμενο που τυλίγεται αντί να κόβεται */
+.blk.narrow{padding:3px 1px 3px 2px;font-size:11px;letter-spacing:-.01em}
+.blk.narrow .blk-head svg{display:none}
+.blk.narrow .blk-head b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;overflow-wrap:anywhere;hyphens:auto;text-overflow:clip}
+/* Στα short narrow η ώρα κρύβεται, άρα χωρούν δύο γραμμές τίτλου· μόνο τα tiny μένουν μονόγραμμα */
+.blk.tiny.narrow .blk-head b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.blk.narrow .blk-time{white-space:normal;line-height:1.2;font-size:10.5px}
+.blk.narrow.short .blk-time,.blk.narrow .blk-time .once,.blk.narrow .blk-goal{display:none}
+@media (min-width:900px){.blk.narrow .blk-time .end{display:none}}
+/* Κοντό μπλοκ με «μία φορά»: όταν η πλήρης ώρα και το σήμα δεν χωρούν στην ίδια γραμμή, μένει η ώρα έναρξης·
+   σε πολύ στενή στήλη το σήμα γίνεται απλό πλάγιο κείμενο (μετράται το εσωτερικό πλάτος του ίδιου του μπλοκ) */
+.blk{container-type:inline-size}
+@container (max-width:131px){.blk.short.has-once:not(.narrow) .blk-time .end{display:none}}
+@container (max-width:94px){.blk.short.has-once:not(.narrow) .blk-time .once{border:0;padding:0;font-style:italic;letter-spacing:0}}
+/* Κλιμακωτή διάταξη: μπλοκ που καλύπτεται από επόμενο λίγο πιο κάτω δείχνει τίτλο και ώρα έναρξης σε μία γραμμή */
+.blk.under{flex-direction:row;align-items:baseline;align-content:flex-start;flex-wrap:nowrap;gap:6px;padding-top:2px;padding-bottom:2px}
+.blk.under .blk-head{flex:0 1 auto;min-width:0}
+.blk.under .blk-head b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.blk.under .blk-head svg{display:none}
+.blk.under .blk-time{flex:none;font-size:10.5px}
+.blk.under .blk-time .end,.blk.under .blk-time .once,.blk.under .blk-goal{display:none}
+.week.is-day .blk.under .blk-time .end{display:inline}
+.is-school{--stripe:var(--a-school);--tint:var(--a-school-bg);--ink:var(--a-school-ink)}
+.is-korifi{--stripe:var(--a-korifi);--tint:var(--a-korifi-bg);--ink:var(--a-korifi-ink)}
+.is-study{--stripe:var(--a-study);--tint:var(--a-study-bg);--ink:var(--a-study-ink)}
+.is-review{--stripe:var(--a-review);--tint:var(--a-review-bg);--ink:var(--a-review-ink)}
+.is-test{--stripe:var(--a-test);--tint:var(--a-test-bg);--ink:var(--a-test-ink)}
+.is-free{--stripe:var(--a-free);--tint:var(--a-free-bg);--ink:var(--a-free-ink)}
+
+/* board footer: legend + note */
+.boardfoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px;padding:10px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;min-width:0}
+.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;min-width:0}
+.legend i{width:10px;height:10px;border-radius:2px;border-left:3px solid var(--stripe);background:var(--tint);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--stripe) 50%,transparent)}
+.boardfoot .fine{min-width:0}
+
+/* day strip (phone) */
+.daystrip{display:none;grid-template-columns:repeat(7,minmax(0,1fr));border-bottom:1px solid var(--line);background:var(--surface-2);position:sticky;top:env(safe-area-inset-top,0px);z-index:33}
+.daystrip button{border:0;background:transparent;padding:7px 0 6px;min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-bottom:2px solid transparent;color:var(--fg-2);min-width:0}
+.daystrip .dn{font-size:12.5px;font-weight:600;line-height:1.2}
+.daystrip .dh{font-family:var(--mono);font-size:10px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.2;white-space:nowrap;max-width:100%}
+.daystrip .dh .unitc{display:none}
+/* Η μονάδα σε Inter (στενότερη από τη mono), όπως στα «ώρ.» της σύνοψης */
+.daystrip .dh .unit,.daystrip .dh .unitc{font-family:var(--sans);letter-spacing:0}
+/* Δίψηφες ώρες με τέταρτα (π.χ. 13,25): μένει μόνο ο αριθμός, η μονάδα υπάρχει στο aria-label */
+.daystrip .dh.long .unit{display:none}
+.daystrip .dots{display:flex;gap:3px;height:5px}
+.daystrip .dots i{width:5px;height:5px;border-radius:50%;background:var(--c)}
+.daystrip button.today .dn::after{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);margin-left:3px;vertical-align:middle}
+.daystrip button:hover{color:var(--fg);background:var(--surface-3)}
+.daystrip button[aria-pressed="true"]{color:var(--fg);border-bottom-color:var(--accent);background:var(--seg-on)}
+.daystrip button:focus-visible{outline-offset:-2px;border-radius:0}
+.board.is-phone .daystrip{display:grid}
+.board.is-phone .corner,.board.is-phone .dayh{top:calc(var(--strip) + env(safe-area-inset-top,0px));border-radius:0}
+.week.is-day .dayh{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 12px}
+.week.is-day .dayh-hours{margin-top:0}
+.week.is-day .dayh .btn{margin-left:auto;flex:none}
+.week.is-day .dayh-hours{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.week.is-day .dayh-hours .tag{display:none}
+
+/* ---------- editorial columns ---------- */
+.cols{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:0;margin-top:40px;border-top:1px solid var(--line)}
+.cols > section{padding:26px 28px 8px;min-width:0;border-left:1px solid var(--hair)}
+.cols > section:first-child{padding-left:0;border-left:0}
+.cols > section:last-child{padding-right:0}
+h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;letter-spacing:-.01em;margin:0 0 16px}
+.note{font-size:13px;color:var(--muted);margin:0 0 12px}
+
+/* summary */
+.summary{display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:center}
+.ringwrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.ring{position:relative;width:150px;height:150px;flex:none}
+.ring svg{width:100%;height:100%}
+.ring .centre{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1}
+.ring .centre b{font-family:var(--serif);font-weight:500;font-size:36px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.ring .centre b.long{font-size:29px}
+.ring .centre small{font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:.08em;text-transform:uppercase}
+.ringcap{font-size:12px;color:var(--muted);text-align:center;margin:0}
+.figs{display:flex;flex-direction:column;gap:0;min-width:0}
+.fig{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--hair)}
+.fig:first-child{border-top:0;padding-top:0}
+.fig i{width:10px;height:10px;border-radius:2px;background:var(--c)}
+.fig i.goal{background:transparent;border:2px solid var(--accent);border-radius:50%}
+.fig span{font-size:13px;color:var(--fg-2);min-width:0;line-height:1.3;overflow-wrap:anywhere}
+.fig span em{display:block;font-style:normal;font-size:11.5px;color:var(--muted);margin-top:1px;font-variant-numeric:tabular-nums}
+.fig b{font-family:var(--serif);font-weight:500;font-size:22px;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap}
+.fig b small{font-family:var(--sans);font-size:11.5px;color:var(--muted);margin-left:2px;letter-spacing:0}
+.goalbar{display:flex;gap:3px;height:5px;margin-top:14px}
+.goalbar i{flex:1;background:var(--surface-3);box-shadow:inset 0 0 0 1px var(--faint);border-radius:99px}
+.goalbar i.on{background:var(--accent);box-shadow:none}
+.hint{display:flex;gap:10px;align-items:flex-start;margin:16px 0 0;font-size:13.5px;color:var(--fg-2)}
+.hint span{min-width:0}
+.hint svg{flex:none;width:16px;height:16px;color:var(--accent);margin-top:2px}
+
+/* goals */
+.goals{list-style:none;margin:0;padding:0}
+.goals li{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--hair);font-size:14.5px}
+.goals li label{flex:1;min-width:0;cursor:pointer;line-height:1.4;padding:4px 0;overflow-wrap:anywhere}
+.goals li.done label{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
+.goals input[type="checkbox"]{appearance:none;-webkit-appearance:none;width:20px;height:20px;border:1.5px solid var(--faint);border-radius:50%;margin:0;flex:none;display:grid;place-items:center;background:var(--surface);cursor:pointer}
+.goals input[type="checkbox"]::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--accent);transform:scale(0)}
+.goals input[type="checkbox"]:hover{border-color:var(--accent)}
+.goals input[type="checkbox"]:checked{border-color:var(--accent)}
+.goals input[type="checkbox"]:checked::after{transform:scale(1)}
+.goals .x{border:0;background:none;color:var(--muted);width:40px;height:40px;margin-right:0;padding:0;display:grid;place-items:center;border-radius:7px;flex:none}
+.goals .x svg{width:14px;height:14px}
+.goals .x:hover{color:var(--danger);background:var(--danger-soft)}
+.goals .x:active{transform:scale(.95)}
+.empty{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:15px;margin:0;padding:6px 0 10px;line-height:1.5}
+.addrow{display:flex;gap:8px;margin-top:14px;min-width:0;align-items:flex-end}
+.addrow input{flex:1;min-width:0}
+.input{border:0;border-bottom:1px solid var(--faint);background:transparent;color:var(--fg);padding:8px 2px;min-height:38px;font-size:14px;width:100%;min-width:0;border-radius:0;text-overflow:ellipsis}
+.input::placeholder{color:var(--muted)}
+.input:hover{border-bottom-color:var(--muted)}
+.input:focus-visible{outline:0;border-bottom-color:var(--accent);box-shadow:0 2px 0 var(--accent)}
+
+/* share */
+.msg{font-family:var(--sans);font-size:13.5px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--surface-2);border-left:3px solid var(--accent);border-radius:3px 10px 10px 3px;padding:12px 14px;margin:0 0 12px;color:var(--fg-2)}
+.share-foot{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.share-foot .note{margin:0;flex:1 1 200px;min-width:0}
+
+/* tips */
+.tips{margin-top:40px;border-top:1px solid var(--line);padding-top:26px}
+.tips h2{margin-bottom:18px}
+.tiplist{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.tiplist li{padding:0 24px 6px 0;margin-right:24px;border-right:1px solid var(--hair);font-size:13.5px;color:var(--fg-2);min-width:0}
+.tiplist li:last-child{border-right:0;margin-right:0;padding-right:0}
+.tiplist b{display:block;font-family:var(--serif);font-weight:500;font-size:17px;color:var(--fg);margin-bottom:6px;line-height:1.25}
+
+/* footnote */
+.foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--hair);font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 18px}
+.foot p{margin:0;min-width:0}
+.foot a{color:var(--accent);font-weight:500;text-underline-offset:3px}
+
+/* ---------- modal ---------- */
+.scrim{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;overflow:auto}
+.modal{background:var(--surface);color:var(--fg);border-radius:14px;width:100%;max-width:460px;max-height:calc(100vh - 32px);overflow:auto;padding:22px 22px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow);margin:auto;min-width:0}
+.modal .grab{display:none}
+.mhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-width:0}
+.modal h3{font-family:var(--serif);font-weight:500;font-size:24px;margin:0;line-height:1.2;min-width:0}
+.mwhen{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field > span,.field > label{font-size:12.5px;font-weight:500;color:var(--muted);letter-spacing:.02em}
+.field .input,.field .select{width:100%}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field + .row2{grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr)}
+.types{display:flex;flex-wrap:wrap;gap:6px}
+.types input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.types label{display:inline-flex;align-items:center;gap:6px;padding:0 11px 0 9px;min-height:32px;border-radius:999px;font-size:13px;font-weight:500;border:1px solid var(--faint);color:var(--fg-2);cursor:pointer;background:var(--surface);line-height:1.2}
+.types label svg{width:13px;height:13px;color:var(--stripe)}
+.types label:hover{border-color:var(--stripe);color:var(--fg)}
+.types label:active{transform:scale(.98)}
+.types input:checked + label{background:var(--tint);color:var(--ink);border-color:var(--stripe)}
+.err{margin:0;font-size:13px;color:var(--danger);display:flex;gap:8px;align-items:flex-start}
+.err svg{width:15px;height:15px;flex:none;margin-top:2px}
+.input[aria-invalid="true"],.select[aria-invalid="true"]{border-color:var(--danger)}
+.mfoot{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:4px}
+.mfoot .right{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.modal .select{background-color:var(--surface)}
+
+/* toast */
+.toast{position:fixed;inset-inline:16px;bottom:calc(22px + env(safe-area-inset-bottom,0px));width:fit-content;max-width:100%;margin-inline:auto;transform:none;display:flex;align-items:center;gap:9px;background:var(--toast-bg);color:var(--toast-fg);padding:10px 16px 10px 13px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:60;box-shadow:var(--shadow);line-height:1.3}
+.toast svg{width:16px;height:16px;flex:none;color:var(--toast-ok)}
+.toast span{min-width:0}
+
+/* ---------- motion (light, gated) ---------- */
+@media (prefers-reduced-motion:no-preference){
+  .seg label,.types label,.btn,.daystrip button{transition:background-color .15s,color .15s,border-color .15s,transform .08s}
+  .blk{transition:filter .15s}
+  .slot{transition:background-color .12s}
+  .goals input[type="checkbox"]::after{transition:transform .12s}
+  .goalbar i{transition:background-color .25s}
+  .toast{animation:rise .2s ease-out}
+  .modal{animation:pop .18s ease-out}
+  @keyframes rise{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+  @keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- responsive ---------- */
+@media (max-width:1060px){
+  .dayh-hours .tag{display:none}
+  .blk{font-size:11.5px;padding:3px 5px 3px 5px}
+  .blk-goal{font-size:11px}
+  .cols{grid-template-columns:1fr 1fr}
+  .cols > section:first-child{grid-column:1 / -1;border-bottom:1px solid var(--line);padding-bottom:26px}
+  .cols > section:nth-child(2){padding-left:0;border-left:0}
+  .tiplist{grid-template-columns:1fr 1fr;gap:18px 0}
+  .tiplist li:nth-child(2){border-right:0;margin-right:0;padding-right:0}
+}
+@media (max-width:899px){
+  :root{--row:60px;--strip:61px}
+  .page{padding-block:20px 48px}
+  .mast{grid-template-columns:minmax(0,1fr);gap:14px}
+  .mast-side{align-items:stretch;gap:10px}
+  .actions{justify-content:flex-start}
+  .actions .btn{flex:1 1 0}
+  #btnClear{min-width:0}
+  .btn.small{min-height:40px}
+  .types label{min-height:38px}
+  .seg label{min-height:38px}
+  .lede{font-size:15px}
+  .ornament{margin:16px 0 18px}
+  .toolbar{flex-direction:column;align-items:stretch;gap:8px}
+  .picker{flex-wrap:wrap;gap:8px}
+  .picker label{flex:1 1 100%;font-size:12.5px;color:var(--muted)}
+  .picker .select{flex:1 1 0;min-width:0}
+  .picker .btn{flex:none}
+  .tool-hint{display:none}
+  .blk{font-size:13px;padding:4px 8px 4px 7px}
+  .blk-head svg{width:13px;height:13px}
+  .blk-time{font-size:11px}
+  .blk-goal{font-size:12px}
+  .blk.narrow{font-size:12px;padding:4px 6px 4px 6px;letter-spacing:0}
+  .blk.narrow .blk-time{font-size:11px}
+  .cols{grid-template-columns:minmax(0,1fr);margin-top:32px}
+  .cols > section,.cols > section:nth-child(2),.cols > section:first-child{padding:24px 0 10px;border-left:0;border-bottom:1px solid var(--hair);grid-column:auto}
+  .cols > section:last-child{border-bottom:0}
+  .summary{gap:18px}
+  .ring{width:132px;height:132px}
+  .ring .centre b{font-size:30px}
+  .ring .centre b.long{font-size:25px}
+  .tiplist{grid-template-columns:minmax(0,1fr);gap:16px}
+  .tiplist li,.tiplist li:nth-child(2){border-right:0;margin-right:0;padding-right:0;padding-bottom:0}
+  .tiplist li + li{border-top:1px solid var(--hair);padding-top:16px}
+}
+@media (max-width:599px){
+  .actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .actions .btn{padding:8px 6px;gap:6px;min-width:0}
+  .theme > span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .seg{display:flex;width:100%}
+  .seg label{flex:1;min-height:38px;padding:0 6px}
+  .scrim{align-items:flex-end;padding:0}
+  .modal{max-width:none;max-height:calc(100vh - 20px);border-radius:18px 18px 0 0;padding:10px 16px calc(18px + env(safe-area-inset-bottom,0px));margin:auto 0 0}
+  .modal .grab{display:block;width:36px;height:4px;border-radius:99px;background:var(--line);margin:0 auto 6px}
+  .mwhen{display:none}
+  .goals li{padding:5px 0}
+  h2{font-size:21px}
+  .boardfoot{padding:10px 12px}
+  @media (prefers-reduced-motion:no-preference){.modal{animation:sheet .22s ease-out}@keyframes sheet{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}}
+}
+@media (max-width:559px){
+  .lbl-long{display:none}
+  .lbl-short{display:inline}
+}
+@media (max-width:374px){
+  #btnPrint svg{display:none}
+}
+@media (max-width:420px){
+  .week.is-day .dayh .btn .t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .week.is-day .dayh .btn{width:40px;padding:0;gap:0}
+}
+@media (max-width:360px){
+  .picker .select{flex:1 1 auto}
+  .picker .btn{flex:1}
+  .seg label svg{display:none}
+}
+@media (max-width:340px){
+  .daystrip .dh .unit{display:none}
+  .daystrip .dh .unitc{display:inline}
+}
+
+/* ---------- print: μία σελίδα A4 οριζόντια με το πρόγραμμα, στόχοι και σύνοψη στη δεύτερη ---------- */
+@page{size:A4 landscape;margin:10mm}
+@media print{
+  :root{--row:34px}
+  html{padding:0}
+  body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:12px}
+  .page{max-width:none;padding:0}
+  .back,.mast-side,.lede,.ornament,.daystrip,.share-col,.tips,.foot,.toast,.scrim,.hint,.goalbar,.addrow,.goals .x,.empty{display:none!important}
+  .mast{display:block;margin-bottom:8px}
+  .eyebrow{margin-bottom:2px}
+  h1{font-size:26px}
+  .weekline{margin-top:2px;font-size:13px}
+  .board{border-color:#c9c9dc;clip-path:none;break-inside:avoid}
+  .corner,.dayh{position:static}
+  .dayh{padding:6px 8px}
+  .slot:hover,.slot::after{background-color:transparent!important;content:none!important}
+  .blk{filter:none!important}
+  .blk-goal{display:none}
+  .cols{break-before:page;margin-top:0;grid-template-columns:1.2fr 1fr!important}
+  .cols > section,.cols > section:first-child,.cols > section:nth-child(2){padding:0 24px 0 0!important;border:0!important;grid-column:auto!important}
+}
+</style>
+</head>
+<body>
+
+<main class="page" id="page" lang="el">
+  <header class="mast">
+    <div class="mast-text">
+      <a class="back" href="/ergaleia"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 4 3 8l4 4"/></svg>Όλα τα εργαλεία</a>
+      <p class="eyebrow"><a href="/">Φροντιστήριο Κορυφή</a> · <a href="/ergaleia">Εργαλεία</a></p>
+      <h1>Το πρόγραμμά μου</h1>
+      <p class="weekline" id="weekline"></p>
+      <p class="lede">Στήσε την εβδομάδα σου σε πέντε λεπτά. Σχολείο, Κορυφή, διάβασμα και ελεύθερος χρόνος, όλα σε μία σελίδα. Πάτα σε ένα κενό κελί για να προσθέσεις κάτι ή σε ένα μπλοκ για να το αλλάξεις. Ξεκινάς με ένα παράδειγμα· άλλαξέ το ή πάτα «Άδειασε» για να φτιάξεις το δικό σου.</p>
+    </div>
+    <div class="mast-side">
+      <div class="theme" role="group" aria-labelledby="themeLabel">
+        <span id="themeLabel">Εμφάνιση</span>
+        <div class="seg">
+          <input type="radio" name="theme" id="theme-light" value="light">
+          <label for="theme-light"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>Ανοιχτό</label>
+          <input type="radio" name="theme" id="theme-dark" value="dark">
+          <label for="theme-dark"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 10.2A6 6 0 0 1 5.8 2.5a6 6 0 1 0 7.7 7.7z"/></svg>Σκούρο</label>
+          <input type="radio" name="theme" id="theme-auto" value="auto">
+          <label for="theme-auto"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 2v12A6 6 0 0 0 8 2z" fill="currentColor" stroke="none"/></svg>Αυτόματο</label>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" type="button" id="btnPrint"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 6V2.5h7V6"/><rect x="2" y="6" width="12" height="5.5" rx="1.2"/><path d="M4.5 9.5h7v4h-7z"/></svg>Εκτύπωση</button>
+        <button class="btn" type="button" id="btnExample"><span class="lbl-long">Φόρτωσε παράδειγμα</span><span class="lbl-short">Παράδειγμα</span></button>
+        <button class="btn" type="button" id="btnClear">Άδειασε</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="ornament" aria-hidden="true">
+    <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M1.5 16.5 9.5 3l4 6.5 3-3.5 8 10.5z"/><path d="M9.5 3v3.5"/></svg>
+  </div>
+
+  <section aria-labelledby="boardTitle">
+    <h2 class="sr" id="boardTitle">Εβδομαδιαίο πρόγραμμα</h2>
+    <div class="board" id="board">
+      <div class="daystrip" id="daystrip" role="group" aria-label="Διάλεξε ημέρα"></div>
+      <div class="week" id="week"></div>
+      <div class="boardfoot">
+        <div class="legend" id="legend" aria-label="Υπόμνημα χρωμάτων"></div>
+        <span class="fine">Οι ώρες κάθε μέρας δεν περιλαμβάνουν το σχολείο.</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="cols">
+    <section aria-labelledby="h-summary">
+      <h2 id="h-summary">Η εβδομάδα με μια ματιά</h2>
+      <div class="summary">
+        <div class="ringwrap">
+          <div class="ring" id="ring"></div>
+          <p class="ringcap">εκτός σχολείου</p>
+        </div>
+        <div class="figs" id="figs"></div>
+      </div>
+      <div class="goalbar" id="goalbar" aria-hidden="true"></div>
+      <p class="hint" id="hint"></p>
+    </section>
+
+    <section aria-labelledby="h-goals">
+      <h2 id="h-goals">Στόχοι της εβδομάδας</h2>
+      <ul class="goals" id="goals"></ul>
+      <p class="empty" id="goalsEmpty" hidden>Δεν έχεις γράψει στόχους ακόμα. Γράψε δύο ή τρεις, μικρούς και συγκεκριμένους.</p>
+      <form class="addrow" id="goalForm">
+        <label class="sr" for="goalInput">Νέος στόχος</label>
+        <input class="input" type="text" id="goalInput" placeholder="π.χ. Ασκήσεις 1–6, Άλγεβρα" autocomplete="off" maxlength="120">
+        <button class="btn" type="submit" id="btnAddGoal">Πρόσθεσε</button>
+      </form>
+    </section>
+
+    <section class="share-col" aria-labelledby="h-share">
+      <h2 id="h-share">Στείλε το στους γονείς σου</h2>
+      <p class="note">Ένα μήνυμα με το πρόγραμμα και τους στόχους σου, έτοιμο να φύγει.</p>
+      <pre class="msg" id="shareText" tabindex="0" aria-label="Μήνυμα για τους γονείς"></pre>
+      <div class="share-foot">
+        <a class="btn primary" id="btnWa" href="https://wa.me/" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 13.4l.8-2.6A5.6 5.6 0 1 1 5.6 13z"/><path d="M6 5.6c0 2.4 2 4.4 4.4 4.4l.8-1-1.3-.8-.6.6a3 3 0 0 1-1.9-1.9l.6-.6-.8-1.3z"/></svg>Στείλε στο WhatsApp</a>
+        <button class="btn" type="button" id="btnCopy"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/></svg>Αντίγραψε το μήνυμα</button>
+        <p class="note">Ανοίγει το WhatsApp με το μήνυμα έτοιμο. Διαλέγεις σε ποιον θα το στείλεις.</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="tips" aria-labelledby="h-tips">
+    <h2 id="h-tips">Πώς διαβάζω πιο αποδοτικά</h2>
+    <ul class="tiplist">
+      <li><b>Λίγο και συχνά.</b>Δύο μισάωρα επανάληψης μέσα στην εβδομάδα στερεώνουν την ύλη καλύτερα από ένα τρίωρο την τελευταία στιγμή.</li>
+      <li><b>Γράψε απ’ έξω.</b>Κλείσε το βιβλίο και γράψε ό,τι θυμάσαι. Τα κενά δείχνουν ακριβώς τι θέλει δουλειά.</li>
+      <li><b>Ξεκίνα από το δύσκολο.</b>Βάλε πρώτο το μάθημα που αποφεύγεις, όσο έχεις ακόμη καθαρό μυαλό.</li>
+      <li><b>Βάλε όρια στον χρόνο.</b>Κάθε μπλοκ έχει αρχή και τέλος. Μετά, διάλειμμα. Το κινητό μένει σε άλλο δωμάτιο όσο διαβάζεις.</li>
+    </ul>
+  </section>
+
+  <footer class="foot">
+    <p>Όλα μένουν στη συσκευή σου. Δεν χρειάζεται λογαριασμός και δεν στέλνεται τίποτα πουθενά.</p>
+    <p>Θέλεις βοήθεια να οργανώσεις τη χρονιά σου; <a href="/epikoinonia">Μίλα μαζί μας</a></p>
+  </footer>
+</main>
+
+<div class="scrim" id="scrim" lang="el" hidden>
+  <form class="modal" id="form" role="dialog" aria-modal="true" aria-labelledby="mTitle" novalidate>
+    <div class="grab" aria-hidden="true"></div>
+    <div class="mhead"><h3 id="mTitle">Νέα δραστηριότητα</h3><span class="mwhen" id="mWhen" aria-hidden="true"></span></div>
+    <div class="field"><span id="typesLabel">Τύπος</span><div class="types" id="types" role="radiogroup" aria-labelledby="typesLabel"></div></div>
+    <div class="field"><label for="fSubject">Μάθημα ή περιγραφή</label><input class="input" type="text" id="fSubject" placeholder="π.χ. Μαθηματικά" autocomplete="off" maxlength="60"></div>
+    <div class="row2">
+      <div class="field"><label for="fDay">Ημέρα</label><select class="select" id="fDay"></select></div>
+      <div class="field"><label for="fRepeat">Συχνότητα</label><select class="select" id="fRepeat"><option value="1">Κάθε εβδομάδα</option><option value="0">Μόνο αυτή την εβδομάδα</option></select></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="fStart">Από</label><select class="select" id="fStart"></select></div>
+      <div class="field"><label for="fEnd">Έως</label><select class="select" id="fEnd"></select></div>
+    </div>
+    <div class="field"><label for="fGoal">Συγκεκριμένος στόχος (προαιρετικό)</label><input class="input" type="text" id="fGoal" placeholder="π.χ. λύνω τις ασκήσεις 1–4" autocomplete="off" maxlength="100"></div>
+    <p class="err" id="fErr" role="alert" hidden><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.3"/><path d="M8 5v3.6M8 11h.01"/></svg><span id="fErrText"></span></p>
+    <div class="mfoot">
+      <button type="button" class="btn ghost danger" id="btnDelete">Διαγραφή</button>
+      <div class="right">
+        <button type="button" class="btn" id="btnCancel">Άκυρο</button>
+        <button type="submit" class="btn primary" id="btnSave">Αποθήκευση</button>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" lang="el" hidden></div>
+
+<script>
+(function(){
+"use strict";
+var DAYS=["Δευτέρα","Τρίτη","Τετάρτη","Πέμπτη","Παρασκευή","Σάββατο","Κυριακή"];
+var SHORT=["Δευ","Τρί","Τετ","Πέμ","Παρ","Σάβ","Κυρ"];
+var MONTHS=["Ιανουαρίου","Φεβρουαρίου","Μαρτίου","Απριλίου","Μαΐου","Ιουνίου","Ιουλίου","Αυγούστου","Σεπτεμβρίου","Οκτωβρίου","Νοεμβρίου","Δεκεμβρίου"];
+var START_H=8, END_H=22;
+var TODAY=(new Date().getDay()+6)%7;
+var TIME_RE=/^([01]\d|2[0-3]):[0-5]\d$/;
+var ICONS={
+  book:'<path d="M2.5 3.5h4a1.6 1.6 0 0 1 1.5.9 1.6 1.6 0 0 1 1.5-.9h4v8.8h-4a1.6 1.6 0 0 0-1.5.8 1.6 1.6 0 0 0-1.5-.8h-4z"/><path d="M8 4.4v8.4"/>',
+  peak:'<path d="M1.5 13.5 6.5 4l2.2 3.8L10 5.8l4.5 7.7z"/><path d="M6.5 4v2.3"/>',
+  pencil:'<path d="m3 13 .7-3.1 7.6-7.6a1.4 1.4 0 0 1 2 0l.4.4a1.4 1.4 0 0 1 0 2L6.1 12.3z"/><path d="m9.9 3.7 2.4 2.4"/>',
+  loop:'<path d="M12.8 7A5 5 0 0 0 4 5.3M3.2 9A5 5 0 0 0 12 10.7"/><path d="M4 2.6v2.7h2.7M12 13.4v-2.7H9.3"/>',
+  flag:'<path d="M3.5 14V2.5"/><path d="M3.5 3h8.6l-2 3 2 3H3.5"/>',
+  clock:'<circle cx="8" cy="8" r="5.6"/><path d="M8 4.8v3.4l2.1 1.4"/>',
+  check:'<path d="M3 8.5l3.2 3.2L13 5"/>',
+  plus:'<path d="M8 3.5v9M3.5 8h9"/>',
+  x:'<path d="M4 4l8 8M12 4l-8 8"/>',
+  trash:'<path d="M3 4.5h10M6.5 4.5v-1h3v1M4.5 4.5l.6 8h5.8l.6-8"/>'
+};
+var TYPES={
+  school:{label:"Σχολείο",icon:"book"},
+  korifi:{label:"Κορυφή",icon:"peak"},
+  study:{label:"Διάβασμα",icon:"pencil"},
+  review:{label:"Επανάληψη",icon:"loop"},
+  test:{label:"Διαγώνισμα",icon:"flag"},
+  free:{label:"Ελεύθερος χρόνος",icon:"clock"}
+};
+function icon(name){return '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICONS[name]+'</svg>';}
+function toMin(t){var p=String(t||"0:0").split(":");return (+p[0])*60+(+p[1]||0);}
+function pad(n){return (n<10?"0":"")+n;}
+function fmt(m){return pad(Math.floor(m/60))+":"+pad(m%60);}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function hstr(x){var v=Math.round(x*100)/100;return String(v).replace(".",",");}
+function hoursWord(x){return x===1?"ώρα":"ώρες";}
+function dayHoursText(hrs){return hrs<1?"<b>"+Math.round(hrs*60)+"</b> λεπτά":"<b>"+hstr(hrs)+"</b> "+hoursWord(hrs);}
+/* Στο στενό κινητό (έως 340px) μένει μόνο ο αριθμός, με ′ για τα λεπτά */
+function stripHoursText(hrs){return hrs<1?Math.round(hrs*60)+'<span class="unit"> λεπ.</span><span class="unitc">′</span>':hstr(hrs)+'<span class="unit"> ώρ.</span>';}
+function hoursPlain(hrs){return hrs<1?Math.round(hrs*60)+" λεπτά":hstr(hrs)+" "+hoursWord(hrs);}
+function plural(n,one,many){return n+" "+(n===1?one:many);}
+var uid=1; function newId(){return "a"+Date.now().toString(36)+(uid++);}
+
+function example(){
+  var a=[];
+  for(var d=0;d<5;d++) a.push({id:newId(),type:"school",subject:"Σχολείο",day:d,start:"08:15",end:"14:00",repeat:1,goal:""});
+  /* Παράδειγμα μαθητή Βʹ Λυκείου, όχι οι πραγματικές ώρες κάποιου τμήματος */
+  a.push({id:newId(),type:"korifi",subject:"Μαθηματικά",day:0,start:"18:00",end:"20:00",repeat:1,goal:""});
+  a.push({id:newId(),type:"korifi",subject:"Φυσική",day:1,start:"17:00",end:"19:00",repeat:1,goal:""});
+  a.push({id:newId(),type:"korifi",subject:"Χημεία",day:3,start:"17:00",end:"18:30",repeat:1,goal:""});
+  a.push({id:newId(),type:"test",subject:"Διαγώνισμα Φυσικής",day:5,start:"10:00",end:"12:00",repeat:1,goal:""});
+  a.push({id:newId(),type:"study",subject:"Μαθηματικά",day:0,start:"15:30",end:"16:30",repeat:1,goal:"Ασκήσεις 1–4, σελ. 52"});
+  a.push({id:newId(),type:"free",subject:"Μπάσκετ",day:1,start:"15:00",end:"16:30",repeat:1,goal:""});
+  a.push({id:newId(),type:"study",subject:"Φυσική",day:2,start:"16:00",end:"17:30",repeat:1,goal:"Θεωρία κεφ. 2 και 3 ασκήσεις"});
+  a.push({id:newId(),type:"review",subject:"Μαθηματικά",day:3,start:"19:00",end:"20:00",repeat:0,goal:"Ξαναλύνω τις ασκήσεις της Δευτέρας"});
+  a.push({id:newId(),type:"review",subject:"Χημεία",day:4,start:"16:00",end:"16:45",repeat:1,goal:"Γράφω απ’ έξω τους τύπους"});
+  a.push({id:newId(),type:"free",subject:"Βόλτα με φίλους",day:6,start:"11:00",end:"13:00",repeat:1,goal:""});
+  a.push({id:newId(),type:"study",subject:"Γλώσσα",day:6,start:"17:00",end:"18:00",repeat:1,goal:"Περίληψη κειμένου"});
+  return {acts:a,goals:[{t:"Τελειώνω τις ασκήσεις Άλγεβρας",d:true},{t:"Επανάληψη Φυσικής πριν το Σάββατο",d:false},{t:"Μία ώρα Γλώσσα την Κυριακή",d:false}]};
+}
+
+/* ---------- state (one key, every read and write guarded) ---------- */
+var KEY="korifi-programma-meletis";
+var state=null, theme="auto";
+function cleanAct(a){
+  if(!a||typeof a!=="object"||!TYPES[a.type]||typeof a.subject!=="string") return null;
+  if(!Number.isInteger(a.day)||a.day<0||a.day>6) return null;
+  if(typeof a.start!=="string"||typeof a.end!=="string"||!TIME_RE.test(a.start)||!TIME_RE.test(a.end)) return null;
+  if(toMin(a.end)<=toMin(a.start)) return null;
+  if(toMin(a.start)<START_H*60||toMin(a.end)>END_H*60) return null;
+  return {id:(typeof a.id==="string"&&a.id)?a.id:newId(),type:a.type,subject:a.subject.slice(0,60),day:a.day,start:a.start,end:a.end,
+    repeat:(a.repeat===0||a.repeat===false)?0:1,goal:typeof a.goal==="string"?a.goal.slice(0,100):""};
+}
+function load(){
+  var raw=null, obj=null;
+  try{ raw=localStorage.getItem(KEY); }catch(e){}
+  if(raw){ try{ obj=JSON.parse(raw); }catch(e){ obj=null; } }
+  if(obj && typeof obj==="object"){
+    if(obj.theme==="light"||obj.theme==="dark"||obj.theme==="auto") theme=obj.theme;
+    if(Array.isArray(obj.acts) && Array.isArray(obj.goals)){
+      var acts=obj.acts.map(cleanAct).filter(Boolean);
+      var goals=obj.goals.filter(function(g){return g&&typeof g.t==="string"&&g.t.trim();}).map(function(g){return {t:g.t.slice(0,120),d:!!g.d};});
+      /* Αν όλα όσα ήταν αποθηκευμένα είναι άκυρα, ξαναφορτώνεται το παράδειγμα */
+      if(!(obj.acts.length>0 && acts.length===0)){
+        state={acts:acts,goals:goals};
+        return;
+      }
+    }
+  }
+  state=example();
+}
+function save(){
+  try{ localStorage.setItem(KEY,JSON.stringify({acts:state.acts,goals:state.goals,theme:theme})); }catch(e){}
+}
+
+/* ---------- theme ---------- */
+function applyTheme(t,fromUser){
+  var r=document.documentElement, shown=t;
+  if(t==="light"||t==="dark") r.setAttribute("data-theme",t);
+  else if(fromUser) r.removeAttribute("data-theme");
+  else { /* Ο host μπορεί να έχει ήδη επιβάλει θέμα: ο διακόπτης δείχνει την πραγματική κατάσταση */
+    var attr=r.getAttribute("data-theme"); if(attr==="light"||attr==="dark") shown=attr; }
+  var inp=document.getElementById("theme-"+(shown==="light"||shown==="dark"?shown:"auto"));
+  if(inp) inp.checked=true;
+}
+Array.prototype.forEach.call(document.querySelectorAll('input[name="theme"]'),function(inp){
+  /* click αντί για change: το «Αυτόματο» δουλεύει και όταν είναι ήδη επιλεγμένο */
+  inp.addEventListener("click",function(){ theme=inp.value; applyTheme(theme,true); save(); });
+});
+
+/* ---------- helpers ---------- */
+function $(s){return document.querySelector(s);}
+var week=$("#week"), board=$("#board"), daystrip=$("#daystrip");
+var phoneMQ=window.matchMedia("(max-width: 899px)");
+var selDay=TODAY;
+
+function weekLine(){
+  var now=new Date(); var mon=new Date(now); mon.setDate(now.getDate()-TODAY); var sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  var s;
+  if(mon.getMonth()===sun.getMonth()) s="Εβδομάδα "+mon.getDate()+"–"+sun.getDate()+" "+MONTHS[mon.getMonth()];
+  else s="Εβδομάδα "+mon.getDate()+" "+MONTHS[mon.getMonth()]+" – "+sun.getDate()+" "+MONTHS[sun.getMonth()];
+  $("#weekline").textContent=s+" · σήμερα "+DAYS[TODAY];
+}
+function dayActs(d){return state.acts.filter(function(a){return a.day===d&&a.type!=="school";});}
+function dayHours(d){
+  return dayActs(d).reduce(function(s,a){return s+Math.max(0,toMin(a.end)-toMin(a.start));},0)/60;
+}
+function clampMin(m){return Math.min(Math.max(m,START_H*60),END_H*60);}
+/* Τοποθέτηση μπλοκ που επικαλύπτονται: ομάδες, στήλες, πλάτος */
+function layoutDay(acts,minGap){
+  minGap=minGap||0;
+  var items=acts.map(function(a){return {a:a,s:clampMin(toMin(a.start)),e:clampMin(toMin(a.end))};}).filter(function(i){return i.e>i.s;})
+    .sort(function(x,y){return x.s-y.s||y.e-x.e;});
+  var out=[], cluster=[], clusterEnd=-1;
+  function flush(){
+    if(!cluster.length) return;
+    var ends=[];
+    cluster.forEach(function(it){
+      var c=-1; for(var k=0;k<ends.length;k++){ if(ends[k]<=it.s){c=k;break;} }
+      if(c<0){c=ends.length;ends.push(0);} ends[c]=it.e; it.col=c;
+    });
+    /* Διαφορετικές ώρες έναρξης: κλιμακωτή διάταξη (κάθε επόμενο μπλοκ λίγο δεξιά και από πάνω),
+       ίδια ώρα έναρξης: ίσες στήλες */
+    /* «Ίδια» έναρξη: και όταν η διαφορά είναι μικρότερη από μία γραμμή κειμένου */
+    var same=false;
+    cluster.forEach(function(it,i){ if(i>0 && it.s-cluster[i-1].s<=minGap) same=true; });
+    cluster.forEach(function(it,i){
+      it.cols=ends.length; it.stack=!same && ends.length>1;
+      if(it.stack){
+        var lvl=0; for(var j=0;j<i;j++){ if(cluster[j].e>it.s) lvl++; } it.level=lvl; it.z=i+1;
+        /* Πόσα λεπτά μένουν ορατά από πάνω μέχρι να το καλύψει το επόμενο μπλοκ */
+        var nxt=-1; for(var k2=i+1;k2<cluster.length;k2++){ if(cluster[k2].s<it.e){ nxt=cluster[k2].s; break; } }
+        it.visibleMin=nxt<0?(it.e-it.s):(nxt-it.s);
+      }
+      out.push(it);
+    });
+    cluster=[];
+  }
+  items.forEach(function(it){ if(cluster.length && it.s>=clusterEnd){flush();clusterEnd=-1;} cluster.push(it); clusterEnd=Math.max(clusterEnd,it.e); });
+  flush(); return out;
+}
+function renderLegend(){
+  $("#legend").innerHTML=Object.keys(TYPES).map(function(k){return '<span><i class="is-'+k+'"></i>'+TYPES[k].label+'</span>';}).join("");
+}
+/* Στην εκτύπωση το --row γίνεται 34px (βλ. @media print). Το beforeprint τρέχει πριν εφαρμοστεί το print CSS,
+   οπότε εκεί παίρνουμε την τιμή της εκτύπωσης κατευθείαν. */
+var PRINT_ROW=34;
+function rowPx(){ if(printing) return PRINT_ROW; var v=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--row")); return v>0?v:48; }
+/* Οι θέσεις γράφονται σε μονάδες του --row, ώστε τα μπλοκ να ακολουθούν το πλέγμα σε κάθε μέσο (οθόνη, εκτύπωση) */
+function rowUnits(px,ROW){ return "calc(var(--row) * "+(Math.round(px/ROW*10000)/10000)+")"; }
+function renderWeek(){
+  var phone=phoneMQ.matches&&!printing, ROW=rowPx();
+  board.classList.toggle("is-phone",phone);
+  var days=phone?[selDay]:[0,1,2,3,4,5,6];
+  week.className="week "+(phone?"is-day":"is-full");
+  week.style.setProperty("--cols",days.length);
+  var h='<div class="corner" aria-hidden="true"></div>';
+  days.forEach(function(d){
+    var hrs=dayHours(d), today=d===TODAY;
+    h+='<div class="dayh'+(today?" today":"")+'"><div class="dayh-name">'+(today?'<span class="dot" aria-hidden="true"></span>':"")+DAYS[d]+'</div>'+
+       '<div class="dayh-hours">'+(hrs>0?dayHoursText(hrs):'κενή μέρα')+(today?'<span class="tag">σήμερα</span>':"")+'</div>'+
+       (phone?'<button type="button" class="btn primary small" id="btnAddDay" data-day="'+d+'" aria-label="Νέα δραστηριότητα, '+DAYS[d]+'">'+icon("plus")+'<span class="t">Προσθήκη</span></button>':"")+'</div>';
+  });
+  h+='<div class="times" aria-hidden="true">';
+  for(var t=START_H;t<END_H;t++) h+='<div class="time">'+pad(t)+':00</div>';
+  h+='</div>';
+  days.forEach(function(d){
+    var lay=layoutDay(state.acts.filter(function(a){return a.day===d;}),Math.ceil(18/ROW*60));
+    h+='<div class="col'+(d===TODAY?" today":"")+'" data-day="'+d+'">';
+    for(var t2=START_H;t2<END_H;t2++){
+      /* Κελιά που καλύπτονται ολόκληρα από μπλοκ βγαίνουν από τη σειρά του Tab */
+      var covered=lay.some(function(it){return it.s<=t2*60&&it.e>=(t2+1)*60;});
+      h+='<button type="button" class="slot" data-day="'+d+'" data-h="'+t2+'"'+(covered?' tabindex="-1" aria-hidden="true"':'')+' aria-label="Προσθήκη, '+DAYS[d]+' '+pad(t2)+':00"></button>';
+    }
+    lay.forEach(function(it){
+      var a=it.a, top=(it.s-START_H*60)/60*ROW+1, ht=Math.max((it.e-it.s)/60*ROW-2,16), look=ht;
+      /* Στο κινητό ένα μπλοκ 15 λεπτών κρατά την όψη των 16px αλλά πιάνει 24px για το δάχτυλο */
+      if(phone&&ht<24){ top-=Math.round((24-ht)/2); ht=24; }
+      /* Ένα πολύ μικρό μπλοκ στην αρχή ή στο τέλος της μέρας μένει μέσα στο πλέγμα */
+      var maxBottom=(END_H-START_H)*ROW-1; if(top+ht>maxBottom) top=maxBottom-ht; if(top<1) top=1;
+      var narrow=it.cols>1&&!it.stack;
+      var under=it.stack&&it.visibleMin<it.e-it.s&&it.visibleMin/60*ROW<34;
+      var cls="blk is-"+a.type+(look<24?" tiny":look<34?" short under":look<56?" short":"")+(narrow?" narrow":"")+(narrow&&it.cols>=3?" x3":"")+(under?" under":"")+(a.repeat===0?" has-once":"");
+      var left, width, z=1;
+      if(it.stack){ left="calc("+(it.level*18+3)+"px)"; width="calc(100% - "+(it.level*18+6)+"px)"; z=it.z; }
+      else { left="calc("+(it.col/it.cols*100)+"% + 3px)"; width="calc("+(100/it.cols)+"% - 6px)"; }
+      var once=a.repeat===0;
+      var full=TYPES[a.type].label+(a.subject.trim().toLowerCase()===TYPES[a.type].label.toLowerCase()?"":", "+a.subject)+", "+a.start+" έως "+a.end+(once?", μόνο αυτή την εβδομάδα":"");
+      h+='<button type="button" class="'+cls+'" data-id="'+esc(a.id)+'" style="top:'+rowUnits(top,ROW)+';height:'+rowUnits(ht,ROW)+';left:'+left+';width:'+width+';--z:'+z+'" aria-label="'+esc(full)+'" title="'+esc(full)+'">'+
+         '<span class="blk-head">'+icon(TYPES[a.type].icon)+'<b>'+esc(a.subject)+'</b></span>'+
+         '<span class="blk-time"><span class="rng">'+a.start+'<span class="end">–'+a.end+'</span></span>'+(once?'<span class="once">μία φορά</span>':'')+'</span>'+
+         (a.goal?'<em class="blk-goal">'+esc(a.goal)+'</em>':"")+'</button>';
+    });
+    h+='</div>';
+  });
+  week.innerHTML=h;
+  if(phone){
+    daystrip.innerHTML=DAYS.map(function(d,i){
+      var hrs=dayHours(i), acts=dayActs(i);
+      var dots=acts.slice(0,4).map(function(a){return '<i style="--c:var(--a-'+a.type+')"></i>';}).join("");
+      return '<button type="button" data-day="'+i+'" aria-pressed="'+(i===selDay)+'" class="'+(i===TODAY?"today":"")+'" aria-label="'+d+', '+(acts.length?plural(acts.length,"δραστηριότητα","δραστηριότητες")+", "+hoursPlain(hrs):"τίποτα ακόμα")+'">'+
+        '<span class="dn">'+SHORT[i]+'</span><span class="dh'+(hrs>0&&hstr(hrs).length>=5?' long':'')+'">'+(hrs>0?stripHoursText(hrs):"–")+'</span><span class="dots" aria-hidden="true">'+dots+'</span></button>';
+    }).join("");
+  } else daystrip.innerHTML="";
+}
+function hours(type){return state.acts.filter(function(a){return a.type===type;}).reduce(function(s,a){return s+Math.max(0,toMin(a.end)-toMin(a.start));},0)/60;}
+function arc(r,frac,color,offFrac){
+  var C=2*Math.PI*r, len=Math.max(0,frac*C-2); if(frac<=0) return "";
+  return '<circle r="'+r+'" cx="0" cy="0" fill="none" stroke="'+color+'" stroke-width="7" stroke-linecap="butt" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-offFrac*C)+'"/>';
+}
+function renderStats(){
+  var st=hours("study")+hours("review"), ko=hours("korifi")+hours("test"), fr=hours("free");
+  var total=st+ko+fr, done=state.goals.filter(function(g){return g.d;}).length, n=state.goals.length;
+  var r=66, segs=[], off=0;
+  [[st,"var(--a-study)"],[ko,"var(--a-korifi)"],[fr,"var(--a-free)"]].forEach(function(s){ if(total>0&&s[0]>0){ var f=s[0]/total; segs.push(arc(r,f,s[1],off)); off+=f; } });
+  function pc(x){ return total>0?Math.round(x/total*100)+"% του χρόνου":"0% του χρόνου"; }
+  $("#ring").innerHTML='<svg viewBox="-80 -80 160 160" role="img" aria-label="Κατανομή ωρών εκτός σχολείου: διάβασμα '+hstr(st)+', Κορυφή '+hstr(ko)+', ελεύθερος χρόνος '+hstr(fr)+'">'+
+    '<circle r="'+r+'" cx="0" cy="0" fill="none" stroke="var(--surface-3)" stroke-width="7"/>'+
+    '<circle r="'+(r-3)+'" cx="0" cy="0" fill="none" stroke="var(--faint)" stroke-width="1"/><circle r="'+(r+3)+'" cx="0" cy="0" fill="none" stroke="var(--faint)" stroke-width="1"/><g transform="rotate(-90)">'+segs.join("")+'</g></svg>'+
+    '<div class="centre"><b'+(hstr(total).length>4?' class="long"':'')+'>'+hstr(total)+'</b><small>'+hoursWord(total)+'</small></div>';
+  var goalLabel=n===0?"Χωρίς στόχους ακόμα":(done===n?"Όλοι οι στόχοι έτοιμοι":"Στόχοι έτοιμοι");
+  $("#figs").innerHTML=
+    '<div class="fig" style="--c:var(--a-study)"><i></i><span>Διάβασμα και επανάληψη<em>'+pc(st)+'</em></span><b>'+hstr(st)+'<small>ώρ.</small></b></div>'+
+    '<div class="fig" style="--c:var(--a-korifi)"><i></i><span>Στην Κορυφή<em>'+pc(ko)+'</em></span><b>'+hstr(ko)+'<small>ώρ.</small></b></div>'+
+    '<div class="fig" style="--c:var(--a-free)"><i></i><span>Ελεύθερος χρόνος<em>'+pc(fr)+'</em></span><b>'+hstr(fr)+'<small>ώρ.</small></b></div>'+
+    '<div class="fig"><i class="goal"></i><span>'+goalLabel+'</span><b>'+done+'<small>/ '+n+'</small></b></div>';
+  var bar="";
+  if(n===0) bar='<i></i>'; else for(var i=0;i<n;i++) bar+='<i class="'+(i<done?"on":"")+'"></i>';
+  $("#goalbar").innerHTML=bar;
+  var msg, ic;
+  if(total===0){ msg=state.acts.length?"Εκτός σχολείου η εβδομάδα είναι ακόμα άδεια. Πρόσθεσε διάβασμα, Κορυφή και λίγο ελεύθερο χρόνο.":"Η εβδομάδα είναι ακόμα άδεια. Πάτα σε ένα κενό κελί ή φόρτωσε το παράδειγμα για να δεις πώς δουλεύει."; ic="plus"; }
+  else if(fr===0){ msg="Δεν έχεις βάλει καθόλου ελεύθερο χρόνο. Η ξεκούραση είναι μέρος του προγράμματος."; ic="clock"; }
+  else if(st===0){ msg="Δεν υπάρχει μπλοκ διαβάσματος. Πρόσθεσε τουλάχιστον ένα, έστω μισή ώρα."; ic="pencil"; }
+  else { msg="Καλή ισορροπία. Διάβασμα, Κορυφή και ξεκούραση έχουν όλα τη θέση τους. Κράτα αυτή την ισορροπία και την επόμενη εβδομάδα."; ic="check"; }
+  $("#hint").innerHTML=icon(ic)+'<span>'+msg+'</span>';
+}
+function renderGoals(){
+  var ul=$("#goals");
+  ul.innerHTML=state.goals.map(function(g,i){
+    return '<li class="'+(g.d?"done":"")+'"><input type="checkbox" id="goal-'+i+'" data-i="'+i+'"'+(g.d?" checked":"")+'><label for="goal-'+i+'">'+esc(g.t)+'</label><button type="button" class="x" data-del="'+i+'" aria-label="Διαγραφή στόχου: '+esc(g.t)+'">'+icon("x")+'</button></li>';
+  }).join("");
+  $("#goalsEmpty").hidden=state.goals.length>0;
+}
+function shareName(a){
+  if(a.type==="korifi"&&!/^κορυφή/i.test(a.subject)) return "Κορυφή "+a.subject;
+  if(a.type==="test"&&!/^διαγ/i.test(a.subject)) return "Διαγώνισμα "+a.subject;
+  if(a.type==="study"&&!/^διάβασμα/i.test(a.subject)) return "Διάβασμα "+a.subject;
+  if(a.type==="review"&&!/^επανάληψη/i.test(a.subject)) return "Επανάληψη "+a.subject;
+  return a.subject;
+}
+function renderShare(){
+  var lines=["Γεια! Αυτό είναι το πρόγραμμά μου για την εβδομάδα:"];
+  DAYS.forEach(function(d,i){
+    var acts=dayActs(i).sort(function(x,y){return toMin(x.start)-toMin(y.start);});
+    if(acts.length) lines.push(d+": "+acts.map(function(a){return shareName(a)+" "+a.start+"–"+a.end;}).join(", "));
+  });
+  if(lines.length===1) lines.push(state.acts.length?"Δεν έχω βάλει δραστηριότητες εκτός σχολείου ακόμα.":"Δεν έχω βάλει δραστηριότητες ακόμα.");
+  if(state.goals.length) lines.push("","Στόχοι: "+state.goals.map(function(g){return (g.d?"✓ ":"")+g.t;}).join(" · "));
+  lines.push("","(από korifi-edu.gr/ergaleia/programma-meletis.html)");
+  var txt=lines.join("\n");
+  $("#shareText").textContent=txt;
+  $("#btnWa").href="https://wa.me/?text="+encodeURIComponent(txt);
+}
+function renderAll(){ renderWeek(); renderStats(); renderGoals(); renderShare(); save(); }
+
+var toastT=null;
+function toast(msg,ic){ var t=$("#toast"); t.innerHTML=icon(ic||"check")+'<span>'+esc(msg)+'</span>'; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(function(){t.hidden=true;},2400); }
+
+/* ---------- modal ---------- */
+var editing=null, lastFocus=null, lastFocusSel=null, openedAt=0, downOnScrim=false;
+$("#types").innerHTML=Object.keys(TYPES).map(function(k){return '<input type="radio" name="fType" id="type-'+k+'" value="'+k+'"><label for="type-'+k+'" class="is-'+k+'">'+icon(TYPES[k].icon)+TYPES[k].label+'</label>';}).join("");
+$("#fDay").innerHTML=DAYS.map(function(d,i){return '<option value="'+i+'">'+d+'</option>';}).join("");
+(function(){ var o1="", o2=""; for(var m=START_H*60;m<=END_H*60;m+=15){ var op='<option value="'+fmt(m)+'">'+fmt(m)+'</option>'; if(m<END_H*60) o1+=op; if(m>START_H*60) o2+=op; } $("#fStart").innerHTML=o1; $("#fEnd").innerHTML=o2; })();
+function snap(t){ var m=Math.round(toMin(t)/15)*15; return fmt(Math.min(Math.max(m,START_H*60),END_H*60)); }
+function setErr(msg,field){
+  var p=$("#fErr"); $("#fErrText").textContent=msg||""; p.hidden=!msg;
+  ["fSubject","fStart","fEnd"].forEach(function(id){ var el=document.getElementById(id); if(field===id) el.setAttribute("aria-invalid","true"); else el.removeAttribute("aria-invalid"); });
+}
+function updateWhen(){ var s=$("#fStart").value, e=$("#fEnd").value; $("#mWhen").textContent=SHORT[+$("#fDay").value]+" "+s+(toMin(e)>toMin(s)?"–"+e:""); }
+function focusSelector(el){
+  if(!el||!el.classList) return null;
+  if(el.classList.contains("slot")) return '.slot[data-day="'+el.getAttribute("data-day")+'"][data-h="'+el.getAttribute("data-h")+'"]';
+  if(el.classList.contains("blk")) return '.blk[data-id="'+el.getAttribute("data-id")+'"]';
+  if(el.id) return "#"+el.id;
+  return null;
+}
+function openModal(a,isNew){
+  lastFocus=document.activeElement; lastFocusSel=focusSelector(lastFocus); openedAt=Date.now();
+  editing=(!isNew&&a.id)?a.id:null;
+  $("#mTitle").textContent=editing?"Αλλαγή δραστηριότητας":"Νέα δραστηριότητα";
+  document.getElementById("type-"+(TYPES[a.type]?a.type:"study")).checked=true;
+  $("#fSubject").value=a.subject||""; $("#fDay").value=String(a.day); $("#fRepeat").value=a.repeat===0?"0":"1";
+  $("#fStart").value=snap(a.start); $("#fEnd").value=snap(a.end); $("#fGoal").value=a.goal||"";
+  $("#btnDelete").hidden=!editing; setErr(""); updateWhen();
+  $("#toast").hidden=true; clearTimeout(toastT);
+  $("#scrim").hidden=false; document.body.classList.add("is-locked");
+  setTimeout(function(){ $("#fSubject").focus(); },0);
+}
+/* Η εστίαση γυρίζει σε στοιχείο που ξαναβρίσκεται μετά το render, όχι στον παλιό κόμβο */
+function closeModal(fallbackSel){
+  $("#scrim").hidden=true; document.body.classList.remove("is-locked");
+  var t=(lastFocusSel&&document.querySelector(lastFocusSel))||(lastFocus&&document.contains(lastFocus)?lastFocus:null)||(fallbackSel&&document.querySelector(fallbackSel))||$("#btnAddDay");
+  if(t&&t.focus) t.focus();
+}
+function defaultsForDay(d){
+  var last=dayActs(d).reduce(function(m,a){return Math.max(m,toMin(a.end));},0);
+  var s=Math.max(16*60,Math.ceil(last/15)*15); if(s>21*60) s=21*60;
+  return {type:"study",day:d,start:fmt(s),end:fmt(Math.min(s+60,END_H*60)),repeat:1};
+}
+week.addEventListener("click",function(e){
+  var add=e.target.closest("#btnAddDay");
+  if(add){ openModal(defaultsForDay(+add.getAttribute("data-day")),true); return; }
+  var b=e.target.closest(".blk");
+  if(b){ var act=state.acts.filter(function(x){return x.id===b.getAttribute("data-id");})[0]; if(act) openModal(act,false); return; }
+  var s=e.target.closest(".slot");
+  if(s){ var hh=+s.getAttribute("data-h"); openModal({type:"study",day:+s.getAttribute("data-day"),start:fmt(hh*60),end:fmt(Math.min(hh*60+60,END_H*60)),repeat:1},true); }
+});
+daystrip.addEventListener("click",function(e){ var b=e.target.closest("button[data-day]"); if(b){ selDay=+b.getAttribute("data-day"); renderWeek(); } });
+/* Όταν αλλάζει η έναρξη, η λήξη ακολουθεί αν έμεινε πίσω */
+$("#fStart").addEventListener("change",function(){
+  var s=toMin($("#fStart").value), en=toMin($("#fEnd").value);
+  if(en<=s) $("#fEnd").value=fmt(Math.min(s+60,END_H*60));
+  setErr(""); updateWhen();
+});
+$("#fEnd").addEventListener("change",function(){ setErr(""); updateWhen(); });
+$("#fDay").addEventListener("change",updateWhen);
+$("#fSubject").addEventListener("input",function(){ if($("#fSubject").value.trim()) setErr(""); });
+$("#form").addEventListener("submit",function(e){
+  e.preventDefault();
+  var typeEl=document.querySelector('input[name="fType"]:checked');
+  var a={type:typeEl?typeEl.value:"study",subject:$("#fSubject").value.trim(),day:+$("#fDay").value,start:$("#fStart").value,end:$("#fEnd").value,repeat:+$("#fRepeat").value,goal:$("#fGoal").value.trim()};
+  if(!a.subject){ setErr("Γράψε ένα μάθημα ή μια περιγραφή.","fSubject"); $("#fSubject").focus(); return; }
+  if(toMin(a.end)<=toMin(a.start)){ setErr("Η ώρα λήξης πρέπει να είναι μετά την ώρα έναρξης.","fEnd"); $("#fEnd").focus(); return; }
+  if(editing){ var ex=state.acts.filter(function(x){return x.id===editing;})[0]; if(ex){ Object.keys(a).forEach(function(k){ex[k]=a[k];}); } }
+  else { a.id=newId(); state.acts.push(a); }
+  var was=editing, id=was||a.id;
+  renderAll();
+  lastFocusSel='.blk[data-id="'+id+'"]';
+  closeModal('.slot[data-day="'+a.day+'"][data-h="'+Math.floor(toMin(a.start)/60)+'"]');
+  toast(was?"Αποθηκεύτηκε":"Προστέθηκε στο πρόγραμμα");
+});
+$("#btnDelete").addEventListener("click",function(){
+  var gone=state.acts.filter(function(a){return a.id===editing;})[0];
+  state.acts=state.acts.filter(function(a){return a.id!==editing;});
+  renderAll();
+  lastFocusSel=gone?'.slot[data-day="'+gone.day+'"][data-h="'+Math.floor(toMin(gone.start)/60)+'"]':null;
+  closeModal(); toast("Διαγράφηκε","trash");
+});
+$("#btnCancel").addEventListener("click",function(){ closeModal(); });
+/* Κλείσιμο από το φόντο μόνο όταν το πάτημα ξεκίνησε εκεί και όχι αμέσως μετά το άνοιγμα (διπλό κλικ) */
+$("#scrim").addEventListener("pointerdown",function(e){ downOnScrim=(e.target===$("#scrim")); });
+$("#scrim").addEventListener("click",function(e){ if(e.target===$("#scrim")&&downOnScrim&&Date.now()-openedAt>350) closeModal(); downOnScrim=false; });
+/* Escape κλείνει, Tab μένει μέσα στο παράθυρο */
+document.addEventListener("keydown",function(e){
+  if($("#scrim").hidden) return;
+  if(e.key==="Escape"){ e.preventDefault(); closeModal(); return; }
+  if(e.key==="Tab"){
+    var f=Array.prototype.filter.call($("#form").querySelectorAll("input,select,button"),function(el){ return !el.hidden && !el.disabled && el.offsetParent!==null && el.type!=="radio"; });
+    var radios=Array.prototype.filter.call($("#form").querySelectorAll('input[type="radio"]'),function(r){return r.checked;});
+    f=radios.concat(f).sort(function(x,y){ return (x.compareDocumentPosition(y)&4)?-1:1; });
+    if(!f.length) return;
+    var first=f[0], last=f[f.length-1], act=document.activeElement;
+    if(e.shiftKey && (act===first || !$("#form").contains(act))){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && (act===last || !$("#form").contains(act))){ e.preventDefault(); first.focus(); }
+  }
+});
+
+/* ---------- goals ---------- */
+$("#goalForm").addEventListener("submit",function(e){
+  e.preventDefault(); var v=$("#goalInput").value.trim(); if(!v){ $("#goalInput").focus(); return; }
+  state.goals.push({t:v,d:false}); $("#goalInput").value=""; renderAll(); $("#goalInput").focus();
+});
+$("#goals").addEventListener("change",function(e){ var i=e.target.getAttribute("data-i"); if(i!==null){ state.goals[+i].d=e.target.checked; renderAll(); var again=document.getElementById("goal-"+i); if(again) again.focus(); } });
+$("#goals").addEventListener("click",function(e){
+  var b=e.target.closest("[data-del]"); if(!b) return;
+  var i=+b.getAttribute("data-del"); state.goals.splice(i,1); renderAll();
+  var xs=document.querySelectorAll("#goals .x"); var next=xs[Math.min(i,xs.length-1)]||$("#goalInput"); if(next) next.focus();
+  toast("Ο στόχος διαγράφηκε","trash");
+});
+
+/* ---------- header actions ---------- */
+var clearArmed=false, clearT=null, btnClear=$("#btnClear"), smallMQ=window.matchMedia("(max-width: 599px)");
+function armedLabel(){ return smallMQ.matches?"Πάτα ξανά":"Σίγουρα; Πάτα ξανά"; }
+/* Το κουμπί κρατά από την αρχή το πλάτος της ετικέτας «Σίγουρα; Πάτα ξανά», ώστε να μην μετακινείται το διπλανό */
+function reserveClearWidth(){
+  if(clearArmed) return;
+  btnClear.style.minWidth="";
+  if(phoneMQ.matches) return; /* στο κινητό τα .actions .btn{flex:1 1 0} έχουν ήδη ίσα πλάτη */
+  var fl=btnClear.style.flex; btnClear.style.flex="0 0 auto";
+  var w=btnClear.offsetWidth;
+  btnClear.textContent="Σίγουρα; Πάτα ξανά"; var armedW=btnClear.offsetWidth; btnClear.textContent="Άδειασε";
+  btnClear.style.flex=fl;
+  btnClear.style.minWidth=Math.max(w,armedW)+"px";
+}
+reserveClearWidth();
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(reserveClearWidth);
+function disarm(){ clearArmed=false; btnClear.textContent="Άδειασε"; btnClear.classList.remove("is-armed"); clearTimeout(clearT); }
+$("#btnExample").addEventListener("click",function(){ disarm(); state=example(); renderAll(); toast("Φορτώθηκε το παράδειγμα"); });
+btnClear.addEventListener("click",function(){
+  if(!clearArmed){ clearArmed=true; btnClear.textContent=armedLabel(); btnClear.classList.add("is-armed"); clearT=setTimeout(disarm,3000); return; }
+  disarm(); state={acts:[],goals:[]}; renderAll(); toast("Το πρόγραμμα άδειασε","trash");
+});
+
+/* ---------- copy ---------- */
+$("#btnCopy").addEventListener("click",function(){
+  var pre=$("#shareText"), txt=pre.textContent;
+  function fallback(){ try{ var r=document.createRange(); r.selectNodeContents(pre); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }catch(e){} toast("Το κείμενο επιλέχθηκε. Πάτα «Αντιγραφή» στη συσκευή σου."); }
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){toast("Αντιγράφηκε. Στείλε το στους γονείς σου.");},fallback);
+    else fallback();
+  }catch(e){ fallback(); }
+});
+
+/* ---------- print ---------- */
+/* Στην εκτύπωση: πάντα όλη η εβδομάδα και ανοιχτό θέμα, μετά επιστρέφει όπως ήταν */
+var printing=false, themeBeforePrint=null;
+window.addEventListener("beforeprint",function(){
+  if(printing) return; printing=true;
+  themeBeforePrint=document.documentElement.getAttribute("data-theme");
+  document.documentElement.setAttribute("data-theme","light");
+  renderWeek();
+});
+window.addEventListener("afterprint",function(){
+  if(!printing) return; printing=false;
+  if(themeBeforePrint) document.documentElement.setAttribute("data-theme",themeBeforePrint); else document.documentElement.removeAttribute("data-theme");
+  renderWeek();
+});
+$("#btnPrint").addEventListener("click",function(){ try{ window.print(); }catch(e){} });
+
+/* ---------- init ---------- */
+load();
+applyTheme(theme,false);
+weekLine(); renderLegend(); renderAll();
+function onBreakpoint(){ renderWeek(); reserveClearWidth(); }
+if(phoneMQ.addEventListener) phoneMQ.addEventListener("change",onBreakpoint); else if(phoneMQ.addListener) phoneMQ.addListener(onBreakpoint);
+})();
+</script>
+</body>
+</html>

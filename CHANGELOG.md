@@ -2,7 +2,27 @@
 
 Chronological log όλων των αλλαγών — διαβάζεται από το πιο πρόσφατο προς το πιο παλιό. Σκοπός: γρήγορο catchup σε κάθε νέα συνομιλία ή συνεργάτη.
 
-> **Where we are now (latest):** Site is **LIVE in production** at [korifi-edu.gr](https://korifi-edu.gr) (Vercel hosting, custom domain, valid HTTPS). All major features shipped: bento-style content pages, hero carousel with seasonal slides, full admin CRUD with inline lessons + access codes, /martyries with weekly auto-sync from Drive, /epikoinonia with embedded Google Maps, **ενότητα `/ergaleia` με 12 Διαδραστικά Εργαλεία** (Χημεία/Μαθηματικά/Φυσική). SEO (per-content JSON-LD, sitemap, OG/Twitter), Vercel Analytics, security hardened. **Νέο (29/7):** μόνιμη «περίοδος εγγραφών» στο seasonal hero (20/7→14/9 κάθε χρόνο) — φέτος «Εγγραφές 2026-27, μαθήματα από Δευτ 14/9» + slide «21 επιτυχίες 2026». **Νέο (3/10):** υλικό μαθημάτων/PDF μόνο για εγγεγραμμένους με κωδικό πρόσβασης (signed URLs), hero φθινοπώρου «Τα μαθήματα τρέχουν ήδη», `/reset-password`. Κύριες εκκρεμότητες: Google Search Console verification (TXT record DNS), Google Business Profile setup, owner content updates, περισσότερα εργαλεία στο `/ergaleia` (βλ. λίστα ιδεών στο πρώτο entry 2026-06-21).
+> **Where we are now (latest):** Site is **LIVE in production** at [korifi-edu.gr](https://korifi-edu.gr) (Vercel hosting, custom domain, valid HTTPS). All major features shipped: bento-style content pages, hero carousel with seasonal slides, full admin CRUD with inline lessons + access codes, /martyries with weekly auto-sync from Drive, /epikoinonia with embedded Google Maps, **ενότητα `/ergaleia` με 13 Διαδραστικά Εργαλεία** (Χημεία/Μαθηματικά/Φυσική + εβδομαδιαίο πρόγραμμα μελέτης «Το πρόγραμμά μου», 10/10). SEO (per-content JSON-LD, sitemap, OG/Twitter), Vercel Analytics, security hardened. **Νέο (29/7):** μόνιμη «περίοδος εγγραφών» στο seasonal hero (20/7→14/9 κάθε χρόνο) — φέτος «Εγγραφές 2026-27, μαθήματα από Δευτ 14/9» + slide «21 επιτυχίες 2026». **Νέο (3/10):** υλικό μαθημάτων/PDF μόνο για εγγεγραμμένους με κωδικό πρόσβασης (signed URLs), hero φθινοπώρου «Τα μαθήματα τρέχουν ήδη», `/reset-password`. Κύριες εκκρεμότητες: Google Search Console verification (TXT record DNS), Google Business Profile setup, owner content updates, περισσότερα εργαλεία στο `/ergaleia` (βλ. λίστα ιδεών στο πρώτο entry 2026-06-21).
+
+---
+
+## 2026-10-10 (νέο εργαλείο — «Το πρόγραμμά μου», εβδομαδιαίο πρόγραμμα μελέτης)
+
+Ιδέα από τη σύγκριση με το myMarge (Μαργαρώνης). Απόφαση Πάνου: χωρίς login, χωρίς ονόματα μαθητών
+ή τμημάτων δημόσια· τα δεδομένα μένουν μόνο στη συσκευή του μαθητή (localStorage, κλειδί
+`korifi-programma-meletis`). Εγκρίθηκε το mock v2 (claude.ai artifact) και μπήκε ως στατική σελίδα.
+
+- **Σελίδα:** `public/ergaleia/programma-meletis.html` (vanilla JS, ένα αρχείο, όπως τα άλλα εργαλεία).
+  Πλέγμα Δευτέρα–Κυριακή 08:00–22:00, 6 τύποι (σχολείο, Κορυφή, διάβασμα, επανάληψη, διαγώνισμα,
+  ελεύθερος χρόνος), «μόνο αυτή την εβδομάδα», στόχοι εβδομάδας, σύνοψη ωρών, θέμα Ανοιχτό/Σκούρο/Αυτόματο,
+  προβολή μίας μέρας στο κινητό. Ξεκινά με παράδειγμα· «Άδειασε» με επιβεβαίωση.
+- **Εκτύπωση:** A4 οριζόντια, πάντα ανοιχτό θέμα και όλη η εβδομάδα (σελ. 1), σύνοψη + στόχοι (σελ. 2).
+  Οι θέσεις των μπλοκ γράφονται σε μονάδες `var(--row)` ώστε να ακολουθούν το πλέγμα και στο print.
+- **Γονείς:** έτοιμο κείμενο του προγράμματος + κουμπί WhatsApp (`wa.me/?text=`) και αντιγραφή. Όχι Viber.
+- **Αφαιρέθηκε από το mock:** η επιλογή τμήματος Κορυφής με ώρες (ήταν placeholders). Αν ο Πάνος στείλει
+  τις πραγματικές ώρες τμημάτων, μπαίνει ξανά ως «Φόρτωσε τις ώρες του τμήματός μου».
+- **Hub/SEO:** πρώτη κάρτα στο `/ergaleia` (`src/lib/ergaleia.ts`), νέο κείμενο εισαγωγής/description,
+  και όλα τα έτοιμα εργαλεία μπαίνουν πλέον στο `sitemap.xml` (`toolPages`)· `STATIC_LASTMOD` → 2026-10-10.
 
 ---
 
