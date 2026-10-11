@@ -68,12 +68,14 @@ export async function submitLead(_prev: LeadState, fd: FormData): Promise<LeadSt
 
 /**
  * Email ειδοποίησης μέσω Resend (https://resend.com). Ενεργοποιείται μόνο αν
- * υπάρχουν `RESEND_API_KEY` και `LEADS_NOTIFY_TO` στο Vercel. Επιστρέφει true
- * αν στάλθηκε.
+ * υπάρχει `RESEND_API_KEY` στο Vercel. Παραλήπτης: `LEADS_NOTIFY_TO`, αλλιώς το
+ * email της Κορυφής (`CONTACT.email`). Με τον δωρεάν αποστολέα `onboarding@resend.dev`
+ * το Resend στέλνει μόνο στο email του λογαριασμού Resend, γι' αυτό ο λογαριασμός
+ * φτιάχνεται με το ίδιο email. Επιστρέφει true αν στάλθηκε.
  */
 async function notifyNewLead(lead: LeadRecord): Promise<boolean> {
   const key = process.env.RESEND_API_KEY;
-  const to = process.env.LEADS_NOTIFY_TO;
+  const to = process.env.LEADS_NOTIFY_TO || CONTACT.email;
   if (!key || !to) return false;
 
   const from = process.env.LEADS_NOTIFY_FROM ?? "Κορυφή site <onboarding@resend.dev>";

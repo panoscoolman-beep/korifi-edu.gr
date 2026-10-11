@@ -6,6 +6,17 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-10-12 (email ειδοποίησης leads — μόνο ένα κλειδί στο Vercel)
+
+- `notifyNewLead` (`src/app/(public)/leadActions.ts`): αν λείπει το `LEADS_NOTIFY_TO`, το email πάει στο
+  `frontistiriokorifh@gmail.com` (`CONTACT.email`). Για να ενεργοποιηθεί αρκεί πλέον μόνο το `RESEND_API_KEY`
+  στο Vercel (Production) + redeploy. Ο λογαριασμός Resend φτιάχνεται με το ίδιο email, γιατί ο δωρεάν
+  αποστολέας `onboarding@resend.dev` στέλνει μόνο στο email του λογαριασμού.
+- Sitemap: δεν χρειάζεται νέα υποβολή στο Search Console· το live `robots.txt` δηλώνει ήδη
+  `Sitemap: https://korifi-edu.gr/sitemap.xml` και η Google το διαβάζει μόνη της.
+
+---
+
 ## 2026-10-11 («Το πρόγραμμά μου» ως web app στο κινητό + σύνδεσμος μεταφοράς)
 
 Ερώτηση Πάνου: να «κατεβαίνει» σαν εφαρμογή στο κινητό, να ανοίγει με το πρόγραμμα του καθενός, και
