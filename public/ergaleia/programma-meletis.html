@@ -16,6 +16,12 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#f5f5fb" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0f0f1c" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="/ergaleia/programma-meletis.webmanifest">
+<link rel="apple-touch-icon" href="/ergaleia/programma-apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Πρόγραμμα">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script>
 /* Εφαρμόζει το αποθηκευμένο θέμα πριν ζωγραφιστεί η σελίδα, ώστε να μην αναβοσβήνει */
 try{var __p=JSON.parse(localStorage.getItem("korifi-programma-meletis")||"null");if(__p&&(__p.theme==="light"||__p.theme==="dark"))document.documentElement.setAttribute("data-theme",__p.theme);}catch(e){}
@@ -490,6 +496,40 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
   .daystrip .dh .unitc{display:inline}
 }
 
+/* ---------- εφαρμογή στην αρχική οθόνη + μεταφορά ---------- */
+.appbar{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:10px 12px;margin:0 0 16px;padding:10px 8px 10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:13.5px;line-height:1.45;color:var(--fg-2)}
+.appbar-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.appbar-ic svg{width:18px;height:18px}
+.appbar p{margin:0;min-width:0}
+.appbar p b{color:var(--fg);font-weight:600}
+.appbar-x{width:36px;height:36px;border:0;background:none;color:var(--muted);border-radius:8px;display:grid;place-items:center;padding:0}
+.appbar-x:hover{background:var(--surface-2);color:var(--fg)}
+.appbar-x svg{width:14px;height:14px}
+.appsec{margin-top:40px;border-top:1px solid var(--line);padding-top:26px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 40px;align-items:end}
+.appsec h2{margin-bottom:8px}
+.appsec .note{margin:0;max-width:64ch;font-size:13.5px;line-height:1.55}
+.appsec-act{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:step}
+.steps li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start;font-size:14.5px;line-height:1.5;color:var(--fg-2)}
+.steps li::before{counter-increment:step;content:counter(step);width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:600 13px/28px var(--mono);text-align:center}
+.steps b{color:var(--fg);font-weight:600}
+.steps .glyph{display:inline-grid;place-items:center;width:24px;height:22px;margin:0 2px;border:1px solid var(--line);border-radius:6px;vertical-align:-5px;color:var(--accent);background:var(--surface)}
+.steps .glyph svg{width:14px;height:14px}
+.callout{margin:0;background:var(--surface-2);border-left:3px solid var(--accent);border-radius:3px 10px 10px 3px;padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--fg-2)}
+.callout .btn{margin-top:10px}
+@media (max-width:899px){
+  .appsec{grid-template-columns:minmax(0,1fr);margin-top:32px}
+  .appsec-act{justify-content:flex-start}
+}
+@media (max-width:599px){
+  .appbar{grid-template-columns:auto minmax(0,1fr) auto;align-items:start}
+  .appbar-ic{grid-column:1;grid-row:1}
+  .appbar p{grid-column:2;grid-row:1;padding-top:1px}
+  .appbar .btn{grid-column:2;grid-row:2;justify-self:start}
+  .appbar-x{grid-column:3;grid-row:1;margin:-4px -2px 0 0}
+  .appsec-act{display:grid;grid-template-columns:minmax(0,1fr)}
+}
+
 /* ---------- print: μία σελίδα A4 οριζόντια με το πρόγραμμα, στόχοι και σύνοψη στη δεύτερη ---------- */
 @page{size:A4 landscape;margin:10mm}
 @media print{
@@ -497,7 +537,7 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
   html{padding:0}
   body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:12px}
   .page{max-width:none;padding:0}
-  .back,.mast-side,.lede,.ornament,.daystrip,.share-col,.tips,.foot,.toast,.scrim,.hint,.goalbar,.addrow,.goals .x,.empty{display:none!important}
+  .back,.mast-side,.lede,.ornament,.daystrip,.share-col,.tips,.foot,.toast,.scrim,.hint,.goalbar,.addrow,.goals .x,.empty,.appbar,.appsec{display:none!important}
   .mast{display:block;margin-bottom:8px}
   .eyebrow{margin-bottom:2px}
   h1{font-size:26px}
@@ -548,6 +588,13 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
     <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M1.5 16.5 9.5 3l4 6.5 3-3.5 8 10.5z"/><path d="M9.5 3v3.5"/></svg>
   </div>
 
+  <aside class="appbar" id="appbar" aria-label="Εφαρμογή στο κινητό" hidden>
+    <span class="appbar-ic" id="appbarIc" aria-hidden="true"></span>
+    <p id="appbarText"></p>
+    <button type="button" class="btn primary small" id="appbarBtn"></button>
+    <button type="button" class="appbar-x" id="appbarX" aria-label="Κλείσιμο"></button>
+  </aside>
+
   <section aria-labelledby="boardTitle">
     <h2 class="sr" id="boardTitle">Εβδομαδιαίο πρόγραμμα</h2>
     <div class="board" id="board">
@@ -597,6 +644,18 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
     </section>
   </div>
 
+  <section class="appsec" aria-labelledby="h-app">
+    <div>
+      <h2 id="h-app">Στο κινητό σου</h2>
+      <p class="note" id="appNote">Βάλ’ το στην αρχική οθόνη: ανοίγει με ένα πάτημα, σαν εφαρμογή, και δουλεύει και χωρίς internet. Για το ίδιο πρόγραμμα σε άλλη συσκευή, αντέγραψε τον σύνδεσμο μεταφοράς και άνοιξέ τον εκεί.</p>
+    </div>
+    <div class="appsec-act">
+      <button type="button" class="btn primary" id="btnInstall">Εγκατάσταση</button>
+      <button type="button" class="btn" id="btnLink">Αντιγραφή συνδέσμου</button>
+      <button type="button" class="btn" id="btnPaste">Επικόλληση συνδέσμου</button>
+    </div>
+  </section>
+
   <section class="tips" aria-labelledby="h-tips">
     <h2 id="h-tips">Πώς διαβάζω πιο αποδοτικά</h2>
     <ul class="tiplist">
@@ -638,6 +697,15 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
     </div>
   </form>
 </div>
+<div class="scrim" id="appScrim" lang="el" hidden>
+  <div class="modal" id="appSheet" role="dialog" aria-modal="true" aria-labelledby="aTitle">
+    <div class="grab" aria-hidden="true"></div>
+    <div class="mhead"><h3 id="aTitle">Βάλ’ το στην αρχική οθόνη</h3></div>
+    <ol class="steps" id="aSteps"></ol>
+    <div id="aExtra"></div>
+    <div class="mfoot"><div class="right"><button type="button" class="btn primary" id="aOk">Εντάξει</button></div></div>
+  </div>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite" lang="el" hidden></div>
 
 <script>
@@ -659,6 +727,11 @@ var ICONS={
   check:'<path d="M3 8.5l3.2 3.2L13 5"/>',
   plus:'<path d="M8 3.5v9M3.5 8h9"/>',
   x:'<path d="M4 4l8 8M12 4l-8 8"/>',
+  phone:'<rect x="4.5" y="1.5" width="7" height="13" rx="1.6"/><path d="M7 12.4h2"/>',
+  link:'<path d="M6.8 9.2a2.6 2.6 0 0 0 3.7 0l2-2a2.6 2.6 0 0 0-3.7-3.7l-.8.8"/><path d="M9.2 6.8a2.6 2.6 0 0 0-3.7 0l-2 2a2.6 2.6 0 0 0 3.7 3.7l.8-.8"/>',
+  paste:'<rect x="3.5" y="3" width="9" height="11.5" rx="1.5"/><path d="M6 3V1.8h4V3"/><path d="M6 7.5h4M6 10h2.5"/>',
+  share:'<path d="M8 10V1.8M5.3 4.3 8 1.6l2.7 2.7"/><path d="M5.6 6.5H4.2a1 1 0 0 0-1 1v5.8a1 1 0 0 0 1 1h7.6a1 1 0 0 0 1-1V7.5a1 1 0 0 0-1-1h-1.4"/>',
+  install:'<path d="M8 2v8M4.8 7 8 10.2 11.2 7"/><path d="M3 11.5V13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1.5"/>',
   trash:'<path d="M3 4.5h10M6.5 4.5v-1h3v1M4.5 4.5l.6 8h5.8l.6-8"/>'
 };
 var TYPES={
@@ -923,10 +996,10 @@ function renderShare(){
   $("#shareText").textContent=txt;
   $("#btnWa").href="https://wa.me/?text="+encodeURIComponent(txt);
 }
-function renderAll(){ renderWeek(); renderStats(); renderGoals(); renderShare(); save(); }
+function renderAll(){ renderWeek(); renderStats(); renderGoals(); renderShare(); save(); updateAppUi(); }
 
 var toastT=null;
-function toast(msg,ic){ var t=$("#toast"); t.innerHTML=icon(ic||"check")+'<span>'+esc(msg)+'</span>'; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(function(){t.hidden=true;},2400); }
+function toast(msg,ic,ms){ var t=$("#toast"); t.innerHTML=icon(ic||"check")+'<span>'+esc(msg)+'</span>'; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(function(){t.hidden=true;},ms||2400); }
 
 /* ---------- modal ---------- */
 var editing=null, lastFocus=null, lastFocusSel=null, openedAt=0, downOnScrim=false;
@@ -1089,10 +1162,178 @@ window.addEventListener("afterprint",function(){
 });
 $("#btnPrint").addEventListener("click",function(){ try{ window.print(); }catch(e){} });
 
+
+/* ---------- εφαρμογή στην αρχική οθόνη + μεταφορά σε άλλη συσκευή ----------
+   Τίποτα δεν ανεβαίνει σε server. Ο σύνδεσμος μεταφοράς κουβαλά το πρόγραμμα στο #p=…
+   (το κομμάτι μετά το # δεν στέλνεται ποτέ στον server) και ο μαθητής τον ανοίγει όπου θέλει.
+   Στο iPhone η εφαρμογή της αρχικής οθόνης έχει δικό της χώρο, χωριστά από το Safari:
+   γι' αυτό η μεταφορά γίνεται με «Αντιγραφή συνδέσμου» → «Επικόλληση». */
+var PAGE="/ergaleia/programma-meletis.html", UIKEY="korifi-programma-meletis-ui";
+var ua=navigator.userAgent||"";
+var isIOS=/iPad|iPhone|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+var isAndroid=/Android/i.test(ua);
+var coarse=window.matchMedia("(pointer: coarse)").matches;
+var deferredPrompt=null;
+var ui={}; try{ ui=JSON.parse(localStorage.getItem(UIKEY)||"{}")||{}; }catch(e){ ui={}; }
+function saveUi(){ try{ localStorage.setItem(UIKEY,JSON.stringify(ui)); }catch(e){} }
+function standalone(){ return window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true; }
+
+function packActs(acts){ return acts.map(function(a){return [a.type,a.subject,a.day,a.start,a.end,a.repeat,a.goal||""];}); }
+function sig(s){ return JSON.stringify([packActs(s.acts),s.goals.map(function(g){return [g.t,!!g.d];})]); }
+var EXAMPLE_SIG=sig(example());
+function isExample(){ return sig(state)===EXAMPLE_SIG; }
+
+function b64enc(str){ var b=new TextEncoder().encode(str), bin=""; for(var i=0;i<b.length;i++) bin+=String.fromCharCode(b[i]); return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function b64dec(str){ var t=str.replace(/-/g,"+").replace(/_/g,"/"); while(t.length%4) t+="="; var bin=atob(t), b=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i); return new TextDecoder().decode(b); }
+function transferLink(){ return location.origin+PAGE+"#p="+b64enc(JSON.stringify({v:1,a:packActs(state.acts),g:state.goals.map(function(g){return [g.t,g.d?1:0];})})); }
+/* Δέχεται ολόκληρο τον σύνδεσμο ή μόνο το κομμάτι μετά το #p=. Επιστρέφει έγκυρο πρόγραμμα ή null. */
+function readLink(text){
+  var str=String(text||"").trim(), m=str.match(/#p=([A-Za-z0-9_-]+)/)||str.match(/^([A-Za-z0-9_-]{16,})$/);
+  if(!m) return null;
+  var o; try{ o=JSON.parse(b64dec(m[1])); }catch(e){ return null; }
+  if(!o||o.v!==1||!Array.isArray(o.a)||!Array.isArray(o.g)) return null;
+  var acts=o.a.map(function(x){ return Array.isArray(x)?cleanAct({type:x[0],subject:x[1],day:x[2],start:x[3],end:x[4],repeat:x[5],goal:x[6]}):null; }).filter(Boolean);
+  var goals=o.g.filter(function(x){return Array.isArray(x)&&typeof x[0]==="string"&&x[0].trim();}).map(function(x){return {t:x[0].slice(0,120),d:!!x[1]};});
+  if(o.a.length>0&&acts.length===0) return null;
+  return {acts:acts,goals:goals};
+}
+function importState(s){
+  if(sig(s)===sig(state)){ toast("Το πρόγραμμα είναι ήδη εδώ"); return; }
+  if(state.acts.length&&!isExample()&&!window.confirm("Να αντικατασταθεί το πρόγραμμα που έχεις εδώ με αυτό από τον σύνδεσμο;")) return;
+  state=s; disarm(); renderAll(); toast("Φορτώθηκε το πρόγραμμά σου");
+}
+function takeHash(){
+  if(!/^#p=/.test(location.hash)) return;
+  var s=readLink(location.hash);
+  try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
+  if(s) importState(s); else toast("Ο σύνδεσμος δεν διαβάζεται. Αντέγραψέ τον ξανά ολόκληρο.","flag",3600);
+}
+function copyLink(){
+  var url=transferLink();
+  var msg=standalone()?"Ο σύνδεσμος αντιγράφηκε. Άνοιξέ τον στην άλλη συσκευή.":"Ο σύνδεσμος αντιγράφηκε. Άνοιξέ τον στην άλλη συσκευή ή πάτα «Επικόλληση» μέσα στην εφαρμογή.";
+  function fallback(){ window.prompt("Αντέγραψε τον σύνδεσμο μεταφοράς:",url); }
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function(){ toast(msg,"link",4200); },fallback); else fallback(); }catch(e){ fallback(); }
+}
+function pasteLink(){
+  function handle(v){ var s=readLink(v); if(s) importState(s); else toast("Δεν βρέθηκε σύνδεσμος μεταφοράς. Αντέγραψέ τον ξανά.","flag",3600); }
+  function ask(){ var v=window.prompt("Επικόλλησε εδώ τον σύνδεσμο μεταφοράς:",""); if(v!==null&&v.trim()) handle(v); }
+  try{
+    if(navigator.clipboard&&navigator.clipboard.readText) navigator.clipboard.readText().then(function(v){ if(readLink(v)) handle(v); else ask(); },ask);
+    else ask();
+  }catch(e){ ask(); }
+}
+
+/* Οδηγίες εγκατάστασης, όταν ο browser δεν έχει δικό του παράθυρο εγκατάστασης */
+var sheetFocus=null, sheetOpenedAt=0, downOnSheet=false;
+function glyph(n){ return '<span class="glyph">'+icon(n)+'</span>'; }
+function openSheet(){
+  var steps, extra="";
+  if(isIOS){
+    steps=['Πάτα το κουμπί <b>Κοινοποίηση</b>'+glyph("share")+'. Αν δεν το βλέπεις, είναι στο μενού <b>•••</b>.',
+           'Διάλεξε <b>«Προσθήκη στην οθόνη Αφετηρίας»</b>.',
+           'Πάτα <b>«Προσθήκη»</b>. Το εικονίδιο «Πρόγραμμα» μπαίνει στην αρχική σου οθόνη.'];
+    extra=isExample()
+      ?'<p class="callout">Στο iPhone η εφαρμογή κρατά τα δικά της δεδομένα, χωριστά από το Safari. Φτιάξε το πρόγραμμά σου μέσα από την εφαρμογή.</p>'
+      :'<div class="callout">Στο iPhone η εφαρμογή κρατά τα δικά της δεδομένα, χωριστά από το Safari. Για να πάρεις μαζί το πρόγραμμα που έφτιαξες, πάτα «Αντιγραφή συνδέσμου» τώρα και «Επικόλληση» μόλις ανοίξεις την εφαρμογή.<br><button type="button" class="btn small" id="aCopy">'+icon("link")+'Αντιγραφή συνδέσμου</button></div>';
+  } else if(isAndroid){
+    steps=['Άνοιξε το μενού του browser <b>⋮</b> (πάνω δεξιά).',
+           'Διάλεξε <b>«Εγκατάσταση εφαρμογής»</b> ή <b>«Προσθήκη στην αρχική οθόνη»</b>.',
+           'Επιβεβαίωσε. Το εικονίδιο «Πρόγραμμα» μπαίνει στην αρχική σου οθόνη, με το πρόγραμμα που έφτιαξες.'];
+  } else {
+    steps=['Άνοιξε αυτή τη σελίδα στον <b>Chrome</b> ή στον <b>Edge</b>.',
+           'Πάτα το εικονίδιο εγκατάστασης δεξιά στη γραμμή διευθύνσεων, ή διάλεξε <b>«Εγκατάσταση»</b> από το μενού <b>⋮</b>.'];
+    extra='<p class="callout">Στο Safari του Mac: <b>Αρχείο › Προσθήκη στο Dock</b>. Στο κινητό είναι ακόμη πιο χρήσιμο: άνοιξε τη σελίδα από εκεί.</p>';
+  }
+  $("#aSteps").innerHTML=steps.map(function(t){return "<li><span>"+t+"</span></li>";}).join("");
+  $("#aExtra").innerHTML=extra; $("#aExtra").hidden=!extra;
+  sheetFocus=document.activeElement; sheetOpenedAt=Date.now();
+  $("#toast").hidden=true;
+  $("#appScrim").hidden=false; document.body.classList.add("is-locked");
+  setTimeout(function(){ $("#aOk").focus(); },0);
+}
+function closeSheet(){
+  $("#appScrim").hidden=true; document.body.classList.remove("is-locked");
+  if(sheetFocus&&document.contains(sheetFocus)&&sheetFocus.offsetParent!==null) sheetFocus.focus(); else $("#btnInstall").focus();
+}
+$("#aOk").addEventListener("click",closeSheet);
+$("#aExtra").addEventListener("click",function(e){ if(e.target.closest("#aCopy")) copyLink(); });
+$("#appScrim").addEventListener("pointerdown",function(e){ downOnSheet=(e.target===$("#appScrim")); });
+$("#appScrim").addEventListener("click",function(e){ if(e.target===$("#appScrim")&&downOnSheet&&Date.now()-sheetOpenedAt>350) closeSheet(); downOnSheet=false; });
+document.addEventListener("keydown",function(e){
+  if($("#appScrim").hidden) return;
+  if(e.key==="Escape"){ e.preventDefault(); closeSheet(); return; }
+  if(e.key==="Tab"){
+    var f=Array.prototype.filter.call($("#appSheet").querySelectorAll("button"),function(el){ return el.offsetParent!==null; });
+    if(!f.length) return;
+    var first=f[0], last=f[f.length-1], act=document.activeElement;
+    if(e.shiftKey&&(act===first||!$("#appSheet").contains(act))){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey&&(act===last||!$("#appSheet").contains(act))){ e.preventDefault(); first.focus(); }
+  }
+});
+
+function install(){
+  if(deferredPrompt){
+    var p=deferredPrompt; deferredPrompt=null;
+    try{
+      p.prompt();
+      Promise.resolve(p.userChoice).then(function(c){ if(c&&c.outcome==="accepted"){ ui.installClosed=true; saveUi(); } updateAppUi(); });
+    }catch(e){ openSheet(); }
+    return;
+  }
+  openSheet();
+}
+window.addEventListener("beforeinstallprompt",function(e){ e.preventDefault(); deferredPrompt=e; updateAppUi(); });
+window.addEventListener("appinstalled",function(){ deferredPrompt=null; ui.installClosed=true; saveUi(); updateAppUi(); toast("Το «Πρόγραμμα» μπήκε στην αρχική οθόνη","install",3600); });
+
+/* Μπάρα πάνω από το πρόγραμμα: στον browser του κινητού προτείνει εγκατάσταση,
+   μέσα στην εφαρμογή (όσο δείχνει ακόμα το παράδειγμα) προτείνει να φέρει το πρόγραμμα με τον σύνδεσμο. */
+function updateAppUi(){
+  var sa=standalone(), mode="";
+  if(sa){ if(isExample()&&!ui.bringClosed) mode="bring"; }
+  else if(!ui.installClosed&&(isIOS||(coarse&&(isAndroid||deferredPrompt)))) mode="install";
+  var bar=$("#appbar");
+  if(mode&&bar.getAttribute("data-mode")!==mode){
+    if(mode==="install"){
+      $("#appbarIc").innerHTML=icon("phone");
+      $("#appbarText").innerHTML="<b>Βάλ’ το στην αρχική οθόνη.</b> Ανοίγει με ένα πάτημα, σαν εφαρμογή, και δουλεύει και χωρίς internet.";
+      $("#appbarBtn").innerHTML=icon("install")+"Εγκατάσταση";
+    } else {
+      $("#appbarIc").innerHTML=icon("paste");
+      $("#appbarText").innerHTML="<b>Έχεις ήδη πρόγραμμα στον browser ή σε άλλη συσκευή;</b> Πάτα εκεί «Αντιγραφή συνδέσμου» και εδώ «Επικόλληση».";
+      $("#appbarBtn").innerHTML=icon("paste")+"Επικόλληση";
+    }
+  }
+  bar.setAttribute("data-mode",mode); bar.hidden=!mode;
+  $("#btnInstall").hidden=sa;
+  $("#h-app").textContent=sa?"Σε άλλη συσκευή":"Στο κινητό σου";
+  $("#appNote").textContent=sa
+    ?"Για το ίδιο πρόγραμμα σε άλλη συσκευή, αντέγραψε τον σύνδεσμο μεταφοράς και άνοιξέ τον εκεί. Αν τον αντέγραψες από τον browser, πάτα «Επικόλληση συνδέσμου»."
+    :"Βάλ’ το στην αρχική οθόνη: ανοίγει με ένα πάτημα, σαν εφαρμογή, και δουλεύει και χωρίς internet. Για το ίδιο πρόγραμμα σε άλλη συσκευή, αντέγραψε τον σύνδεσμο μεταφοράς και άνοιξέ τον εκεί.";
+}
+$("#appbarX").innerHTML=icon("x");
+$("#appbarBtn").addEventListener("click",function(){ if($("#appbar").getAttribute("data-mode")==="bring") pasteLink(); else install(); });
+$("#appbarX").addEventListener("click",function(){
+  if($("#appbar").getAttribute("data-mode")==="bring") ui.bringClosed=true; else ui.installClosed=true;
+  saveUi(); updateAppUi(); $("#btnLink").focus({preventScroll:true});
+});
+$("#btnInstall").insertAdjacentHTML("afterbegin",icon("install"));
+$("#btnLink").insertAdjacentHTML("afterbegin",icon("link"));
+$("#btnPaste").insertAdjacentHTML("afterbegin",icon("paste"));
+$("#btnInstall").addEventListener("click",install);
+$("#btnLink").addEventListener("click",copyLink);
+$("#btnPaste").addEventListener("click",pasteLink);
+window.addEventListener("hashchange",takeHash);
+
 /* ---------- init ---------- */
 load();
 applyTheme(theme,false);
 weekLine(); renderLegend(); renderAll();
+takeHash();
+/* Εγκατεστημένη εφαρμογή: ζητά από τον browser να μη σβήνει τα δεδομένα όταν χρειάζεται χώρο */
+if(standalone()&&navigator.storage&&navigator.storage.persist){ try{ navigator.storage.persist().catch(function(){}); }catch(e){} }
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){ navigator.serviceWorker.register("/ergaleia/programma-sw.js",{scope:PAGE}).catch(function(){}); });
+}
 function onBreakpoint(){ renderWeek(); reserveClearWidth(); }
 if(phoneMQ.addEventListener) phoneMQ.addEventListener("change",onBreakpoint); else if(phoneMQ.addListener) phoneMQ.addListener(onBreakpoint);
 })();
