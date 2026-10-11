@@ -34,6 +34,20 @@ export type Ergaleio = {
 
 export const ERGALEIA: Ergaleio[] = [
   {
+    slug: "programma-meletis",
+    href: "/ergaleia/programma-meletis.html",
+    title: "Το πρόγραμμά μου",
+    short: "Στήσε την εβδομάδα σου: σχολείο, φροντιστήριο, διάβασμα και ελεύθερος χρόνος.",
+    description:
+      "Δωρεάν εβδομαδιαίο πρόγραμμα μελέτης: βάλε σχολείο, φροντιστήριο, διάβασμα, επανάληψη, διαγωνίσματα και ελεύθερο χρόνο σε ένα πλέγμα Δευτέρα έως Κυριακή. Στόχοι εβδομάδας, σύνοψη ωρών, εκτύπωση και έτοιμο μήνυμα για τους γονείς στο WhatsApp. Χωρίς λογαριασμό, όλα μένουν στη συσκευή σου.",
+    subject: "Οργάνωση μελέτης",
+    level: "Γυμνάσιο · Λύκειο",
+    icon: "🗓️",
+    tileFrom: "from-indigo-500",
+    tileTo: "to-violet-600",
+    ready: true,
+  },
+  {
     slug: "periodikos-pinakas",
     href: "/ergaleia/periodikos-pinakas.html",
     title: "Περιοδικός Πίνακας Στοιχείων",

@@ -4,6 +4,7 @@ import {
   getPublishedEvents, getCourses, getPublishedAlbums,
 } from "@/lib/queries";
 import { REPLACED_BY } from "@/lib/article-redirects";
+import { ERGALEIA } from "@/lib/ergaleia";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://korifi-edu.gr";
 
@@ -19,9 +20,9 @@ const RESERVED_SLUGS = new Set([
  * ΜΗΝ το κάνεις `new Date()` — αν το lastmod «φρεσκάρεται» σε κάθε deploy χωρίς
  * πραγματική αλλαγή περιεχομένου, η Google μαθαίνει να αγνοεί το σήμα.
  * Bump ΧΕΙΡΟΚΙΝΗΤΑ μόνο όταν αλλάζει ουσιαστικά κάποια στατική σελίδα.
- * (Τελευταίο bump: 2026-07-29 — νέο hero «Εγγραφές 2026-27» + nav link Λέσβου.)
+ * (Τελευταίο bump: 2026-10-10 — νέο εργαλείο «Το πρόγραμμά μου» στο /ergaleia.)
  */
-const STATIC_LASTMOD = new Date("2026-07-29");
+const STATIC_LASTMOD = new Date("2026-10-10");
 
 export const revalidate = 3600;
 
@@ -55,6 +56,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getCourses(),
     getPublishedAlbums(),
   ]);
+
+  // Διαδραστικά εργαλεία: στατικά HTML στο public/ergaleia (βλ. src/lib/ergaleia.ts)
+  const toolPages: MetadataRoute.Sitemap = ERGALEIA.filter((t) => t.ready).map((t) => ({
+    url: `${BASE_URL}${t.href}`,
+    lastModified: STATIC_LASTMOD,
+    changeFrequency: "yearly" as const,
+    priority: 0.5,
+  }));
 
   // Avoid duplicating slugs already in staticRoutes (gimnasio, alikeiou, etc.)
   const staticSlugSet = new Set(staticRoutes.map((r) => r.url.replace(`${BASE_URL}/`, "")));
@@ -104,6 +113,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticRoutes,
+    ...toolPages,
     ...dynamicPages,
     ...articlePages,
     ...eventPages,

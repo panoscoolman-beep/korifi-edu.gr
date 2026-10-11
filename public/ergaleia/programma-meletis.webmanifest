@@ -1,0 +1,20 @@
+{
+  "id": "/ergaleia/programma-meletis.html",
+  "name": "Το πρόγραμμά μου · Φροντιστήριο Κορυφή",
+  "short_name": "Πρόγραμμα",
+  "description": "Εβδομαδιαίο πρόγραμμα μελέτης: σχολείο, φροντιστήριο, διάβασμα και ελεύθερος χρόνος. Χωρίς λογαριασμό, όλα μένουν στη συσκευή σου.",
+  "lang": "el",
+  "dir": "ltr",
+  "start_url": "/ergaleia/programma-meletis.html",
+  "scope": "/ergaleia/programma-meletis.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f5fb",
+  "theme_color": "#f5f5fb",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "/ergaleia/programma-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/ergaleia/programma-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/ergaleia/programma-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
