@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { ContactFab } from "@/components/ContactFab";
 
 const interSans = Inter({
   variable: "--font-sans-family",
@@ -92,6 +93,7 @@ export default function RootLayout({
         <Navbar />
         <main id="main" tabIndex={-1} className="flex-1 outline-none">{children}</main>
         <Footer />
+        <ContactFab />
         <Analytics />
       </body>
     </html>

@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { Markdown } from "@/components/Markdown";
+import { LeadForm } from "@/components/LeadForm";
+import { guessGrade } from "@/lib/leads";
 import { JsonLd, webPageLd, breadcrumbsLd } from "@/components/JsonLd";
 import { getPageBySlug, getAllPublishedPageSlugs } from "@/lib/queries";
 
@@ -11,6 +13,14 @@ const RESERVED = new Set([
   "blog", "events", "synergates", "gallery", "martyries",
   "login", "register", "dashboard", "admin",
 ]);
+
+// Σελίδες τάξεων/υπηρεσιών που παίρνουν αυτόματα τη φόρμα «Κλείσε δωρεάν
+// διαγνωστικό» στο τέλος. Οποιαδήποτε άλλη σελίδα μπορεί να τη βάλει όπου θέλει
+// γράφοντας τη λέξη `{{lead-form}}` μόνη της σε μια γραμμή του κειμένου (admin).
+const LEAD_FORM_SLUGS = new Set([
+  "gimnasio", "alikeiou", "blikeiou", "glikeiou", "epal", "online-mathimata", "epikoinonia",
+]);
+const LEAD_FORM_MARKER = "{{lead-form}}";
 
 // ISR + prerender all known slugs at build time.
 export const revalidate = 3600;
@@ -64,7 +74,31 @@ export default async function DynamicPage({ params }: { params: Params }) {
         )}
       </header>
 
-      <Markdown>{p.content_md}</Markdown>
+      {renderContent(slug, p.title, p.content_md)}
     </article>
+  );
+}
+
+function renderContent(slug: string, title: string, md: string) {
+  const form = (
+    <LeadForm source={`/${slug}`} sourceLabel={title} grade={guessGrade(slug)} />
+  );
+  const at = md.indexOf(LEAD_FORM_MARKER);
+  if (at >= 0) {
+    const before = md.slice(0, at);
+    const after = md.slice(at + LEAD_FORM_MARKER.length);
+    return (
+      <>
+        <Markdown>{before}</Markdown>
+        {form}
+        {after.trim() && <Markdown>{after}</Markdown>}
+      </>
+    );
+  }
+  return (
+    <>
+      <Markdown>{md}</Markdown>
+      {LEAD_FORM_SLUGS.has(slug) && form}
+    </>
   );
 }

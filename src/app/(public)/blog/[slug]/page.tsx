@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
 import { Markdown } from "@/components/Markdown";
+import { LeadForm } from "@/components/LeadForm";
 import { JsonLd, articleLd, breadcrumbsLd } from "@/components/JsonLd";
 import { getArticleBySlug, getAllPublishedArticleSlugs } from "@/lib/queries";
 import { REPLACED_BY } from "@/lib/article-redirects";
@@ -98,6 +99,13 @@ export default async function ArticlePage({ params }: { params: Params }) {
       <div className="mt-10">
         <Markdown>{article.content_md}</Markdown>
       </div>
+
+      <LeadForm
+        source={`/blog/${article.slug}`}
+        sourceLabel={article.title}
+        title="Θες να δούμε πού βρίσκεται το παιδί;"
+        intro="Άφησε το κινητό σου και σε καλούμε εμείς για ένα δωρεάν διαγνωστικό: 30 λεπτά, χωρίς δέσμευση, για να δούμε από πού ξεκινά."
+      />
     </article>
   );
 }

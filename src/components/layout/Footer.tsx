@@ -1,12 +1,13 @@
 import Image from "next/image";
 import { ResourcesStrip } from "./ResourcesStrip";
+import { CONTACT as SITE } from "@/lib/site";
 
 const CONTACT = {
-  address: "Καλλονή Λέσβου, ΤΚ 81107",
-  phone:   "22530 25080",
-  phoneHref: "tel:+302253025080",
-  email:   "frontistiriokorifh@gmail.com",
-  emailHref: "mailto:frontistiriokorifh@gmail.com",
+  address: SITE.address,
+  phone:   SITE.phone,
+  phoneHref: `tel:${SITE.phoneE164}`,
+  email:   SITE.email,
+  emailHref: `mailto:${SITE.email}`,
 };
 
 const SOCIAL = {
