@@ -376,7 +376,7 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
 
 /* ---------- modal ---------- */
 .scrim{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;overflow:auto}
-.modal{background:var(--surface);color:var(--fg);border-radius:14px;width:100%;max-width:460px;max-height:calc(100vh - 32px);overflow:auto;padding:22px 22px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow);margin:auto;min-width:0}
+.modal{background:var(--surface);color:var(--fg);border-radius:14px;width:100%;max-width:460px;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto;padding:22px 22px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow);margin:auto;min-width:0}
 .modal .grab{display:none}
 .mhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-width:0}
 .modal h3{font-family:var(--serif);font-weight:500;font-size:24px;margin:0;line-height:1.2;min-width:0}
@@ -386,6 +386,8 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
 .field .input,.field .select{width:100%}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .field + .row2{grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr)}
+/* Πολύ στενά κινητά (320–374px): να χωρά ολόκληρο το «Παρασκευή» */
+@media screen and (max-width:374px){.field + .row2{grid-template-columns:auto minmax(0,1fr)} #fDay{padding-right:26px}}
 .types{display:flex;flex-wrap:wrap;gap:6px}
 .types input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
 .types label{display:inline-flex;align-items:center;gap:6px;padding:0 11px 0 9px;min-height:32px;border-radius:999px;font-size:13px;font-weight:500;border:1px solid var(--faint);color:var(--fg-2);cursor:pointer;background:var(--surface);line-height:1.2}
@@ -473,7 +475,7 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
   .seg{display:flex;width:100%}
   .seg label{flex:1;min-height:38px;padding:0 6px}
   .scrim{align-items:flex-end;padding:0}
-  .modal{max-width:none;max-height:calc(100vh - 20px);border-radius:18px 18px 0 0;padding:10px 16px calc(18px + env(safe-area-inset-bottom,0px));margin:auto 0 0}
+  .modal{max-width:none;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);border-radius:18px 18px 0 0;padding:10px 16px calc(18px + env(safe-area-inset-bottom,0px));margin:auto 0 0}
   .modal .grab{display:block;width:36px;height:4px;border-radius:99px;background:var(--line);margin:0 auto 6px}
   .mwhen{display:none}
   .goals li{padding:5px 0}
@@ -530,11 +532,13 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
 .linkbox:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 @media (pointer:coarse){.linkbox{font-size:16px}}
 .callout .linkbox{margin-top:10px;min-height:72px}
+.linkbox.msgbox{font-family:var(--sans);word-break:normal;overflow-wrap:break-word}
 .copy-hint{margin:6px 0 0;font-size:12.5px;line-height:1.5;color:var(--muted)}
 /* Τα κουμπιά του φύλλου μένουν πάντα ορατά, ακόμα κι όταν το περιεχόμενο κυλά (μικρές οθόνες, εικόνα) */
-#appSheet .mfoot{position:sticky;bottom:0;z-index:1;background:var(--surface);margin:0 -22px -18px;padding:12px 22px 18px;border-top:1px solid transparent}
+#appSheet{padding-bottom:0}
+#appSheet .mfoot{position:sticky;bottom:0;z-index:1;background:var(--surface);margin:0 -22px;padding:12px 22px 18px;border-top:1px solid transparent}
 #appSheet.is-over .mfoot{border-top-color:var(--line)}
-@media screen and (max-width:599px){#appSheet .mfoot{margin:0 -16px calc(-18px - env(safe-area-inset-bottom,0px));padding:12px 16px calc(18px + env(safe-area-inset-bottom,0px))}}
+@media screen and (max-width:599px){#appSheet{padding-bottom:0} #appSheet .mfoot{margin:0 -16px;padding:12px 16px calc(18px + env(safe-area-inset-bottom,0px))}}
 .shot-lbl{margin:0;font-size:13.5px;color:var(--fg-2)}
 .shot{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
 .shot-frame{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;min-height:120px;display:grid;place-items:center}
@@ -861,8 +865,8 @@ var saveFailed=false;
 function save(){
   try{ localStorage.setItem(KEY,JSON.stringify({acts:state.acts,goals:state.goals,theme:theme})); saveFailed=false; }
   catch(e){
-    /* Αποκλεισμένη ή γεμάτη αποθήκευση: ο μαθητής το μαθαίνει μία φορά, πριν χάσει δουλειά */
-    if(!saveFailed){ saveFailed=true; setTimeout(function(){ toast("Αυτός ο browser δεν κρατά τις αλλαγές σου. Πριν κλείσεις, πάτα «Αντιγραφή συνδέσμου» για να μη χαθούν.","flag",7000); },60); }
+    /* Αποκλεισμένη ή γεμάτη αποθήκευση: το λέει η μπάρα πάνω από το πρόγραμμα (updateAppUi) */
+    saveFailed=true;
   }
 }
 
@@ -870,7 +874,7 @@ function save(){
 window.addEventListener("storage",function(e){
   if(e.key!==KEY&&e.key!==null) return;
   load(); applyTheme(theme,true);
-  renderWeek(); renderStats(); renderGoals(); renderShare(); updateAppUi();
+  renderWeek(); renderStats(); renderGoals(); renderShare(); updateAppUi(); if(carryOn) carryHash(true);
 });
 
 /* ---------- theme ---------- */
@@ -1237,7 +1241,7 @@ function legacyCopy(text){
 }
 $("#btnCopy").addEventListener("click",function(){
   var pre=$("#shareText"), txt=pre.textContent, ok="Αντιγράφηκε. Στείλε το στους γονείς σου.";
-  function fallback(){ showCopyBox("Αντέγραψε το μήνυμα",txt,"Μήνυμα για τους γονείς",6); }
+  function fallback(){ showCopyBox("Αντέγραψε το μήνυμα",txt,"Μήνυμα για τους γονείς",6,"msgbox"); }
   try{
     if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){toast(ok);},function(){ if(legacyCopy(txt)) toast(ok); else fallback(); });
     else if(legacyCopy(txt)) toast(ok); else fallback();
@@ -1302,6 +1306,7 @@ $("#btnPrint").addEventListener("click",function(){
 var PAGE="/ergaleia/programma-meletis.html", UIKEY="korifi-programma-meletis-ui";
 var ua=navigator.userAgent||"";
 var isIOS=/iPad|iPhone|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+var iDev=/iPhone|iPod/.test(ua)?"iPhone":"iPad";
 var isAndroid=/Android/i.test(ua);
 var coarse=window.matchMedia("(pointer: coarse)").matches;
 /* Browser μέσα σε εφαρμογή (Instagram, Facebook, Messenger, TikTok, WhatsApp για επιχειρήσεις, Android WebView, iOS χωρίς «Safari/») */
@@ -1334,15 +1339,16 @@ function transferLink(){ return location.origin+PAGE+"#p="+packLink(); }
 /* Δέχεται ολόκληρο τον σύνδεσμο ή μόνο το κομμάτι μετά το #p=, και σύνδεσμο που έσπασε σε γραμμές
    ή πέρασε από «ενδιάμεσο» σύνδεσμο (π.χ. l.facebook.com, όπου το #p= γίνεται %23p%3D). Επιστρέφει έγκυρο πρόγραμμα ή null. */
 function readLink(text){
-  var str=String(text||""), tries=[str,str.replace(/\s+/g,"")];
-  tries.slice().forEach(function(t){ try{ var d=decodeURIComponent(t); if(d!==t) tries.push(d); }catch(e){} });
+  var str=String(text||""), tries=[str,str.replace(/[\s\u00ad\u200b-\u200d\u2060]+/g,"")];
+  for(var j=0;j<tries.length&&j<6;j++){ try{ var d=decodeURIComponent(tries[j]); if(d!==tries[j]&&tries.indexOf(d)<0) tries.push(d); }catch(e){} }
   for(var i=0;i<tries.length;i++){ var s=parseLink(tries[i]); if(s) return s; }
   return null;
 }
 function parseLink(text){
   var str=String(text||"").trim(), m=str.match(/#p=([A-Za-z0-9_-]+)/)||str.match(/^([A-Za-z0-9_-]{16,})$/);
   if(!m) return null;
-  var o; try{ o=JSON.parse(b64dec(m[1])); }catch(e){ return null; }
+  /* Αν κόλλησε λέξη στο τέλος (π.χ. «Sent from my iPhone» κάτω από σπασμένο σύνδεσμο), κόβεται γράμμα-γράμμα */
+  var o=null; for(var k=0;!o&&k<=40&&m[1].length-k>=16;k++){ try{ o=JSON.parse(b64dec(m[1].slice(0,m[1].length-k))); }catch(e){} }
   if(!o||o.v!==1||!Array.isArray(o.a)||!Array.isArray(o.g)) return null;
   var acts=o.a.map(function(x){ return Array.isArray(x)?cleanAct({type:x[0],subject:x[1],day:x[2],start:x[3],end:x[4],repeat:x[5],goal:x[6]}):null; }).filter(Boolean);
   var goals=o.g.filter(function(x){return Array.isArray(x)&&typeof x[0]==="string"&&x[0].trim();}).map(function(x){return {t:x[0].slice(0,120),d:!!x[1]};});
@@ -1365,14 +1371,15 @@ function takeHash(fromUser){
   if(!/^#p=/.test(location.hash)) return;
   var s=readLink(location.hash);
   try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
-  if(s) importState(s,fromUser===true); else toast("Ο σύνδεσμος δεν διαβάζεται. Αντέγραψέ τον ξανά ολόκληρο.","flag",3600);
+  if(s){ importState(s,fromUser===true); if(IN_APP){ carryOn=true; carryHash(true); } }
+  else toast("Ο σύνδεσμος δεν διαβάζεται. Αντέγραψέ τον ξανά ολόκληρο.","flag",3600);
 }
 /* Όταν η αντιγραφή δεν επιτρέπεται: το κείμενο σε πλαίσιο, για αντιγραφή με το χέρι */
 function copyHint(){ return coarse?"Κράτα πατημένο μέσα στο πλαίσιο, διάλεξε «Επιλογή όλων» και μετά «Αντιγραφή».":"Το κείμενο είναι επιλεγμένο. Πάτα Ctrl+C (ή ⌘C στο Mac) για αντιγραφή."; }
 function selectBox(ta){ setTimeout(function(){ try{ ta.focus({preventScroll:true}); ta.select(); ta.setSelectionRange(0,ta.value.length); }catch(e){} },30); }
-function showCopyBox(title,text,label,rows){
+function showCopyBox(title,text,label,rows,cls){
   showSheet({title:title,lead:copyHint(),
-    extra:'<textarea class="linkbox" id="aLink" rows="'+(rows||4)+'" readonly aria-label="'+esc(label)+'"></textarea>',focus:"#aLink"});
+    extra:'<textarea class="linkbox'+(cls?" "+cls:"")+'" id="aLink" rows="'+(rows||4)+'" readonly aria-label="'+esc(label)+'"></textarea>',focus:"#aLink"});
   var ta=$("#aLink"); ta.value=text; selectBox(ta);
 }
 function showLinkBox(url){
@@ -1382,6 +1389,8 @@ function showLinkBox(url){
     var ta=$("#aLink");
     if(!ta){ btn.insertAdjacentHTML("afterend",'<textarea class="linkbox" id="aLink" rows="3" readonly aria-label="Σύνδεσμος μεταφοράς"></textarea><p class="copy-hint">'+copyHint()+'</p>'); ta=$("#aLink"); }
     ta.value=url; selectBox(ta); sheetOverflow();
+    var sh=$("#appSheet"), last=ta.nextElementSibling||ta, d=last.getBoundingClientRect().bottom-sh.querySelector(".mfoot").getBoundingClientRect().top+8;
+    if(d>0) sh.scrollTop+=d;
     return;
   }
   showCopyBox("Αντέγραψε τον σύνδεσμο",url,"Σύνδεσμος μεταφοράς",4);
@@ -1487,23 +1496,25 @@ function openInstallSheet(){
            'Διάλεξε <b>«Προσθήκη στην οθόνη Αφετηρίας»</b>.',
            'Πάτα <b>«Προσθήκη»</b>. Το εικονίδιο «Πρόγραμμα» μπαίνει στην αρχική σου οθόνη.'];
     extra=isExample()
-      ?'<p class="callout">Στο iPhone η εφαρμογή κρατά τα δικά της δεδομένα, χωριστά από το Safari. Φτιάξε το πρόγραμμά σου μέσα από την εφαρμογή.</p>'
-      :'<div class="callout">Στο iPhone η εφαρμογή κρατά τα δικά της δεδομένα, χωριστά από το Safari. Για να πάρεις μαζί το πρόγραμμα που έφτιαξες, πάτα «Αντιγραφή συνδέσμου» τώρα και «Επικόλληση» μόλις ανοίξεις την εφαρμογή.<br><button type="button" class="btn small" id="aCopy" data-act="copy">'+icon("link")+'Αντιγραφή συνδέσμου</button></div>';
+      ?'<p class="callout">Στο '+iDev+' η εφαρμογή κρατά τα δικά της δεδομένα, χωριστά από το Safari. Φτιάξε το πρόγραμμά σου μέσα από την εφαρμογή.</p>'
+      :'<div class="callout">Στο '+iDev+' η εφαρμογή κρατά τα δικά της δεδομένα, χωριστά από το Safari. Για να πάρεις μαζί το πρόγραμμα που έφτιαξες, πάτα «Αντιγραφή συνδέσμου» τώρα και «Επικόλληση» μόλις ανοίξεις την εφαρμογή.<br><button type="button" class="btn small" id="aCopy" data-act="copy">'+icon("link")+'Αντιγραφή συνδέσμου</button></div>';
   } else if(isAndroid){
     steps=['Άνοιξε το μενού του browser <b>⋮</b> (πάνω δεξιά).',
            'Διάλεξε <b>«Εγκατάσταση εφαρμογής»</b> ή <b>«Προσθήκη στην αρχική οθόνη»</b>.',
            'Επιβεβαίωσε. Το εικονίδιο «Πρόγραμμα» μπαίνει στην αρχική σου οθόνη, με το πρόγραμμα που έφτιαξες.'];
-  } else if(/Safari\//.test(ua)&&!/Chrome|Chromium|Edg\/|Firefox/.test(ua)){
+  } else if(/Macintosh/.test(ua)&&/Safari\//.test(ua)&&!/Chrome|Chromium|Edg\/|Firefox|Ddg\//.test(ua)){
     steps=['Στη γραμμή μενού πάτα <b>Αρχείο</b>.',
            'Διάλεξε <b>«Προσθήκη στο Dock»</b> και πάτα <b>«Προσθήκη»</b>. Το «Πρόγραμμα» ανοίγει από το Dock σαν εφαρμογή.'];
     extra='<p class="callout">Στο κινητό είναι ακόμη πιο χρήσιμο: άνοιξε τη σελίδα από εκεί και βάλ’ τη στην αρχική οθόνη.</p>';
   } else if(/Chrome|Chromium|Edg\//.test(ua)){
-    steps=['Πάτα το εικονίδιο εγκατάστασης δεξιά στη γραμμή διευθύνσεων, ή άνοιξε το μενού <b>⋮</b> και διάλεξε <b>«Εγκατάσταση»</b>.',
+    steps=[/Edg\//.test(ua)
+             ?'Πάτα το εικονίδιο εγκατάστασης δεξιά στη γραμμή διευθύνσεων, ή άνοιξε το μενού <b>…</b> και διάλεξε <b>«Εφαρμογές»</b> και μετά <b>«Εγκατάσταση»</b>.'
+             :'Πάτα το εικονίδιο εγκατάστασης δεξιά στη γραμμή διευθύνσεων, ή άνοιξε το μενού <b>⋮</b> και διάλεξε <b>«Εγκατάσταση»</b>.',
            'Αν το έχεις ήδη εγκαταστήσει, στη θέση του εικονιδίου θα δεις <b>«Άνοιγμα σε εφαρμογή»</b>.'];
     extra='<p class="callout">Στο κινητό είναι ακόμη πιο χρήσιμο: άνοιξε τη σελίδα από εκεί και βάλ’ τη στην αρχική οθόνη.</p>';
   } else {
     steps=['Άνοιξε αυτή τη σελίδα στον <b>Chrome</b> ή στον <b>Edge</b>.',
-           'Πάτα το εικονίδιο εγκατάστασης δεξιά στη γραμμή διευθύνσεων, ή διάλεξε <b>«Εγκατάσταση»</b> από το μενού <b>⋮</b>.'];
+           'Πάτα το εικονίδιο εγκατάστασης δεξιά στη γραμμή διευθύνσεων, ή διάλεξε <b>«Εγκατάσταση»</b> από το μενού <b>⋮</b> (στον Edge <b>…</b>).'];
     extra='<p class="callout">Στο Safari του Mac: <b>Αρχείο › Προσθήκη στο Dock</b>. Στο κινητό είναι ακόμη πιο χρήσιμο: άνοιξε τη σελίδα από εκεί.</p>';
   }
   /* Σε browser μέσα σε εφαρμογή δεν γίνεται εγκατάσταση: πρώτα άνοιγμα στον κανονικό browser */
@@ -1559,7 +1570,8 @@ function prepareShot(){
     var img=$("#aShot"); img.onload=sheetOverflow; img.src=shotUrl; img.hidden=false; $("#aShotWait").hidden=true;
     var share=$("#aShare"), dl=$("#aDownload"), main=share||dl;
     if(main){ main.disabled=false; if(document.activeElement===sheetAutoFocus) main.focus({preventScroll:true}); }
-    $("#aShotCap").textContent=share?"Στο μενού που ανοίγει διάλεξε «Εκτύπωση», «Αποθήκευση στα Αρχεία» ή το WhatsApp. Ή κράτα πατημένη την εικόνα για να την κρατήσεις στις Φωτογραφίες."
+    $("#aShotCap").textContent=share?(isIOS?"Στο μενού που ανοίγει διάλεξε «Εκτύπωση», «Αποθήκευση στα Αρχεία» ή το WhatsApp. Ή κράτα πατημένη την εικόνα για να την αποθηκεύσεις στις Φωτογραφίες."
+        :"Στο μενού που ανοίγει διάλεξε το WhatsApp, το Drive ή την αποθήκευση. Ή κράτα πατημένη την εικόνα για να την αποθηκεύσεις.")
       :dl?"Η εικόνα έχει μέγεθος για σελίδα A4 οριζόντια."
       :"Κράτα πατημένη την εικόνα και διάλεξε «Αποθήκευση» ή «Κοινοποίηση».";
   },function(){
@@ -1580,7 +1592,9 @@ function downloadShot(){
   if(!shotUrl) return false;
   var a=document.createElement("a"); a.href=shotUrl; a.download="programma-meletis.png"; a.rel="noopener";
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  toast("Η εικόνα κατέβηκε","install");
+  var b=$("#aDownload");
+  if(b){ b.innerHTML=icon("check")+"Κατέβηκε"; setTimeout(function(){ if(document.contains(b)) b.innerHTML=icon("install")+"Λήψη εικόνας"; },2500); }
+  else toast("Η εικόνα κατέβηκε","install");
   return false;
 }
 function openPrintHelp(env){
@@ -1592,10 +1606,10 @@ function openPrintHelp(env){
   extra=shotFigure("");
   if(app) extra+='<div class="callout">Θέλεις το φύλλο A4 με τους στόχους; Πάτα «Αντιγραφή συνδέσμου», άνοιξε τον σύνδεσμο στο Safari και πάτα εκεί «Εκτύπωση».<br><button type="button" class="btn small" data-act="copy">'+icon("link")+'Αντιγραφή συνδέσμου</button></div>';
   showSheet({kind:"print",
-    title:app?"Εκτύπωση από το iPhone":"Δεν άνοιξε η εκτύπωση;",
-    lead:app?"Από την εφαρμογή της αρχικής οθόνης το iPhone δεν ανοίγει εκτύπωση. Κράτα το πρόγραμμα ως εικόνα: από εκεί το τυπώνεις, το αποθηκεύεις ή το στέλνεις."
+    title:app?"Εκτύπωση από το "+iDev:"Δεν άνοιξε η εκτύπωση;",
+    lead:app?"Από την εφαρμογή της αρχικής οθόνης το "+iDev+" δεν ανοίγει εκτύπωση. Κράτα το πρόγραμμα ως εικόνα: από εκεί το τυπώνεις, το αποθηκεύεις ή το στέλνεις."
       :coarse?"Δοκίμασε από το μενού του browser: <b>⋮</b> ή <b>Κοινοποίηση</b>, μετά <b>«Εκτύπωση»</b>. Αλλιώς κράτα το πρόγραμμα ως εικόνα."
-      :"Δοκίμασε από το μενού του browser (<b>«Εκτύπωση»</b> ή <b>Ctrl+P</b>). Αλλιώς κατέβασε το πρόγραμμα ως εικόνα.",
+      :"Δοκίμασε από το μενού του browser (<b>«Εκτύπωση»</b> ή <b>"+(/Macintosh/.test(ua)?"⌘P":"Ctrl+P")+"</b>). Αλλιώς κατέβασε το πρόγραμμα ως εικόνα.",
     extra:extra,on:{copy:copyLink},actions:acts,opener:"#btnPrint",onClose:dropShot});
   prepareShot();
 }
@@ -1740,7 +1754,7 @@ window.addEventListener("appinstalled",function(){ deferredPrompt=null; installe
 function updateAppUi(){
   var sa=standalone(), mode="";
   /* Ο browser δεν αποθηκεύει (ιδιωτική περιήγηση, γεμάτος χώρος): η ειδοποίηση μένει μέχρι να την κλείσει ο μαθητής */
-  if(saveFailed&&!noStoreClosed) mode="nostore";
+  if(saveFailed){ if(!noStoreClosed) mode="nostore"; }
   else if(sa){ if(isExample()&&!ui.bringClosed) mode="bring"; }
   else if(!ui.installClosed&&(isIOS||(coarse&&(isAndroid||deferredPrompt)))) mode="install";
   var bar=$("#appbar");
