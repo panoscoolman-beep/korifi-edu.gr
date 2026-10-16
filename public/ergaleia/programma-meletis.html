@@ -129,6 +129,9 @@ input,select,textarea{font:inherit}
 svg{display:block}
 .page{max-width:1240px;margin:0 auto;padding-inline:var(--gutter);padding-block:28px 56px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip:focus{position:static;width:auto;height:auto;clip:auto;display:inline-flex;margin:0 0 10px;padding:6px 12px;border-radius:8px;background:var(--accent);color:var(--accent-ink);font-size:13.5px;font-weight:600;text-decoration:none}
+#h-summary:focus{outline:none}
 
 /* focus */
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
@@ -143,6 +146,7 @@ svg{display:block}
 .eyebrow a{color:inherit;text-decoration:none}
 .eyebrow a:hover{text-decoration:underline;text-underline-offset:3px}
 .eyebrow{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+.eyebrow .prt{display:none}
 h1{font-family:var(--serif);font-weight:500;font-size:clamp(38px,6vw,64px);line-height:1.02;letter-spacing:-.015em;margin:0;text-wrap:balance}
 .weekline{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--fg-2);margin:12px 0 0}
 .lede{margin:14px 0 0;color:var(--fg-2);max-width:58ch;font-size:15.5px}
@@ -214,6 +218,8 @@ a.btn{text-decoration:none}
 .slot:hover::after,.slot:focus-visible::after{content:"+";position:absolute;inset:0;display:grid;place-items:center;color:var(--accent);font-weight:600;font-size:16px}
 .slot:active{background-color:var(--surface-3)}
 .slot:focus-visible{outline-offset:-2px;border-radius:0}
+.slot,.blk{scroll-margin-top:72px}
+.board.is-phone .slot,.board.is-phone .blk{scroll-margin-top:calc(var(--strip) + 70px)}
 .col.today .slot{border-top-color:color-mix(in srgb,var(--fg) 11%,transparent);background-image:linear-gradient(color-mix(in srgb,var(--fg) 6%,transparent),color-mix(in srgb,var(--fg) 6%,transparent))}
 .blk{position:absolute;display:flex;flex-direction:column;gap:1px;border:0;border-left:3px solid var(--stripe);background:var(--tint);color:var(--ink);border-radius:3px 5px 5px 3px;padding:3px 7px 3px 6px;text-align:left;overflow:hidden;font-size:12px;line-height:1.25;z-index:var(--z,1);min-width:0}
 .blk:hover{filter:var(--blk-hover);z-index:20}
@@ -242,7 +248,7 @@ a.btn{text-decoration:none}
 .blk.tiny.narrow .blk-head b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .blk.narrow .blk-time{white-space:normal;line-height:1.2;font-size:10.5px}
 .blk.narrow.short .blk-time,.blk.narrow .blk-time .once,.blk.narrow .blk-goal{display:none}
-@media (min-width:900px){.blk.narrow .blk-time .end{display:none}}
+@media print,(min-width:900px){.blk.narrow .blk-time .end{display:none}}
 /* Κοντό μπλοκ με «μία φορά»: όταν η πλήρης ώρα και το σήμα δεν χωρούν στην ίδια γραμμή, μένει η ώρα έναρξης·
    σε πολύ στενή στήλη το σήμα γίνεται απλό πλάγιο κείμενο (μετράται το εσωτερικό πλάτος του ίδιου του μπλοκ) */
 .blk{container-type:inline-size}
@@ -370,7 +376,7 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
 
 /* ---------- modal ---------- */
 .scrim{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;overflow:auto}
-.modal{background:var(--surface);color:var(--fg);border-radius:14px;width:100%;max-width:460px;max-height:calc(100vh - 32px);overflow:auto;padding:22px 22px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow);margin:auto;min-width:0}
+.modal{background:var(--surface);color:var(--fg);border-radius:14px;width:100%;max-width:460px;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto;padding:22px 22px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow);margin:auto;min-width:0}
 .modal .grab{display:none}
 .mhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-width:0}
 .modal h3{font-family:var(--serif);font-weight:500;font-size:24px;margin:0;line-height:1.2;min-width:0}
@@ -380,6 +386,8 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
 .field .input,.field .select{width:100%}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .field + .row2{grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr)}
+/* Πολύ στενά κινητά (320–374px): να χωρά ολόκληρο το «Παρασκευή» */
+@media screen and (max-width:374px){.field + .row2{grid-template-columns:auto minmax(0,1fr)} #fDay{padding-right:26px}}
 .types{display:flex;flex-wrap:wrap;gap:6px}
 .types input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
 .types label{display:inline-flex;align-items:center;gap:6px;padding:0 11px 0 9px;min-height:32px;border-radius:999px;font-size:13px;font-weight:500;border:1px solid var(--faint);color:var(--fg-2);cursor:pointer;background:var(--surface);line-height:1.2}
@@ -395,7 +403,7 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
 .modal .select{background-color:var(--surface)}
 
 /* toast */
-.toast{position:fixed;inset-inline:16px;bottom:calc(22px + env(safe-area-inset-bottom,0px));width:fit-content;max-width:100%;margin-inline:auto;transform:none;display:flex;align-items:center;gap:9px;background:var(--toast-bg);color:var(--toast-fg);padding:10px 16px 10px 13px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:60;box-shadow:var(--shadow);line-height:1.3}
+.toast{pointer-events:none;position:fixed;inset-inline:16px;bottom:calc(22px + env(safe-area-inset-bottom,0px));width:fit-content;max-width:100%;margin-inline:auto;transform:none;display:flex;align-items:center;gap:9px;background:var(--toast-bg);color:var(--toast-fg);padding:10px 16px 10px 13px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:60;box-shadow:var(--shadow);line-height:1.3}
 .toast svg{width:16px;height:16px;flex:none;color:var(--toast-ok)}
 .toast span{min-width:0}
 
@@ -424,7 +432,7 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
   .tiplist{grid-template-columns:1fr 1fr;gap:18px 0}
   .tiplist li:nth-child(2){border-right:0;margin-right:0;padding-right:0}
 }
-@media (max-width:899px){
+@media screen and (max-width:899px){
   :root{--row:60px;--strip:61px}
   .page{padding-block:20px 48px}
   .mast{grid-template-columns:minmax(0,1fr);gap:14px}
@@ -460,14 +468,14 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
   .tiplist li,.tiplist li:nth-child(2){border-right:0;margin-right:0;padding-right:0;padding-bottom:0}
   .tiplist li + li{border-top:1px solid var(--hair);padding-top:16px}
 }
-@media (max-width:599px){
+@media screen and (max-width:599px){
   .actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
   .actions .btn{padding:8px 6px;gap:6px;min-width:0}
   .theme > span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .seg{display:flex;width:100%}
   .seg label{flex:1;min-height:38px;padding:0 6px}
   .scrim{align-items:flex-end;padding:0}
-  .modal{max-width:none;max-height:calc(100vh - 20px);border-radius:18px 18px 0 0;padding:10px 16px calc(18px + env(safe-area-inset-bottom,0px));margin:auto 0 0}
+  .modal{max-width:none;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);border-radius:18px 18px 0 0;padding:10px 16px calc(18px + env(safe-area-inset-bottom,0px));margin:auto 0 0}
   .modal .grab{display:block;width:36px;height:4px;border-radius:99px;background:var(--line);margin:0 auto 6px}
   .mwhen{display:none}
   .goals li{padding:5px 0}
@@ -475,23 +483,23 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
   .boardfoot{padding:10px 12px}
   @media (prefers-reduced-motion:no-preference){.modal{animation:sheet .22s ease-out}@keyframes sheet{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}}
 }
-@media (max-width:559px){
+@media screen and (max-width:559px){
   .lbl-long{display:none}
   .lbl-short{display:inline}
 }
-@media (max-width:374px){
+@media screen and (max-width:374px){
   #btnPrint svg{display:none}
 }
-@media (max-width:420px){
+@media screen and (max-width:420px){
   .week.is-day .dayh .btn .t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .week.is-day .dayh .btn{width:40px;padding:0;gap:0}
 }
-@media (max-width:360px){
+@media screen and (max-width:360px){
   .picker .select{flex:1 1 auto}
   .picker .btn{flex:1}
   .seg label svg{display:none}
 }
-@media (max-width:340px){
+@media screen and (max-width:340px){
   .daystrip .dh .unit{display:none}
   .daystrip .dh .unitc{display:inline}
 }
@@ -517,11 +525,32 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
 .steps .glyph svg{width:14px;height:14px}
 .callout{margin:0;background:var(--surface-2);border-left:3px solid var(--accent);border-radius:3px 10px 10px 3px;padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--fg-2)}
 .callout .btn{margin-top:10px}
-@media (max-width:899px){
+#appSheet .lead{margin:0;font-size:14.5px;line-height:1.55;color:var(--fg-2)}
+#appSheet .lead b{color:var(--fg);font-weight:600}
+.sheet-extra{display:flex;flex-direction:column;gap:12px;min-width:0}
+.linkbox{display:block;width:100%;min-height:92px;resize:vertical;border:1px solid var(--faint);border-radius:8px;background:var(--surface-2);color:var(--fg);padding:10px 12px;font:13px/1.45 var(--mono);overflow-wrap:anywhere;word-break:break-all}
+.linkbox:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+@media (pointer:coarse){.linkbox{font-size:16px}}
+.callout .linkbox{margin-top:10px;min-height:72px}
+.linkbox.msgbox{font-family:var(--sans);word-break:normal;overflow-wrap:break-word}
+.copy-hint{margin:6px 0 0;font-size:12.5px;line-height:1.5;color:var(--muted)}
+/* Τα κουμπιά του φύλλου μένουν πάντα ορατά, ακόμα κι όταν το περιεχόμενο κυλά (μικρές οθόνες, εικόνα) */
+#appSheet{padding-bottom:0}
+#appSheet .mfoot{position:sticky;bottom:0;z-index:1;background:var(--surface);margin:0 -22px;padding:12px 22px 18px;border-top:1px solid transparent}
+#appSheet.is-over .mfoot{border-top-color:var(--line)}
+@media screen and (max-width:599px){#appSheet{padding-bottom:0} #appSheet .mfoot{margin:0 -16px;padding:12px 16px calc(18px + env(safe-area-inset-bottom,0px))}}
+.shot-lbl{margin:0;font-size:13.5px;color:var(--fg-2)}
+.shot{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+.shot-frame{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;min-height:120px;display:grid;place-items:center}
+.shot-frame img{display:block;width:100%;height:auto;-webkit-touch-callout:default;user-select:auto}
+.shot-wait{font-size:13px;color:#62648a;padding:20px;text-align:center}
+.shot figcaption{font-size:12.5px;line-height:1.5;color:var(--muted)}
+.shot figcaption:empty{display:none}
+@media screen and (max-width:899px){
   .appsec{grid-template-columns:minmax(0,1fr);margin-top:32px}
   .appsec-act{justify-content:flex-start}
 }
-@media (max-width:599px){
+@media screen and (max-width:599px){
   .appbar{grid-template-columns:auto minmax(0,1fr) auto;align-items:start}
   .appbar-ic{grid-column:1;grid-row:1}
   .appbar p{grid-column:2;grid-row:1;padding-top:1px}
@@ -533,15 +562,39 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
 /* ---------- print: μία σελίδα A4 οριζόντια με το πρόγραμμα, στόχοι και σύνοψη στη δεύτερη ---------- */
 @page{size:A4 landscape;margin:10mm}
 @media print{
-  :root{--row:34px}
+  /* Το χαρτί είναι πάντα ανοιχτό, ακόμη κι αν ο browser δεν τρέξει το beforeprint (το :is ισοφαρίζει την ειδικότητα των σκούρων κανόνων) */
+  :root:is([data-theme],:not([data-theme])){
+    color-scheme:light;
+    --bg:#f5f5fb; --surface:#ffffff; --surface-2:#eeeef7; --surface-3:#e4e4f1;
+    --fg:#1b1a3a; --fg-2:#454768; --muted:#62648a; --faint:#75779a;
+    --line:#d9d9ea; --hair:#e1e1ee; --hair-2:#ebebf5; --seg-on:#ffffff;
+    --accent:#4338ca; --accent-strong:#3730a3; --accent-ink:#ffffff; --accent-soft:#eef2ff;
+    --a-school:#64748b; --a-school-bg:#eceff4; --a-school-ink:#334155;
+    --a-korifi:#4338ca; --a-korifi-bg:#e7e9fb; --a-korifi-ink:#2b2683;
+    --a-study:#0e8f84; --a-study-bg:#e0f3f0; --a-study-ink:#0c5e57;
+    --a-review:#0369a1; --a-review-bg:#e2eff9; --a-review-ink:#084f78;
+    --a-test:#be123c; --a-test-bg:#fbe6ec; --a-test-ink:#8f1033;
+    --a-free:#c2610a; --a-free-bg:#fbf1e5; --a-free-ink:#7e3f06;
+    --row:37px }
   html{padding:0}
   body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:12px}
   .page{max-width:none;padding:0}
-  .back,.mast-side,.lede,.ornament,.daystrip,.share-col,.tips,.foot,.toast,.scrim,.hint,.goalbar,.addrow,.goals .x,.empty,.appbar,.appsec{display:none!important}
+  .back,.mast-side,.lede,.ornament,.daystrip,.share-col,.tips,.foot,.toast,.scrim,.hint,.goalbar,.addrow,.goals .x,.empty,.appbar,.appsec,.dayh .btn,.skip{display:none!important}
   .mast{display:block;margin-bottom:8px}
-  .eyebrow{margin-bottom:2px}
-  h1{font-size:26px}
-  .weekline{margin-top:2px;font-size:13px}
+  /* Τίτλος και εβδομάδα αριστερά, το φροντιστήριο δεξιά: λιγότερο ύψος, περισσότερος χώρος για το πρόγραμμα */
+  .mast-text{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;align-items:end}
+  h1{grid-column:1;grid-row:1;font-size:26px}
+  .weekline{grid-column:1;grid-row:2;margin-top:2px;font-size:13px}
+  .eyebrow{grid-column:2;grid-row:1 / span 2;margin:0 0 2px;text-align:right}
+  .eyebrow .scr{display:none}
+  .eyebrow .prt{display:inline}
+  /* Στο χαρτί δεν υπάρχει «σήμερα»: η εβδομάδα τυπώνεται ουδέτερη */
+  .weekline .wk-today,.dayh-name .dot,.dayh-hours .tag{display:none!important}
+  .dayh.today,.col.today{background:none}
+  .dayh.today{border-bottom-color:var(--line)}
+  .dayh.today .dayh-name{color:inherit}
+  .col.today .slot{border-top-color:var(--hair);background-image:linear-gradient(var(--hair-2),var(--hair-2))}
+  .cols{border-top:0}
   .board{border-color:#c9c9dc;clip-path:none;break-inside:avoid}
   .corner,.dayh{position:static}
   .dayh{padding:6px 8px}
@@ -559,7 +612,7 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
   <header class="mast">
     <div class="mast-text">
       <a class="back" href="/ergaleia"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 4 3 8l4 4"/></svg>Όλα τα εργαλεία</a>
-      <p class="eyebrow"><a href="/">Φροντιστήριο Κορυφή</a> · <a href="/ergaleia">Εργαλεία</a></p>
+      <p class="eyebrow"><a href="/">Φροντιστήριο Κορυφή</a><span class="scr"> · <a href="/ergaleia">Εργαλεία</a></span><span class="prt"> · korifi-edu.gr</span></p>
       <h1>Το πρόγραμμά μου</h1>
       <p class="weekline" id="weekline"></p>
       <p class="lede">Στήσε την εβδομάδα σου σε πέντε λεπτά. Σχολείο, Κορυφή, διάβασμα και ελεύθερος χρόνος, όλα σε μία σελίδα. Πάτα σε ένα κενό κελί για να προσθέσεις κάτι ή σε ένα μπλοκ για να το αλλάξεις. Ξεκινάς με ένα παράδειγμα· άλλαξέ το ή πάτα «Άδειασε» για να φτιάξεις το δικό σου.</p>
@@ -595,6 +648,7 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
     <button type="button" class="appbar-x" id="appbarX" aria-label="Κλείσιμο"></button>
   </aside>
 
+  <a class="skip" href="#h-summary" id="skipBoard">Παράλειψη του πίνακα</a>
   <section aria-labelledby="boardTitle">
     <h2 class="sr" id="boardTitle">Εβδομαδιαίο πρόγραμμα</h2>
     <div class="board" id="board">
@@ -609,7 +663,7 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
 
   <div class="cols">
     <section aria-labelledby="h-summary">
-      <h2 id="h-summary">Η εβδομάδα με μια ματιά</h2>
+      <h2 id="h-summary" tabindex="-1">Η εβδομάδα με μια ματιά</h2>
       <div class="summary">
         <div class="ringwrap">
           <div class="ring" id="ring"></div>
@@ -639,7 +693,7 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
       <div class="share-foot">
         <a class="btn primary" id="btnWa" href="https://wa.me/" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 13.4l.8-2.6A5.6 5.6 0 1 1 5.6 13z"/><path d="M6 5.6c0 2.4 2 4.4 4.4 4.4l.8-1-1.3-.8-.6.6a3 3 0 0 1-1.9-1.9l.6-.6-.8-1.3z"/></svg>Στείλε στο WhatsApp</a>
         <button class="btn" type="button" id="btnCopy"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/></svg>Αντίγραψε το μήνυμα</button>
-        <p class="note">Ανοίγει το WhatsApp με το μήνυμα έτοιμο. Διαλέγεις σε ποιον θα το στείλεις.</p>
+        <p class="note" id="waNote">Ανοίγει το WhatsApp με το μήνυμα έτοιμο. Διαλέγεις σε ποιον θα το στείλεις.</p>
       </div>
     </section>
   </div>
@@ -675,7 +729,7 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
 <div class="scrim" id="scrim" lang="el" hidden>
   <form class="modal" id="form" role="dialog" aria-modal="true" aria-labelledby="mTitle" novalidate>
     <div class="grab" aria-hidden="true"></div>
-    <div class="mhead"><h3 id="mTitle">Νέα δραστηριότητα</h3><span class="mwhen" id="mWhen" aria-hidden="true"></span></div>
+    <div class="mhead"><h3 id="mTitle" tabindex="-1">Νέα δραστηριότητα</h3><span class="mwhen" id="mWhen" aria-hidden="true"></span></div>
     <div class="field"><span id="typesLabel">Τύπος</span><div class="types" id="types" role="radiogroup" aria-labelledby="typesLabel"></div></div>
     <div class="field"><label for="fSubject">Μάθημα ή περιγραφή</label><input class="input" type="text" id="fSubject" placeholder="π.χ. Μαθηματικά" autocomplete="off" maxlength="60"></div>
     <div class="row2">
@@ -701,9 +755,10 @@ h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;lette
   <div class="modal" id="appSheet" role="dialog" aria-modal="true" aria-labelledby="aTitle">
     <div class="grab" aria-hidden="true"></div>
     <div class="mhead"><h3 id="aTitle">Βάλ’ το στην αρχική οθόνη</h3></div>
+    <p class="lead" id="aLead" hidden></p>
     <ol class="steps" id="aSteps"></ol>
-    <div id="aExtra"></div>
-    <div class="mfoot"><div class="right"><button type="button" class="btn primary" id="aOk">Εντάξει</button></div></div>
+    <div class="sheet-extra" id="aExtra"></div>
+    <div class="mfoot"><div class="right" id="aActs"><button type="button" class="btn primary" id="aOk">Εντάξει</button></div></div>
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" lang="el" hidden></div>
@@ -792,9 +847,9 @@ function load(){
   if(raw){ try{ obj=JSON.parse(raw); }catch(e){ obj=null; } }
   if(obj && typeof obj==="object"){
     if(obj.theme==="light"||obj.theme==="dark"||obj.theme==="auto") theme=obj.theme;
-    if(Array.isArray(obj.acts) && Array.isArray(obj.goals)){
+    if(Array.isArray(obj.acts)){
       var acts=obj.acts.map(cleanAct).filter(Boolean);
-      var goals=obj.goals.filter(function(g){return g&&typeof g.t==="string"&&g.t.trim();}).map(function(g){return {t:g.t.slice(0,120),d:!!g.d};});
+      var goals=(Array.isArray(obj.goals)?obj.goals:[]).filter(function(g){return g&&typeof g.t==="string"&&g.t.trim();}).map(function(g){return {t:g.t.slice(0,120),d:!!g.d};});
       /* Αν όλα όσα ήταν αποθηκευμένα είναι άκυρα, ξαναφορτώνεται το παράδειγμα */
       if(!(obj.acts.length>0 && acts.length===0)){
         state={acts:acts,goals:goals};
@@ -802,11 +857,25 @@ function load(){
       }
     }
   }
+  /* Ό,τι δεν διαβάζεται κρατιέται σε αντίγραφο πριν πάρει τη θέση του το παράδειγμα */
+  if(raw){ try{ localStorage.setItem(KEY+"-backup",raw); }catch(e){} }
   state=example();
 }
+var saveFailed=false;
 function save(){
-  try{ localStorage.setItem(KEY,JSON.stringify({acts:state.acts,goals:state.goals,theme:theme})); }catch(e){}
+  try{ localStorage.setItem(KEY,JSON.stringify({acts:state.acts,goals:state.goals,theme:theme})); saveFailed=false; }
+  catch(e){
+    /* Αποκλεισμένη ή γεμάτη αποθήκευση: το λέει η μπάρα πάνω από το πρόγραμμα (updateAppUi) */
+    saveFailed=true;
+  }
 }
+
+/* Δύο καρτέλες ανοιχτές: η μία δεν σβήνει σιωπηλά ό,τι άλλαξε η άλλη */
+window.addEventListener("storage",function(e){
+  if(e.key!==KEY&&e.key!==null) return;
+  load(); applyTheme(theme,true);
+  renderWeek(); renderStats(); renderGoals(); renderShare(); updateAppUi(); if(carryOn) carryHash(true);
+});
 
 /* ---------- theme ---------- */
 function applyTheme(t,fromUser){
@@ -829,12 +898,14 @@ var week=$("#week"), board=$("#board"), daystrip=$("#daystrip");
 var phoneMQ=window.matchMedia("(max-width: 899px)");
 var selDay=TODAY;
 
-function weekLine(){
+function weekRange(){
   var now=new Date(); var mon=new Date(now); mon.setDate(now.getDate()-TODAY); var sun=new Date(mon); sun.setDate(mon.getDate()+6);
-  var s;
-  if(mon.getMonth()===sun.getMonth()) s="Εβδομάδα "+mon.getDate()+"–"+sun.getDate()+" "+MONTHS[mon.getMonth()];
-  else s="Εβδομάδα "+mon.getDate()+" "+MONTHS[mon.getMonth()]+" – "+sun.getDate()+" "+MONTHS[sun.getMonth()];
-  $("#weekline").textContent=s+" · σήμερα "+DAYS[TODAY];
+  if(mon.getMonth()===sun.getMonth()) return "Εβδομάδα "+mon.getDate()+"–"+sun.getDate()+" "+MONTHS[mon.getMonth()];
+  return "Εβδομάδα "+mon.getDate()+" "+MONTHS[mon.getMonth()]+" – "+sun.getDate()+" "+MONTHS[sun.getMonth()];
+}
+function weekLine(){
+  var w=$("#weekline"), t=document.createElement("span");
+  w.textContent=weekRange(); t.className="wk-today"; t.textContent=" · σήμερα "+DAYS[TODAY]; w.appendChild(t);
 }
 function dayActs(d){return state.acts.filter(function(a){return a.day===d&&a.type!=="school";});}
 function dayHours(d){
@@ -877,9 +948,9 @@ function layoutDay(acts,minGap){
 function renderLegend(){
   $("#legend").innerHTML=Object.keys(TYPES).map(function(k){return '<span><i class="is-'+k+'"></i>'+TYPES[k].label+'</span>';}).join("");
 }
-/* Στην εκτύπωση το --row γίνεται 34px (βλ. @media print). Το beforeprint τρέχει πριν εφαρμοστεί το print CSS,
+/* Στην εκτύπωση το --row γίνεται 37px (βλ. @media print). Το beforeprint τρέχει πριν εφαρμοστεί το print CSS,
    οπότε εκεί παίρνουμε την τιμή της εκτύπωσης κατευθείαν. */
-var PRINT_ROW=34;
+var PRINT_ROW=37;
 function rowPx(){ if(printing) return PRINT_ROW; var v=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--row")); return v>0?v:48; }
 /* Οι θέσεις γράφονται σε μονάδες του --row, ώστε τα μπλοκ να ακολουθούν το πλέγμα σε κάθε μέσο (οθόνη, εκτύπωση) */
 function rowUnits(px,ROW){ return "calc(var(--row) * "+(Math.round(px/ROW*10000)/10000)+")"; }
@@ -909,8 +980,8 @@ function renderWeek(){
     }
     lay.forEach(function(it){
       var a=it.a, top=(it.s-START_H*60)/60*ROW+1, ht=Math.max((it.e-it.s)/60*ROW-2,16), look=ht;
-      /* Στο κινητό ένα μπλοκ 15 λεπτών κρατά την όψη των 16px αλλά πιάνει 24px για το δάχτυλο */
-      if(phone&&ht<24){ top-=Math.round((24-ht)/2); ht=24; }
+      /* Με δάχτυλο (κινητό, tablet) ένα μπλοκ 15 λεπτών κρατά την όψη των 16px αλλά πιάνει 24px */
+      if((phone||(coarse&&!printing))&&ht<24){ top-=Math.round((24-ht)/2); ht=24; }
       /* Ένα πολύ μικρό μπλοκ στην αρχή ή στο τέλος της μέρας μένει μέσα στο πλέγμα */
       var maxBottom=(END_H-START_H)*ROW-1; if(top+ht>maxBottom) top=maxBottom-ht; if(top<1) top=1;
       var narrow=it.cols>1&&!it.stack;
@@ -996,7 +1067,7 @@ function renderShare(){
   $("#shareText").textContent=txt;
   $("#btnWa").href="https://wa.me/?text="+encodeURIComponent(txt);
 }
-function renderAll(){ renderWeek(); renderStats(); renderGoals(); renderShare(); save(); updateAppUi(); }
+function renderAll(){ renderWeek(); renderStats(); renderGoals(); renderShare(); save(); updateAppUi(); if(carryOn) carryHash(true); }
 
 var toastT=null;
 function toast(msg,ic,ms){ var t=$("#toast"); t.innerHTML=icon(ic||"check")+'<span>'+esc(msg)+'</span>'; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(function(){t.hidden=true;},ms||2400); }
@@ -1029,9 +1100,17 @@ function openModal(a,isNew){
   $("#btnDelete").hidden=!editing; setErr(""); updateWhen();
   $("#toast").hidden=true; clearTimeout(toastT);
   $("#scrim").hidden=false; document.body.classList.add("is-locked");
-  setTimeout(function(){ $("#fSubject").focus(); },0);
+  /* Με δάχτυλο η εστίαση πάει στον τίτλο, ώστε να μην ανοίγει μόνο του το πληκτρολόγιο πάνω από τα κουμπιά */
+  setTimeout(function(){ if(coarse) $("#mTitle").focus({preventScroll:true}); else $("#fSubject").focus(); },0);
 }
 /* Η εστίαση γυρίζει σε στοιχείο που ξαναβρίσκεται μετά το render, όχι στον παλιό κόμβο */
+/* Το κελί μιας ώρας, ή το μπλοκ που το σκεπάζει (ένα σκεπασμένο κελί δεν παίρνει εστίαση) */
+function cellSelector(day,h){
+  var sel='.slot[data-day="'+day+'"][data-h="'+h+'"]', s=document.querySelector(sel);
+  if(!s||s.getAttribute("tabindex")!=="-1") return sel;
+  var hit=state.acts.filter(function(a){ return a.day===day&&toMin(a.start)<=h*60&&toMin(a.end)>h*60; })[0];
+  return hit?'.blk[data-id="'+hit.id+'"]':sel;
+}
 function closeModal(fallbackSel){
   $("#scrim").hidden=true; document.body.classList.remove("is-locked");
   var t=(lastFocusSel&&document.querySelector(lastFocusSel))||(lastFocus&&document.contains(lastFocus)?lastFocus:null)||(fallbackSel&&document.querySelector(fallbackSel))||$("#btnAddDay");
@@ -1066,9 +1145,12 @@ $("#form").addEventListener("submit",function(e){
   var a={type:typeEl?typeEl.value:"study",subject:$("#fSubject").value.trim(),day:+$("#fDay").value,start:$("#fStart").value,end:$("#fEnd").value,repeat:+$("#fRepeat").value,goal:$("#fGoal").value.trim()};
   if(!a.subject){ setErr("Γράψε ένα μάθημα ή μια περιγραφή.","fSubject"); $("#fSubject").focus(); return; }
   if(toMin(a.end)<=toMin(a.start)){ setErr("Η ώρα λήξης πρέπει να είναι μετά την ώρα έναρξης.","fEnd"); $("#fEnd").focus(); return; }
-  if(editing){ var ex=state.acts.filter(function(x){return x.id===editing;})[0]; if(ex){ Object.keys(a).forEach(function(k){ex[k]=a[k];}); } }
+  /* Αν στο μεταξύ η δραστηριότητα σβήστηκε σε άλλη καρτέλα, η αλλαγή δεν χάνεται: μπαίνει ξανά */
+  if(editing){ var ex=state.acts.filter(function(x){return x.id===editing;})[0]; if(ex){ Object.keys(a).forEach(function(k){ex[k]=a[k];}); } else { a.id=editing; state.acts.push(a); } }
   else { a.id=newId(); state.acts.push(a); }
   var was=editing, id=was||a.id;
+  /* Στο κινητό ο πίνακας δείχνει τη μέρα όπου μπήκε (ή μετακινήθηκε) η δραστηριότητα */
+  if(phoneMQ.matches) selDay=a.day;
   renderAll();
   lastFocusSel='.blk[data-id="'+id+'"]';
   closeModal('.slot[data-day="'+a.day+'"][data-h="'+Math.floor(toMin(a.start)/60)+'"]');
@@ -1078,7 +1160,7 @@ $("#btnDelete").addEventListener("click",function(){
   var gone=state.acts.filter(function(a){return a.id===editing;})[0];
   state.acts=state.acts.filter(function(a){return a.id!==editing;});
   renderAll();
-  lastFocusSel=gone?'.slot[data-day="'+gone.day+'"][data-h="'+Math.floor(toMin(gone.start)/60)+'"]':null;
+  lastFocusSel=gone?cellSelector(gone.day,Math.floor(toMin(gone.start)/60)):null;
   closeModal(); toast("Διαγράφηκε","trash");
 });
 $("#btnCancel").addEventListener("click",function(){ closeModal(); });
@@ -1087,7 +1169,7 @@ $("#scrim").addEventListener("pointerdown",function(e){ downOnScrim=(e.target===
 $("#scrim").addEventListener("click",function(e){ if(e.target===$("#scrim")&&downOnScrim&&Date.now()-openedAt>350) closeModal(); downOnScrim=false; });
 /* Escape κλείνει, Tab μένει μέσα στο παράθυρο */
 document.addEventListener("keydown",function(e){
-  if($("#scrim").hidden) return;
+  if($("#scrim").hidden||!$("#appScrim").hidden) return;
   if(e.key==="Escape"){ e.preventDefault(); closeModal(); return; }
   if(e.key==="Tab"){
     var f=Array.prototype.filter.call($("#form").querySelectorAll("input,select,button"),function(el){ return !el.hidden && !el.disabled && el.offsetParent!==null && el.type!=="radio"; });
@@ -1095,7 +1177,7 @@ document.addEventListener("keydown",function(e){
     f=radios.concat(f).sort(function(x,y){ return (x.compareDocumentPosition(y)&4)?-1:1; });
     if(!f.length) return;
     var first=f[0], last=f[f.length-1], act=document.activeElement;
-    if(e.shiftKey && (act===first || !$("#form").contains(act))){ e.preventDefault(); last.focus(); }
+    if(e.shiftKey && (act===first || act===$("#mTitle") || !$("#form").contains(act))){ e.preventDefault(); last.focus(); }
     else if(!e.shiftKey && (act===last || !$("#form").contains(act))){ e.preventDefault(); first.focus(); }
   }
 });
@@ -1130,37 +1212,90 @@ function reserveClearWidth(){
 reserveClearWidth();
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(reserveClearWidth);
 function disarm(){ clearArmed=false; btnClear.textContent="Άδειασε"; btnClear.classList.remove("is-armed"); clearTimeout(clearT); }
-$("#btnExample").addEventListener("click",function(){ disarm(); state=example(); renderAll(); toast("Φορτώθηκε το παράδειγμα"); });
+$("#btnExample").addEventListener("click",function(){
+  function go(){ disarm(); state=example(); renderAll(); toast("Φορτώθηκε το παράδειγμα"); }
+  /* Το παράδειγμα δεν σβήνει χωρίς ερώτηση ό,τι έγραψε ο μαθητής */
+  if(!isExample()&&(state.acts.length||state.goals.length)){
+    showSheet({title:"Να φορτωθεί το παράδειγμα;",lead:"Θα πάρει τη θέση των δραστηριοτήτων και των στόχων που έχεις γράψει.",
+      actions:[{label:"Άκυρο"},{label:"Φόρτωσε",primary:true,run:go}],focus:"#aActs button",opener:"#btnExample"});
+    return;
+  }
+  go();
+});
 btnClear.addEventListener("click",function(){
   if(!clearArmed){ clearArmed=true; btnClear.textContent=armedLabel(); btnClear.classList.add("is-armed"); clearT=setTimeout(disarm,3000); return; }
   disarm(); state={acts:[],goals:[]}; renderAll(); toast("Το πρόγραμμα άδειασε","trash");
 });
 
 /* ---------- copy ---------- */
+/* Αντιγραφή χωρίς το Clipboard API (browsers μέσα σε εφαρμογές, παλιές εκδόσεις): μέσα στο ίδιο πάτημα */
+function legacyCopy(text){
+  var ta=document.createElement("textarea"), ok=false, act=document.activeElement;
+  ta.value=text; ta.setAttribute("readonly",""); ta.setAttribute("aria-hidden","true");
+  ta.style.cssText="position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px";
+  document.body.appendChild(ta);
+  try{ ta.focus({preventScroll:true}); ta.select(); ta.setSelectionRange(0,text.length); ok=document.execCommand("copy"); }catch(e){ ok=false; }
+  document.body.removeChild(ta);
+  if(act&&act.focus){ try{ act.focus({preventScroll:true}); }catch(e){} }
+  return !!ok;
+}
 $("#btnCopy").addEventListener("click",function(){
-  var pre=$("#shareText"), txt=pre.textContent;
-  function fallback(){ try{ var r=document.createRange(); r.selectNodeContents(pre); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }catch(e){} toast("Το κείμενο επιλέχθηκε. Πάτα «Αντιγραφή» στη συσκευή σου."); }
+  var pre=$("#shareText"), txt=pre.textContent, ok="Αντιγράφηκε. Στείλε το στους γονείς σου.";
+  function fallback(){ showCopyBox("Αντέγραψε το μήνυμα",txt,"Μήνυμα για τους γονείς",6,"msgbox"); }
   try{
-    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){toast("Αντιγράφηκε. Στείλε το στους γονείς σου.");},fallback);
-    else fallback();
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){toast(ok);},function(){ if(legacyCopy(txt)) toast(ok); else fallback(); });
+    else if(legacyCopy(txt)) toast(ok); else fallback();
   }catch(e){ fallback(); }
 });
 
 /* ---------- print ---------- */
 /* Στην εκτύπωση: πάντα όλη η εβδομάδα και ανοιχτό θέμα, μετά επιστρέφει όπως ήταν */
-var printing=false, themeBeforePrint=null;
-window.addEventListener("beforeprint",function(){
+var printing=false, themeBeforePrint=null, printSeen=false, printHintT=null;
+function leavePrint(){
+  if(!printing) return; printing=false;
+  if(themeBeforePrint) document.documentElement.setAttribute("data-theme",themeBeforePrint); else document.documentElement.removeAttribute("data-theme");
+  renderWeek();
+}
+function enterPrint(){
+  printSeen=true; clearTimeout(printHintT);
+  /* Η εκτύπωση τελικά άνοιξε: οι οδηγίες για «δεν ανοίγει» δεν χρειάζονται */
+  if(sheet&&sheet.kind==="print") closeSheet();
   if(printing) return; printing=true;
   themeBeforePrint=document.documentElement.getAttribute("data-theme");
   document.documentElement.setAttribute("data-theme","light");
   renderWeek();
+}
+window.addEventListener("beforeprint",enterPrint);
+window.addEventListener("afterprint",leavePrint);
+/* Για browsers που τυπώνουν χωρίς beforeprint: η αλλαγή σε μέσο «print» φέρνει κι αυτή όλη την εβδομάδα */
+var printMQ=window.matchMedia("print");
+function onPrintMQ(e){ if(e.matches) enterPrint(); }
+if(printMQ.addEventListener) printMQ.addEventListener("change",onPrintMQ); else if(printMQ.addListener) printMQ.addListener(onPrintMQ);
+/* Αν ο browser δεν στείλει ποτέ afterprint, το πρώτο άγγιγμα στη σελίδα (το παράθυρο εκτύπωσης έχει κλείσει) επαναφέρει την κανονική εικόνα.
+   Στο κινητό η μέρα ξαναστήνεται κάτω από το δάχτυλο, οπότε το ίδιο πάτημα δεν ανοίγει ό,τι βρέθηκε εκεί. */
+document.addEventListener("pointerdown",function(){
+  if(!printing) return;
+  leavePrint();
+  if(!phoneMQ.matches) return;
+  function swallow(ev){ ev.preventDefault(); ev.stopPropagation(); stop(); }
+  function stop(){ document.removeEventListener("click",swallow,true); document.removeEventListener("pointerdown",stop,true); }
+  document.addEventListener("click",swallow,true);
+  document.addEventListener("pointerdown",stop,true);
+  setTimeout(stop,700);
+},true);
+/* Στην εφαρμογή αρχικής οθόνης του iPhone και στους browsers μέσα σε εφαρμογές (Instagram, Facebook, TikTok…)
+   το window.print() δεν κάνει τίποτα και δεν βγάζει σφάλμα. Το καταλαβαίνουμε επειδή δεν έρχεται beforeprint
+   (όπου η εκτύπωση ανοίγει, έρχεται μέσα στο ίδιο το print()) και τότε δείχνουμε τι μπορεί να γίνει. */
+$("#btnPrint").addEventListener("click",function(){
+  var env=printEnv(), t0=Date.now();
+  printSeen=false; clearTimeout(printHintT);
+  try{ window.print(); }catch(e){ openPrintHelp(env); return; }
+  if(printSeen||Date.now()-t0>400) return;
+  /* Chrome/Firefox/Edge στο iPhone ανοίγουν την εκτύπωση λίγο αργότερα, με δικό τους τρόπο: εκεί περιμένουμε περισσότερο.
+     Οι οδηγίες δεν ανοίγουν πάνω από τη φόρμα δραστηριότητας, και κλείνουν μόνες τους αν η εκτύπωση ανοίξει αργότερα. */
+  var wait=env!=="browser"?600:/CriOS|FxiOS|EdgiOS/.test(ua)?4000:1500;
+  printHintT=setTimeout(function(){ if(!printSeen&&$("#scrim").hidden&&$("#appScrim").hidden) openPrintHelp(env); },wait);
 });
-window.addEventListener("afterprint",function(){
-  if(!printing) return; printing=false;
-  if(themeBeforePrint) document.documentElement.setAttribute("data-theme",themeBeforePrint); else document.documentElement.removeAttribute("data-theme");
-  renderWeek();
-});
-$("#btnPrint").addEventListener("click",function(){ try{ window.print(); }catch(e){} });
 
 
 /* ---------- εφαρμογή στην αρχική οθόνη + μεταφορά σε άλλη συσκευή ----------
@@ -1171,12 +1306,26 @@ $("#btnPrint").addEventListener("click",function(){ try{ window.print(); }catch(
 var PAGE="/ergaleia/programma-meletis.html", UIKEY="korifi-programma-meletis-ui";
 var ua=navigator.userAgent||"";
 var isIOS=/iPad|iPhone|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+var iDev=/iPhone|iPod/.test(ua)?"iPhone":"iPad";
 var isAndroid=/Android/i.test(ua);
 var coarse=window.matchMedia("(pointer: coarse)").matches;
-var deferredPrompt=null;
-var ui={}; try{ ui=JSON.parse(localStorage.getItem(UIKEY)||"{}")||{}; }catch(e){ ui={}; }
+/* Browser μέσα σε εφαρμογή (Instagram, Facebook, Messenger, TikTok, WhatsApp για επιχειρήσεις, Android WebView, iOS χωρίς «Safari/») */
+var IN_APP=/FBAN|FBAV|FB_IAB|FB4A|FBIOS|MetaIAB|Instagram|Barcelona|musical_ly|Bytedance|\bLine\/|MicroMessenger|Snapchat|LinkedInApp|WAiOS|WA4A|\bGSA\/|Twitter/i.test(ua)
+  ||/Android.*; wv\)/i.test(ua)||(isIOS&&!/Safari\//.test(ua)&&navigator.standalone!==true);
+var deferredPrompt=null, installedNow=false, noStoreClosed=false;
+var ui={}; try{ var uiRaw=JSON.parse(localStorage.getItem(UIKEY)||"{}"); if(uiRaw&&typeof uiRaw==="object"&&!Array.isArray(uiRaw)) ui=uiRaw; }catch(e){}
 function saveUi(){ try{ localStorage.setItem(UIKEY,JSON.stringify(ui)); }catch(e){} }
 function standalone(){ return window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true; }
+function printEnv(){ return (isIOS&&standalone())?"ios-app":IN_APP?"in-app":"browser"; }
+function appName(){
+  if(/Instagram/i.test(ua)) return "το Instagram";
+  if(/Messenger|Orca-Android/i.test(ua)) return "το Messenger";
+  if(/FBAN|FBAV|FB_IAB|FB4A|FBIOS|MetaIAB/i.test(ua)) return "το Facebook";
+  if(/musical_ly|Bytedance/i.test(ua)) return "το TikTok";
+  if(/WAiOS|WA4A/i.test(ua)) return "το WhatsApp";
+  if(/Snapchat/i.test(ua)) return "το Snapchat";
+  return "την εφαρμογή";
+}
 
 function packActs(acts){ return acts.map(function(a){return [a.type,a.subject,a.day,a.start,a.end,a.repeat,a.goal||""];}); }
 function sig(s){ return JSON.stringify([packActs(s.acts),s.goals.map(function(g){return [g.t,!!g.d];})]); }
@@ -1185,85 +1334,153 @@ function isExample(){ return sig(state)===EXAMPLE_SIG; }
 
 function b64enc(str){ var b=new TextEncoder().encode(str), bin=""; for(var i=0;i<b.length;i++) bin+=String.fromCharCode(b[i]); return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
 function b64dec(str){ var t=str.replace(/-/g,"+").replace(/_/g,"/"); while(t.length%4) t+="="; var bin=atob(t), b=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i); return new TextDecoder().decode(b); }
-function transferLink(){ return location.origin+PAGE+"#p="+b64enc(JSON.stringify({v:1,a:packActs(state.acts),g:state.goals.map(function(g){return [g.t,g.d?1:0];})})); }
-/* Δέχεται ολόκληρο τον σύνδεσμο ή μόνο το κομμάτι μετά το #p=. Επιστρέφει έγκυρο πρόγραμμα ή null. */
+function packLink(){ return b64enc(JSON.stringify({v:1,a:packActs(state.acts),g:state.goals.map(function(g){return [g.t,g.d?1:0];})})); }
+function transferLink(){ return location.origin+PAGE+"#p="+packLink(); }
+/* Δέχεται ολόκληρο τον σύνδεσμο ή μόνο το κομμάτι μετά το #p=, και σύνδεσμο που έσπασε σε γραμμές
+   ή πέρασε από «ενδιάμεσο» σύνδεσμο (π.χ. l.facebook.com, όπου το #p= γίνεται %23p%3D). Επιστρέφει έγκυρο πρόγραμμα ή null. */
 function readLink(text){
+  var str=String(text||""), tries=[str,str.replace(/[\s\u00ad\u200b-\u200d\u2060]+/g,"")];
+  for(var j=0;j<tries.length&&j<6;j++){ try{ var d=decodeURIComponent(tries[j]); if(d!==tries[j]&&tries.indexOf(d)<0) tries.push(d); }catch(e){} }
+  for(var i=0;i<tries.length;i++){ var s=parseLink(tries[i]); if(s) return s; }
+  return null;
+}
+function parseLink(text){
   var str=String(text||"").trim(), m=str.match(/#p=([A-Za-z0-9_-]+)/)||str.match(/^([A-Za-z0-9_-]{16,})$/);
   if(!m) return null;
-  var o; try{ o=JSON.parse(b64dec(m[1])); }catch(e){ return null; }
+  /* Αν κόλλησε λέξη στο τέλος (π.χ. «Sent from my iPhone» κάτω από σπασμένο σύνδεσμο), κόβεται γράμμα-γράμμα */
+  var o=null; for(var k=0;!o&&k<=40&&m[1].length-k>=16;k++){ try{ o=JSON.parse(b64dec(m[1].slice(0,m[1].length-k))); }catch(e){} }
   if(!o||o.v!==1||!Array.isArray(o.a)||!Array.isArray(o.g)) return null;
   var acts=o.a.map(function(x){ return Array.isArray(x)?cleanAct({type:x[0],subject:x[1],day:x[2],start:x[3],end:x[4],repeat:x[5],goal:x[6]}):null; }).filter(Boolean);
   var goals=o.g.filter(function(x){return Array.isArray(x)&&typeof x[0]==="string"&&x[0].trim();}).map(function(x){return {t:x[0].slice(0,120),d:!!x[1]};});
   if(o.a.length>0&&acts.length===0) return null;
   return {acts:acts,goals:goals};
 }
-function importState(s){
-  if(sig(s)===sig(state)){ toast("Το πρόγραμμα είναι ήδη εδώ"); return; }
-  if(state.acts.length&&!isExample()&&!window.confirm("Να αντικατασταθεί το πρόγραμμα που έχεις εδώ με αυτό από τον σύνδεσμο;")) return;
-  state=s; disarm(); renderAll(); toast("Φορτώθηκε το πρόγραμμά σου");
+/* Ερώτηση μέσα στη σελίδα αντί για window.confirm, που σε browsers εφαρμογών απαντά μόνο του «όχι» */
+function importState(s,fromUser){
+  if(sig(s)===sig(state)){ if(fromUser) toast("Το πρόγραμμα είναι ήδη εδώ"); return; }
+  function go(){ state=s; disarm(); renderAll(); toast("Φορτώθηκε το πρόγραμμά σου"); }
+  if((state.acts.length||state.goals.length)&&!isExample()){
+    showSheet({title:"Να αντικατασταθεί το πρόγραμμα;",
+      lead:"Σε αυτή τη συσκευή υπάρχει ήδη πρόγραμμα. Αν συνεχίσεις, θα πάρει τη θέση του αυτό από τον σύνδεσμο.",
+      actions:[{label:"Άκυρο"},{label:"Αντικατάσταση",primary:true,run:go}],focus:"#aActs button",opener:fromUser?"#btnPaste":null});
+    return;
+  }
+  go();
 }
-function takeHash(){
+function takeHash(fromUser){
   if(!/^#p=/.test(location.hash)) return;
   var s=readLink(location.hash);
   try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
-  if(s) importState(s); else toast("Ο σύνδεσμος δεν διαβάζεται. Αντέγραψέ τον ξανά ολόκληρο.","flag",3600);
+  if(s){ importState(s,fromUser===true); if(IN_APP){ carryOn=true; carryHash(true); } }
+  else toast("Ο σύνδεσμος δεν διαβάζεται. Αντέγραψέ τον ξανά ολόκληρο.","flag",3600);
 }
-function copyLink(){
+/* Όταν η αντιγραφή δεν επιτρέπεται: το κείμενο σε πλαίσιο, για αντιγραφή με το χέρι */
+function copyHint(){ return coarse?"Κράτα πατημένο μέσα στο πλαίσιο, διάλεξε «Επιλογή όλων» και μετά «Αντιγραφή».":"Το κείμενο είναι επιλεγμένο. Πάτα Ctrl+C (ή ⌘C στο Mac) για αντιγραφή."; }
+function selectBox(ta){ setTimeout(function(){ try{ ta.focus({preventScroll:true}); ta.select(); ta.setSelectionRange(0,ta.value.length); }catch(e){} },30); }
+function showCopyBox(title,text,label,rows,cls){
+  showSheet({title:title,lead:copyHint(),
+    extra:'<textarea class="linkbox'+(cls?" "+cls:"")+'" id="aLink" rows="'+(rows||4)+'" readonly aria-label="'+esc(label)+'"></textarea>',focus:"#aLink"});
+  var ta=$("#aLink"); ta.value=text; selectBox(ta);
+}
+function showLinkBox(url){
+  /* Μέσα σε φύλλο οδηγιών (iPhone, Instagram…) το πλαίσιο μπαίνει κάτω από το κουμπί, χωρίς να χαθούν οι οδηγίες */
+  var btn=!$("#appScrim").hidden&&$('#aExtra [data-act="copy"]');
+  if(btn){
+    var ta=$("#aLink");
+    if(!ta){ btn.insertAdjacentHTML("afterend",'<textarea class="linkbox" id="aLink" rows="3" readonly aria-label="Σύνδεσμος μεταφοράς"></textarea><p class="copy-hint">'+copyHint()+'</p>'); ta=$("#aLink"); }
+    ta.value=url; selectBox(ta); sheetOverflow();
+    var sh=$("#appSheet"), last=ta.nextElementSibling||ta, d=last.getBoundingClientRect().bottom-sh.querySelector(".mfoot").getBoundingClientRect().top+8;
+    if(d>0) sh.scrollTop+=d;
+    return;
+  }
+  showCopyBox("Αντέγραψε τον σύνδεσμο",url,"Σύνδεσμος μεταφοράς",4);
+}
+function copyLink(note){
   var url=transferLink();
-  var msg=standalone()?"Ο σύνδεσμος αντιγράφηκε. Άνοιξέ τον στην άλλη συσκευή.":"Ο σύνδεσμος αντιγράφηκε. Άνοιξέ τον στην άλλη συσκευή ή πάτα «Επικόλληση» μέσα στην εφαρμογή.";
-  function fallback(){ window.prompt("Αντέγραψε τον σύνδεσμο μεταφοράς:",url); }
-  try{ if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function(){ toast(msg,"link",4200); },fallback); else fallback(); }catch(e){ fallback(); }
+  var msg=typeof note==="string"?note:standalone()?"Ο σύνδεσμος αντιγράφηκε. Άνοιξέ τον στην άλλη συσκευή.":"Ο σύνδεσμος αντιγράφηκε. Άνοιξέ τον στην άλλη συσκευή ή πάτα «Επικόλληση» μέσα στην εφαρμογή.";
+  /* Μέσα σε φύλλο οδηγιών η επιβεβαίωση φαίνεται στο ίδιο το κουμπί, όχι σε μήνυμα πάνω από τα κουμπιά του */
+  function done(){
+    var btn=!$("#appScrim").hidden&&$('#aExtra [data-act="copy"]');
+    if(btn){ btn.innerHTML=icon("check")+"Αντιγράφηκε"; setTimeout(function(){ if(document.contains(btn)) btn.innerHTML=icon("link")+"Αντιγραφή συνδέσμου"; },2500); return; }
+    toast(msg,"link",4200);
+  }
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done,function(){ if(legacyCopy(url)) done(); else showLinkBox(url); });
+    else if(legacyCopy(url)) done(); else showLinkBox(url);
+  }catch(e){ showLinkBox(url); }
+}
+function showPasteBox(){
+  showSheet({title:"Επικόλληση συνδέσμου",
+    lead:"Επικόλλησε εδώ τον σύνδεσμο μεταφοράς που αντέγραψες στην άλλη συσκευή ή στον browser.",
+    extra:'<textarea class="linkbox" id="aLink" rows="4" placeholder="korifi-edu.gr/ergaleia/programma-meletis.html#p=…" aria-label="Σύνδεσμος μεταφοράς" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>'+
+          '<p class="err" id="aErr" role="alert" hidden>'+icon("flag")+'<span>Δεν βρέθηκε σύνδεσμος μεταφοράς. Αντέγραψέ τον ξανά ολόκληρο.</span></p>',
+    actions:[{label:"Άκυρο"},{label:"Φόρτωσε",icon:"paste",primary:true,run:function(){
+      var s=readLink($("#aLink").value);
+      if(!s){ $("#aErr").hidden=false; $("#aLink").focus(); return false; }
+      importState(s,true);
+    }}],focus:"#aLink",opener:"#btnPaste"});
+  $("#aLink").addEventListener("input",function(){ $("#aErr").hidden=true; });
 }
 function pasteLink(){
-  function handle(v){ var s=readLink(v); if(s) importState(s); else toast("Δεν βρέθηκε σύνδεσμος μεταφοράς. Αντέγραψέ τον ξανά.","flag",3600); }
-  function ask(){ var v=window.prompt("Επικόλλησε εδώ τον σύνδεσμο μεταφοράς:",""); if(v!==null&&v.trim()) handle(v); }
   try{
-    if(navigator.clipboard&&navigator.clipboard.readText) navigator.clipboard.readText().then(function(v){ if(readLink(v)) handle(v); else ask(); },ask);
-    else ask();
-  }catch(e){ ask(); }
+    if(navigator.clipboard&&navigator.clipboard.readText) navigator.clipboard.readText().then(function(v){ var s=readLink(v); if(s) importState(s,true); else showPasteBox(); },showPasteBox);
+    else showPasteBox();
+  }catch(e){ showPasteBox(); }
 }
 
-/* Οδηγίες εγκατάστασης, όταν ο browser δεν έχει δικό του παράθυρο εγκατάστασης */
-var sheetFocus=null, sheetOpenedAt=0, downOnSheet=false;
+/* ---------- φύλλο οδηγιών και ερωτήσεων (κάτω μέρος στο κινητό, παράθυρο στον υπολογιστή) ---------- */
+var sheet=null, sheetGen=0, sheetFocus=null, sheetOpenedAt=0, downOnSheet=false, sheetAutoFocus=null;
+/* Γραμμή πάνω από τα κουμπιά μόνο όταν το περιεχόμενο κυλά από κάτω τους */
+function sheetOverflow(){ var s=$("#appSheet"); s.classList.toggle("is-over",s.scrollHeight>s.clientHeight+1); }
+window.addEventListener("resize",function(){ if(!$("#appScrim").hidden) sheetOverflow(); });
 function glyph(n){ return '<span class="glyph">'+icon(n)+'</span>'; }
-function openSheet(){
-  var steps, extra="";
-  if(isIOS){
-    steps=['Πάτα το κουμπί <b>Κοινοποίηση</b>'+glyph("share")+'. Αν δεν το βλέπεις, είναι στο μενού <b>•••</b>.',
-           'Διάλεξε <b>«Προσθήκη στην οθόνη Αφετηρίας»</b>.',
-           'Πάτα <b>«Προσθήκη»</b>. Το εικονίδιο «Πρόγραμμα» μπαίνει στην αρχική σου οθόνη.'];
-    extra=isExample()
-      ?'<p class="callout">Στο iPhone η εφαρμογή κρατά τα δικά της δεδομένα, χωριστά από το Safari. Φτιάξε το πρόγραμμά σου μέσα από την εφαρμογή.</p>'
-      :'<div class="callout">Στο iPhone η εφαρμογή κρατά τα δικά της δεδομένα, χωριστά από το Safari. Για να πάρεις μαζί το πρόγραμμα που έφτιαξες, πάτα «Αντιγραφή συνδέσμου» τώρα και «Επικόλληση» μόλις ανοίξεις την εφαρμογή.<br><button type="button" class="btn small" id="aCopy">'+icon("link")+'Αντιγραφή συνδέσμου</button></div>';
-  } else if(isAndroid){
-    steps=['Άνοιξε το μενού του browser <b>⋮</b> (πάνω δεξιά).',
-           'Διάλεξε <b>«Εγκατάσταση εφαρμογής»</b> ή <b>«Προσθήκη στην αρχική οθόνη»</b>.',
-           'Επιβεβαίωσε. Το εικονίδιο «Πρόγραμμα» μπαίνει στην αρχική σου οθόνη, με το πρόγραμμα που έφτιαξες.'];
-  } else {
-    steps=['Άνοιξε αυτή τη σελίδα στον <b>Chrome</b> ή στον <b>Edge</b>.',
-           'Πάτα το εικονίδιο εγκατάστασης δεξιά στη γραμμή διευθύνσεων, ή διάλεξε <b>«Εγκατάσταση»</b> από το μενού <b>⋮</b>.'];
-    extra='<p class="callout">Στο Safari του Mac: <b>Αρχείο › Προσθήκη στο Dock</b>. Στο κινητό είναι ακόμη πιο χρήσιμο: άνοιξε τη σελίδα από εκεί.</p>';
-  }
-  $("#aSteps").innerHTML=steps.map(function(t){return "<li><span>"+t+"</span></li>";}).join("");
-  $("#aExtra").innerHTML=extra; $("#aExtra").hidden=!extra;
-  sheetFocus=document.activeElement; sheetOpenedAt=Date.now();
+function showSheet(o){
+  var wasOpen=!$("#appScrim").hidden;
+  if(wasOpen&&sheet&&sheet.onClose) sheet.onClose();
+  sheet=o; sheetGen++;
+  var acts=o.actions||[{label:"Εντάξει",primary:true,id:"aOk"}];
+  o.actions=acts;
+  $("#aTitle").textContent=o.title;
+  $("#aLead").innerHTML=o.lead||""; $("#aLead").hidden=!o.lead;
+  $("#aSteps").innerHTML=(o.steps||[]).map(function(t){return "<li><span>"+t+"</span></li>";}).join(""); $("#aSteps").hidden=!(o.steps&&o.steps.length);
+  $("#aExtra").innerHTML=o.extra||""; $("#aExtra").hidden=!o.extra;
+  $("#aActs").innerHTML=acts.map(function(a,i){
+    return '<button type="button" class="btn'+(a.primary?" primary":"")+'"'+(a.id?' id="'+a.id+'"':"")+' data-i="'+i+'"'+(a.disabled?" disabled":"")+'>'+(a.icon?icon(a.icon):"")+esc(a.label)+'</button>';
+  }).join("");
+  if(!wasOpen){ sheetFocus=document.activeElement; sheetOpenedAt=Date.now(); }
   $("#toast").hidden=true;
   $("#appScrim").hidden=false; document.body.classList.add("is-locked");
-  setTimeout(function(){ $("#aOk").focus(); },0);
+  $("#appSheet").scrollTop=0; sheetOverflow();
+  /* Η εστίαση μπαίνει πάντα μέσα στο φύλλο: αν το κύριο κουμπί περιμένει ακόμα (εικόνα), πάει στο «Κλείσιμο» */
+  setTimeout(function(){
+    var f=(o.focus&&$(o.focus))||$("#aActs .primary:not([disabled])")||$("#aActs button:not([disabled])");
+    sheetAutoFocus=f||null; if(f) f.focus({preventScroll:true});
+  },0);
 }
 function closeSheet(){
-  $("#appScrim").hidden=true; document.body.classList.remove("is-locked");
-  if(sheetFocus&&document.contains(sheetFocus)&&sheetFocus.offsetParent!==null) sheetFocus.focus(); else $("#btnInstall").focus();
+  if($("#appScrim").hidden) return;
+  var o=sheet; sheet=null; sheetGen++;
+  $("#appScrim").hidden=true; if($("#scrim").hidden) document.body.classList.remove("is-locked");
+  if(o&&o.onClose) o.onClose();
+  /* Επιστροφή στο κουμπί που άνοιξε το φύλλο, χωρίς να κυλήσει η σελίδα. Μετά από άγγιγμα (iPhone) ή σε φύλλο που άνοιξε
+     μόνο του (σύνδεσμος μεταφοράς) δεν υπάρχει τέτοιο κουμπί: τότε η σελίδα μένει εκεί που ήταν. */
+  var back=(sheetFocus&&sheetFocus!==document.body&&document.contains(sheetFocus))?sheetFocus:(o&&o.opener?$(o.opener):null);
+  if(back&&back.focus&&back.offsetParent!==null){ try{ back.focus({preventScroll:true}); }catch(e){} }
 }
-$("#aOk").addEventListener("click",closeSheet);
-$("#aExtra").addEventListener("click",function(e){ if(e.target.closest("#aCopy")) copyLink(); });
+$("#aActs").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-i]"); if(!b||!sheet) return;
+  var a=sheet.actions[+b.getAttribute("data-i")], gen=sheetGen;
+  var r=a&&a.run?a.run():undefined;
+  if(r!==false&&gen===sheetGen) closeSheet();
+});
+$("#aExtra").addEventListener("click",function(e){ var b=e.target.closest("[data-act]"); if(b&&sheet&&sheet.on&&sheet.on[b.getAttribute("data-act")]) sheet.on[b.getAttribute("data-act")](); });
 $("#appScrim").addEventListener("pointerdown",function(e){ downOnSheet=(e.target===$("#appScrim")); });
 $("#appScrim").addEventListener("click",function(e){ if(e.target===$("#appScrim")&&downOnSheet&&Date.now()-sheetOpenedAt>350) closeSheet(); downOnSheet=false; });
 document.addEventListener("keydown",function(e){
   if($("#appScrim").hidden) return;
   if(e.key==="Escape"){ e.preventDefault(); closeSheet(); return; }
   if(e.key==="Tab"){
-    var f=Array.prototype.filter.call($("#appSheet").querySelectorAll("button"),function(el){ return el.offsetParent!==null; });
+    var f=Array.prototype.filter.call($("#appSheet").querySelectorAll("button:not([disabled]),a[href],textarea,input"),function(el){ return el.offsetParent!==null; });
     if(!f.length) return;
     var first=f[0], last=f[f.length-1], act=document.activeElement;
     if(e.shiftKey&&(act===first||!$("#appSheet").contains(act))){ e.preventDefault(); last.focus(); }
@@ -1271,29 +1488,282 @@ document.addEventListener("keydown",function(e){
   }
 });
 
+/* Οδηγίες εγκατάστασης, όταν ο browser δεν έχει δικό του παράθυρο εγκατάστασης */
+function openInstallSheet(){
+  var steps, extra="";
+  if(isIOS){
+    steps=['Πάτα το κουμπί <b>Κοινοποίηση</b>'+glyph("share")+'. Αν δεν το βλέπεις, είναι στο μενού <b>•••</b>.',
+           'Διάλεξε <b>«Προσθήκη στην οθόνη Αφετηρίας»</b>.',
+           'Πάτα <b>«Προσθήκη»</b>. Το εικονίδιο «Πρόγραμμα» μπαίνει στην αρχική σου οθόνη.'];
+    extra=isExample()
+      ?'<p class="callout">Στο '+iDev+' η εφαρμογή κρατά τα δικά της δεδομένα, χωριστά από το Safari. Φτιάξε το πρόγραμμά σου μέσα από την εφαρμογή.</p>'
+      :'<div class="callout">Στο '+iDev+' η εφαρμογή κρατά τα δικά της δεδομένα, χωριστά από το Safari. Για να πάρεις μαζί το πρόγραμμα που έφτιαξες, πάτα «Αντιγραφή συνδέσμου» τώρα και «Επικόλληση» μόλις ανοίξεις την εφαρμογή.<br><button type="button" class="btn small" id="aCopy" data-act="copy">'+icon("link")+'Αντιγραφή συνδέσμου</button></div>';
+  } else if(isAndroid){
+    steps=['Άνοιξε το μενού του browser <b>⋮</b> (πάνω δεξιά).',
+           'Διάλεξε <b>«Εγκατάσταση εφαρμογής»</b> ή <b>«Προσθήκη στην αρχική οθόνη»</b>.',
+           'Επιβεβαίωσε. Το εικονίδιο «Πρόγραμμα» μπαίνει στην αρχική σου οθόνη, με το πρόγραμμα που έφτιαξες.'];
+  } else if(/Macintosh/.test(ua)&&/Safari\//.test(ua)&&!/Chrome|Chromium|Edg\/|Firefox|Ddg\//.test(ua)){
+    steps=['Στη γραμμή μενού πάτα <b>Αρχείο</b>.',
+           'Διάλεξε <b>«Προσθήκη στο Dock»</b> και πάτα <b>«Προσθήκη»</b>. Το «Πρόγραμμα» ανοίγει από το Dock σαν εφαρμογή.'];
+    extra='<p class="callout">Στο κινητό είναι ακόμη πιο χρήσιμο: άνοιξε τη σελίδα από εκεί και βάλ’ τη στην αρχική οθόνη.</p>';
+  } else if(/Chrome|Chromium|Edg\//.test(ua)){
+    steps=[/Edg\//.test(ua)
+             ?'Πάτα το εικονίδιο εγκατάστασης δεξιά στη γραμμή διευθύνσεων, ή άνοιξε το μενού <b>…</b> και διάλεξε <b>«Εφαρμογές»</b> και μετά <b>«Εγκατάσταση»</b>.'
+             :'Πάτα το εικονίδιο εγκατάστασης δεξιά στη γραμμή διευθύνσεων, ή άνοιξε το μενού <b>⋮</b> και διάλεξε <b>«Εγκατάσταση»</b>.',
+           'Αν το έχεις ήδη εγκαταστήσει, στη θέση του εικονιδίου θα δεις <b>«Άνοιγμα σε εφαρμογή»</b>.'];
+    extra='<p class="callout">Στο κινητό είναι ακόμη πιο χρήσιμο: άνοιξε τη σελίδα από εκεί και βάλ’ τη στην αρχική οθόνη.</p>';
+  } else {
+    steps=['Άνοιξε αυτή τη σελίδα στον <b>Chrome</b> ή στον <b>Edge</b>.',
+           'Πάτα το εικονίδιο εγκατάστασης δεξιά στη γραμμή διευθύνσεων, ή διάλεξε <b>«Εγκατάσταση»</b> από το μενού <b>⋮</b> (στον Edge <b>…</b>).'];
+    extra='<p class="callout">Στο Safari του Mac: <b>Αρχείο › Προσθήκη στο Dock</b>. Στο κινητό είναι ακόμη πιο χρήσιμο: άνοιξε τη σελίδα από εκεί.</p>';
+  }
+  /* Σε browser μέσα σε εφαρμογή δεν γίνεται εγκατάσταση: πρώτα άνοιγμα στον κανονικό browser */
+  if(IN_APP){ openInBrowserSheet("install"); return; }
+  showSheet({title:"Βάλ’ το στην αρχική οθόνη",steps:steps,extra:extra,on:{copy:copyLink},opener:"#btnInstall"});
+}
+
+/* ---------- άνοιγμα στον κανονικό browser (από Instagram, Facebook κ.λπ.) ---------- */
+/* Μόλις φανούν οι οδηγίες, το πρόγραμμα μπαίνει στο #p= της διεύθυνσης: το «Άνοιγμα στο Safari/Chrome»
+   της εφαρμογής ανοίγει αυτή τη διεύθυνση και το πρόγραμμα έρχεται μαζί (και πάλι μόνο στη συσκευή).
+   Από εκεί και πέρα η διεύθυνση ακολουθεί κάθε αλλαγή, γιατί ο μαθητής συνήθως κλείνει πρώτα τις οδηγίες
+   και μετά πατά «Άνοιγμα στο Chrome/Safari». */
+var carryOn=false;
+function carryHash(on){
+  var keep=on&&!isExample()&&(state.acts.length||state.goals.length);
+  try{ history.replaceState(null,"",location.pathname+location.search+(keep?"#p="+packLink():"")); }catch(e){}
+}
+function browserSteps(then){
+  return isIOS
+    ?['Πάτα <b>•••</b> ή το κουμπί <b>Κοινοποίηση</b>'+glyph("share")+' (πάνω ή κάτω δεξιά).','Διάλεξε <b>«Άνοιγμα στο Safari»</b> ή <b>«Άνοιγμα σε εξωτερικό πρόγραμμα περιήγησης»</b>.',then]
+    :['Πάτα <b>⋮</b> πάνω δεξιά.','Διάλεξε <b>«Άνοιγμα σε Chrome»</b> ή <b>«Άνοιγμα στο πρόγραμμα περιήγησης»</b>.',then];
+}
+function openInBrowserSheet(why){
+  var install=why==="install", shareOk=coarse&&canShareFiles();
+  var extra=isExample()?"":'<div class="callout">Το πρόγραμμά σου ανοίγει μαζί. Αν εκεί δεν το δεις, γύρνα εδώ, πάτα «Αντιγραφή συνδέσμου» και άνοιξε τον σύνδεσμο στον browser.<br><button type="button" class="btn small" data-act="copy">'+icon("link")+'Αντιγραφή συνδέσμου</button></div>';
+  if(!install&&shareOk) extra+=shotFigure("Ή κράτα το πρόγραμμα ως εικόνα:");
+  showSheet({kind:install?"":"print",
+    title:install?"Άνοιξέ το στον browser":"Άνοιξέ το στον browser για εκτύπωση",
+    lead:"Μέσα από "+appName()+(install?" δεν γίνεται εγκατάσταση.":" η εκτύπωση δεν ανοίγει.")+" Στο "+(isIOS?"Safari":"Chrome")+" δουλεύει κανονικά.",
+    steps:browserSteps(install?'Εκεί πάτα <b>«Εγκατάσταση»</b>.':'Εκεί πάτα ξανά <b>«Εκτύπωση»</b>.'),
+    extra:extra,on:{copy:copyLink},
+    actions:(!install&&shareOk)?[{label:"Κλείσιμο"},{label:"Κοινοποίηση εικόνας",icon:"share",primary:true,id:"aShare",disabled:true,run:shareShot}]:null,
+    opener:install?"#btnInstall":"#btnPrint",onClose:dropShot});
+  carryOn=true; carryHash(true);
+  if(!install&&shareOk) prepareShot();
+}
+
+/* ---------- το πρόγραμμα ως εικόνα, για όπου δεν ανοίγει εκτύπωση ---------- */
+var shotBlob=null, shotUrl=null;
+function canShareFiles(){
+  try{ return !!(navigator.share&&navigator.canShare&&window.File&&navigator.canShare({files:[new File([new Blob(["x"],{type:"image/png"})],"x.png",{type:"image/png"})]})); }catch(e){ return false; }
+}
+function shotFigure(label){
+  return (label?'<p class="shot-lbl">'+label+'</p>':'')+'<figure class="shot"><div class="shot-frame"><img id="aShot" alt="Το πρόγραμμα της εβδομάδας ως εικόνα" hidden><span class="shot-wait" id="aShotWait">Ετοιμάζεται η εικόνα…</span></div><figcaption id="aShotCap"></figcaption></figure>';
+}
+function dropShot(){ if(shotUrl){ try{ URL.revokeObjectURL(shotUrl); }catch(e){} } shotUrl=null; shotBlob=null; }
+function prepareShot(){
+  var gen=sheetGen;
+  dropShot();
+  renderShot().then(function(blob){
+    if(gen!==sheetGen||!$("#aShot")) return;
+    shotBlob=blob; shotUrl=URL.createObjectURL(blob);
+    var img=$("#aShot"); img.onload=sheetOverflow; img.src=shotUrl; img.hidden=false; $("#aShotWait").hidden=true;
+    var share=$("#aShare"), dl=$("#aDownload"), main=share||dl;
+    if(main){ main.disabled=false; if(document.activeElement===sheetAutoFocus) main.focus({preventScroll:true}); }
+    $("#aShotCap").textContent=share?(isIOS?"Στο μενού που ανοίγει διάλεξε «Εκτύπωση», «Αποθήκευση στα Αρχεία» ή το WhatsApp. Ή κράτα πατημένη την εικόνα για να την αποθηκεύσεις στις Φωτογραφίες."
+        :"Στο μενού που ανοίγει διάλεξε το WhatsApp, το Drive ή την αποθήκευση. Ή κράτα πατημένη την εικόνα για να την αποθηκεύσεις.")
+      :dl?"Η εικόνα έχει μέγεθος για σελίδα A4 οριζόντια."
+      :"Κράτα πατημένη την εικόνα και διάλεξε «Αποθήκευση» ή «Κοινοποίηση».";
+  },function(){
+    if(gen!==sheetGen||!$("#aShotWait")) return;
+    $("#aShotWait").textContent="Η εικόνα δεν μπόρεσε να φτιαχτεί σε αυτόν τον browser.";
+  });
+}
+function shareShot(){
+  if(!shotBlob) return false;
+  function failed(){ var c=$("#aShotCap"); if(c) c.textContent="Η κοινοποίηση δεν άνοιξε. Κράτα πατημένη την εικόνα για να την αποθηκεύσεις."; }
+  try{
+    var f=new File([shotBlob],"programma-meletis.png",{type:"image/png"});
+    navigator.share({files:[f],title:"Το πρόγραμμά μου"}).catch(function(e){ if(!(e&&e.name==="AbortError")) failed(); });
+  }catch(e){ failed(); }
+  return false;
+}
+function downloadShot(){
+  if(!shotUrl) return false;
+  var a=document.createElement("a"); a.href=shotUrl; a.download="programma-meletis.png"; a.rel="noopener";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  var b=$("#aDownload");
+  if(b){ b.innerHTML=icon("check")+"Κατέβηκε"; setTimeout(function(){ if(document.contains(b)) b.innerHTML=icon("install")+"Λήψη εικόνας"; },2500); }
+  else toast("Η εικόνα κατέβηκε","install");
+  return false;
+}
+function openPrintHelp(env){
+  if(env==="in-app"){ openInBrowserSheet("print"); return; }
+  var share=coarse&&canShareFiles(), app=env==="ios-app", acts, extra;
+  if(share) acts=[{label:"Κλείσιμο"},{label:"Κοινοποίηση εικόνας",icon:"share",primary:true,id:"aShare",disabled:true,run:shareShot}];
+  else if(!coarse) acts=[{label:"Κλείσιμο"},{label:"Λήψη εικόνας",icon:"install",primary:true,id:"aDownload",disabled:true,run:downloadShot}];
+  else acts=[{label:"Εντάξει",primary:true}];
+  extra=shotFigure("");
+  if(app) extra+='<div class="callout">Θέλεις το φύλλο A4 με τους στόχους; Πάτα «Αντιγραφή συνδέσμου», άνοιξε τον σύνδεσμο στο Safari και πάτα εκεί «Εκτύπωση».<br><button type="button" class="btn small" data-act="copy">'+icon("link")+'Αντιγραφή συνδέσμου</button></div>';
+  showSheet({kind:"print",
+    title:app?"Εκτύπωση από το "+iDev:"Δεν άνοιξε η εκτύπωση;",
+    lead:app?"Από την εφαρμογή της αρχικής οθόνης το "+iDev+" δεν ανοίγει εκτύπωση. Κράτα το πρόγραμμα ως εικόνα: από εκεί το τυπώνεις, το αποθηκεύεις ή το στέλνεις."
+      :coarse?"Δοκίμασε από το μενού του browser: <b>⋮</b> ή <b>Κοινοποίηση</b>, μετά <b>«Εκτύπωση»</b>. Αλλιώς κράτα το πρόγραμμα ως εικόνα."
+      :"Δοκίμασε από το μενού του browser (<b>«Εκτύπωση»</b> ή <b>"+(/Macintosh/.test(ua)?"⌘P":"Ctrl+P")+"</b>). Αλλιώς κατέβασε το πρόγραμμα ως εικόνα.",
+    extra:extra,on:{copy:copyLink},actions:acts,opener:"#btnPrint",onClose:dropShot});
+  prepareShot();
+}
+
+/* Σχεδίαση με Canvas 2D: ανοιχτό θέμα, αναλογία A4 οριζόντια. Όχι αντιγραφή του DOM σε εικόνα,
+   γιατί στο Safari ο καμβάς τότε «κλειδώνει» και η εικόνα δεν βγαίνει. */
+var SHOT_C={school:["#64748b","#eceff4","#334155"],korifi:["#4338ca","#e7e9fb","#2b2683"],study:["#0e8f84","#e0f3f0","#0c5e57"],
+  review:["#0369a1","#e2eff9","#084f78"],test:["#be123c","#fbe6ec","#8f1033"],free:["#c2610a","#fbf1e5","#7e3f06"]};
+var F_SANS='Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif', F_MONO='"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace', F_SERIF='Literata,"Noto Serif",Georgia,serif';
+function fontsReady(){
+  if(!document.fonts||!document.fonts.load) return Promise.resolve();
+  var list=['600 13px Inter','500 13px Inter','400 13px Inter','400 11px "JetBrains Mono"','500 11px "JetBrains Mono"','500 34px Literata','italic 400 15px Literata'];
+  var all=Promise.all(list.map(function(f){ return document.fonts.load(f,"Αβγ 09").catch(function(){}); }));
+  return Promise.race([all,new Promise(function(r){ setTimeout(r,2500); })]);
+}
+function rr(c,x,y,w,h,r){ r=Math.min(r,w/2,h/2); c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+function hline(c,x1,x2,y,col){ c.fillStyle=col; c.fillRect(x1,Math.round(y),x2-x1,1); }
+function vline(c,x,y1,y2,col){ c.fillStyle=col; c.fillRect(Math.round(x),y1,1,y2-y1); }
+function fitText(c,t,w){ t=String(t); if(c.measureText(t).width<=w) return t; while(t.length>1&&c.measureText(t+"…").width>w) t=t.slice(0,-1); return t.replace(/\s+$/,"")+"…"; }
+function wrapText(c,t,w,max){
+  var words=String(t).trim().split(/\s+/), lines=[], cur="";
+  for(var i=0;i<words.length;i++){
+    var next=cur?cur+" "+words[i]:words[i];
+    if(!cur||c.measureText(next).width<=w){ cur=next; continue; }
+    if(lines.length===max-1){ cur=cur+" "+words.slice(i).join(" "); break; }
+    lines.push(cur); cur=words[i];
+  }
+  lines.push(cur);
+  return lines.map(function(l){ return fitText(c,l,w); });
+}
+function drawSchedule(){
+  var S=2, W=1240, PX=36, TOP=30, HEADH=78, TIMEW=58, DAYH=50, ROW=46, FOOTH=42, BOT=30;
+  var BW=W-2*PX, colW=(BW-TIMEW)/7, by=TOP+HEADH, gy=by+DAYH, gh=(END_H-START_H)*ROW, H=gy+gh+FOOTH+BOT;
+  var cv=document.createElement("canvas"); cv.width=W*S; cv.height=H*S;
+  var c=cv.getContext("2d"); c.scale(S,S); c.textBaseline="alphabetic";
+  var ls="letterSpacing" in c;
+  c.fillStyle="#ffffff"; c.fillRect(0,0,W,H);
+  /* κεφαλίδα: τίτλος και εβδομάδα αριστερά, το φροντιστήριο δεξιά */
+  c.fillStyle="#1b1a3a"; c.font="500 34px "+F_SERIF; c.fillText("Το πρόγραμμά μου",PX,TOP+38);
+  c.fillStyle="#454768"; c.font="italic 400 15px "+F_SERIF; c.fillText(weekRange(),PX,TOP+63);
+  c.fillStyle="#4338ca"; c.font="600 12px "+F_SANS; c.textAlign="right"; if(ls) c.letterSpacing="1.4px";
+  c.fillText("ΦΡΟΝΤΙΣΤΗΡΙΟ ΚΟΡΥΦΗ · KORIFI-EDU.GR",W-PX,TOP+61); if(ls) c.letterSpacing="0px"; c.textAlign="left";
+  /* πίνακας */
+  rr(c,PX+.5,by+.5,BW-1,DAYH+gh+FOOTH-1,10); c.fillStyle="#ffffff"; c.fill();
+  c.save(); rr(c,PX+.5,by+.5,BW-1,DAYH+gh+FOOTH-1,10); c.clip();
+  var gx=PX+TIMEW;
+  for(var h=0;h<END_H-START_H;h++){ hline(c,gx,PX+BW,gy+h*ROW+ROW/2,"#ebebf5"); if(h) hline(c,gx,PX+BW,gy+h*ROW,"#e1e1ee"); }
+  for(var d=0;d<7;d++) vline(c,gx+d*colW,by,gy+gh,"#e1e1ee");
+  hline(c,PX,PX+BW,gy,"#d9d9ea"); hline(c,PX,PX+BW,gy+gh,"#d9d9ea");
+  /* ώρες */
+  c.font="400 11px "+F_MONO; c.fillStyle="#62648a"; c.textAlign="right";
+  for(var t=START_H;t<END_H;t++) c.fillText(pad(t)+":00",gx-8,gy+(t-START_H)*ROW+14);
+  c.textAlign="left";
+  /* ημέρες */
+  for(var d2=0;d2<7;d2++){
+    var cx=gx+d2*colW, hrs=dayHours(d2);
+    c.fillStyle="#1b1a3a"; c.font="600 13.5px "+F_SANS; c.fillText(fitText(c,DAYS[d2],colW-16),cx+10,by+22);
+    c.font="400 11.5px "+F_MONO; c.fillStyle="#62648a";
+    if(hrs>0){
+      var num=hrs<1?String(Math.round(hrs*60)):hstr(hrs), unit=hrs<1?" λεπτά":" "+hoursWord(hrs);
+      c.fillStyle="#454768"; c.font="500 11.5px "+F_MONO; c.fillText(num,cx+10,by+39);
+      var nw=c.measureText(num).width; c.fillStyle="#62648a"; c.font="400 11.5px "+F_MONO; c.fillText(unit,cx+10+nw,by+39);
+    } else c.fillText("κενή μέρα",cx+10,by+39);
+    /* μπλοκ: ίδια διάταξη με την οθόνη (στήλες ή κλιμακωτά όταν επικαλύπτονται) */
+    layoutDay(state.acts.filter(function(a){return a.day===d2;}),Math.ceil(18/ROW*60)).forEach(function(it){
+      var a=it.a, k=SHOT_C[a.type], top=gy+(it.s-START_H*60)/60*ROW+1, ht=Math.max((it.e-it.s)/60*ROW-2,16), x, w;
+      if(top+ht>gy+gh-1) top=gy+gh-1-ht; if(top<gy+1) top=gy+1;
+      if(it.stack){ x=cx+it.level*18+3; w=colW-(it.level*18+6); } else { x=cx+it.col/it.cols*colW+3; w=colW/it.cols-6; }
+      rr(c,x,top,w,ht,4); c.fillStyle=k[1]; c.fill();
+      if(it.stack&&it.level>0){ c.strokeStyle="#ffffff"; c.lineWidth=1.5; c.stroke(); }
+      c.save(); rr(c,x,top,w,ht,4); c.clip();
+      c.fillStyle=k[0]; c.fillRect(x,top,3,ht);
+      var narrow=it.cols>1&&!it.stack, tx=x+(narrow?6:9), tw=w-(narrow?8:14), once=a.repeat===0;
+      c.fillStyle=k[2];
+      if(ht>=34){
+        c.font="600 12px "+F_SANS;
+        var lines=wrapText(c,a.subject,tw,ht>=60?2:1), y=top+16;
+        lines.forEach(function(l){ c.fillText(l,tx,y); y+=15; });
+        c.globalAlpha=.85; c.font="400 10.5px "+F_MONO;
+        var rng=narrow?a.start:a.start+"–"+a.end; c.fillText(fitText(c,rng,tw),tx,y+1);
+        var rw=c.measureText(rng).width; c.globalAlpha=1;
+        if(once&&!narrow){
+          c.font="600 9.5px "+F_SANS; var bw=c.measureText("μία φορά").width+8;
+          if(rw+6+bw<=tw){ c.strokeStyle=k[2]; c.lineWidth=1; rr(c,tx+rw+6.5,y-9.5,bw,13,3); c.stroke(); c.fillText("μία φορά",tx+rw+10.5,y+.5); }
+        }
+        if(a.goal&&top+ht-(y+4)>=16){
+          c.font="italic 400 11px "+F_SERIF; c.globalAlpha=.9;
+          wrapText(c,a.goal,tw,Math.max(1,Math.min(2,Math.floor((top+ht-(y+4))/14)))).forEach(function(l){ y+=14; c.fillText(l,tx,y+1); });
+          c.globalAlpha=1;
+        }
+      } else {
+        var mid=top+ht/2+4;
+        c.font="400 10.5px "+F_MONO; var tm=a.start, tmw=c.measureText(tm).width;
+        var withTime=ht>=22&&tw-tmw-6>=40;
+        c.font=(ht>=22?"600 11.5px ":"600 11px ")+F_SANS;
+        var title=fitText(c,a.subject,withTime?tw-tmw-6:tw); c.fillText(title,tx,mid);
+        if(withTime){ var ttw=c.measureText(title).width; c.globalAlpha=.85; c.font="400 10.5px "+F_MONO; c.fillText(tm,tx+ttw+6,mid); c.globalAlpha=1; }
+      }
+      c.restore();
+    });
+  }
+  /* υπόμνημα */
+  var ly=gy+gh+FOOTH/2+4, lx=PX+14;
+  c.font="400 12.5px "+F_SANS;
+  Object.keys(TYPES).forEach(function(key){
+    var k=SHOT_C[key]; c.fillStyle=k[1]; c.fillRect(lx,ly-10,10,10); c.fillStyle=k[0]; c.fillRect(lx,ly-10,3,10);
+    c.fillStyle="#62648a"; c.fillText(TYPES[key].label,lx+16,ly); lx+=16+c.measureText(TYPES[key].label).width+18;
+  });
+  c.textAlign="right"; c.fillText("Οι ώρες κάθε μέρας δεν περιλαμβάνουν το σχολείο.",PX+BW-14,ly); c.textAlign="left";
+  c.restore();
+  rr(c,PX+.5,by+.5,BW-1,DAYH+gh+FOOTH-1,10); c.strokeStyle="#d9d9ea"; c.lineWidth=1; c.stroke();
+  return cv;
+}
+function renderShot(){
+  return fontsReady().then(function(){
+    var cv=drawSchedule();
+    return new Promise(function(res,rej){
+      try{
+        if(cv.toBlob) cv.toBlob(function(b){ if(b) res(b); else rej(new Error("toBlob")); },"image/png");
+        else { var d=cv.toDataURL("image/png"), bin=atob(d.split(",")[1]), u=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); res(new Blob([u],{type:"image/png"})); }
+      }catch(e){ rej(e); }
+    });
+  });
+}
+
 function install(){
   if(deferredPrompt){
     var p=deferredPrompt; deferredPrompt=null;
     try{
       p.prompt();
-      Promise.resolve(p.userChoice).then(function(c){ if(c&&c.outcome==="accepted"){ ui.installClosed=true; saveUi(); } updateAppUi(); });
-    }catch(e){ openSheet(); }
+      Promise.resolve(p.userChoice).then(function(c){ if(c&&c.outcome==="accepted"){ installedNow=true; ui.installClosed=true; saveUi(); } updateAppUi(); });
+    }catch(e){ openInstallSheet(); }
     return;
   }
-  openSheet();
+  openInstallSheet();
 }
 window.addEventListener("beforeinstallprompt",function(e){ e.preventDefault(); deferredPrompt=e; updateAppUi(); });
-window.addEventListener("appinstalled",function(){ deferredPrompt=null; ui.installClosed=true; saveUi(); updateAppUi(); toast("Το «Πρόγραμμα» μπήκε στην αρχική οθόνη","install",3600); });
+window.addEventListener("appinstalled",function(){ deferredPrompt=null; installedNow=true; ui.installClosed=true; saveUi(); updateAppUi(); toast("Το «Πρόγραμμα» μπήκε στην αρχική οθόνη","install",3600); });
 
 /* Μπάρα πάνω από το πρόγραμμα: στον browser του κινητού προτείνει εγκατάσταση,
    μέσα στην εφαρμογή (όσο δείχνει ακόμα το παράδειγμα) προτείνει να φέρει το πρόγραμμα με τον σύνδεσμο. */
 function updateAppUi(){
   var sa=standalone(), mode="";
-  if(sa){ if(isExample()&&!ui.bringClosed) mode="bring"; }
+  /* Ο browser δεν αποθηκεύει (ιδιωτική περιήγηση, γεμάτος χώρος): η ειδοποίηση μένει μέχρι να την κλείσει ο μαθητής */
+  if(saveFailed){ if(!noStoreClosed) mode="nostore"; }
+  else if(sa){ if(isExample()&&!ui.bringClosed) mode="bring"; }
   else if(!ui.installClosed&&(isIOS||(coarse&&(isAndroid||deferredPrompt)))) mode="install";
   var bar=$("#appbar");
   if(mode&&bar.getAttribute("data-mode")!==mode){
-    if(mode==="install"){
+    if(mode==="nostore"){
+      $("#appbarIc").innerHTML=icon("flag");
+      $("#appbarText").innerHTML="<b>Αυτός ο browser δεν αποθηκεύει το πρόγραμμα.</b> Πριν κλείσεις τη σελίδα, πάτα «Αντιγραφή συνδέσμου» για να μη χαθεί.";
+      $("#appbarBtn").innerHTML=icon("link")+"Αντιγραφή συνδέσμου";
+    } else if(mode==="install"){
       $("#appbarIc").innerHTML=icon("phone");
       $("#appbarText").innerHTML="<b>Βάλ’ το στην αρχική οθόνη.</b> Ανοίγει με ένα πάτημα, σαν εφαρμογή, και δουλεύει και χωρίς internet.";
       $("#appbarBtn").innerHTML=icon("install")+"Εγκατάσταση";
@@ -1304,16 +1774,17 @@ function updateAppUi(){
     }
   }
   bar.setAttribute("data-mode",mode); bar.hidden=!mode;
-  $("#btnInstall").hidden=sa;
+  $("#btnInstall").hidden=sa||installedNow;
   $("#h-app").textContent=sa?"Σε άλλη συσκευή":"Στο κινητό σου";
   $("#appNote").textContent=sa
     ?"Για το ίδιο πρόγραμμα σε άλλη συσκευή, αντέγραψε τον σύνδεσμο μεταφοράς και άνοιξέ τον εκεί. Αν τον αντέγραψες από τον browser, πάτα «Επικόλληση συνδέσμου»."
     :"Βάλ’ το στην αρχική οθόνη: ανοίγει με ένα πάτημα, σαν εφαρμογή, και δουλεύει και χωρίς internet. Για το ίδιο πρόγραμμα σε άλλη συσκευή, αντέγραψε τον σύνδεσμο μεταφοράς και άνοιξέ τον εκεί.";
 }
 $("#appbarX").innerHTML=icon("x");
-$("#appbarBtn").addEventListener("click",function(){ if($("#appbar").getAttribute("data-mode")==="bring") pasteLink(); else install(); });
+$("#appbarBtn").addEventListener("click",function(){ var m=$("#appbar").getAttribute("data-mode"); if(m==="nostore") copyLink("Ο σύνδεσμος αντιγράφηκε. Κράτα τον (π.χ. στις Σημειώσεις) και άνοιξέ τον για να συνεχίσεις από εκεί."); else if(m==="bring") pasteLink(); else install(); });
 $("#appbarX").addEventListener("click",function(){
-  if($("#appbar").getAttribute("data-mode")==="bring") ui.bringClosed=true; else ui.installClosed=true;
+  var m=$("#appbar").getAttribute("data-mode");
+  if(m==="nostore") noStoreClosed=true; else if(m==="bring") ui.bringClosed=true; else ui.installClosed=true;
   saveUi(); updateAppUi(); $("#btnLink").focus({preventScroll:true});
 });
 $("#btnInstall").insertAdjacentHTML("afterbegin",icon("install"));
@@ -1322,7 +1793,23 @@ $("#btnPaste").insertAdjacentHTML("afterbegin",icon("paste"));
 $("#btnInstall").addEventListener("click",install);
 $("#btnLink").addEventListener("click",copyLink);
 $("#btnPaste").addEventListener("click",pasteLink);
-window.addEventListener("hashchange",takeHash);
+window.addEventListener("hashchange",function(){ takeHash(true); });
+
+/* WhatsApp: μέσα σε εφαρμογές (Instagram, Facebook…) και στην εφαρμογή του iPhone ο σύνδεσμος wa.me συχνά δεν ανοίγει
+   το WhatsApp. Εκεί ανοίγει το μενού κοινοποίησης της συσκευής, που έχει σίγουρα το WhatsApp. Όπου δεν υπάρχει αυτό το
+   μενού, ο σύνδεσμος ανοίγει στο ίδιο παράθυρο (σε νέο παράθυρο οι εφαρμογές συχνά δεν κάνουν τίποτα). */
+var waShare=(IN_APP||(isIOS&&standalone()))&&!!navigator.share;
+if(IN_APP) $("#btnWa").removeAttribute("target");
+if(waShare) $("#waNote").textContent="Ανοίγει το μενού κοινοποίησης: διάλεξε WhatsApp και μετά σε ποιον θα το στείλεις.";
+$("#btnWa").addEventListener("click",function(e){
+  if(!waShare) return;
+  e.preventDefault();
+  var href=this.href;
+  try{ navigator.share({text:$("#shareText").textContent}).catch(function(err){ if(!(err&&err.name==="AbortError")) location.href=href; }); }
+  catch(err){ location.href=href; }
+});
+
+$("#skipBoard").addEventListener("click",function(e){ e.preventDefault(); $("#h-summary").focus(); });
 
 /* ---------- init ---------- */
 load();
@@ -1331,8 +1818,8 @@ weekLine(); renderLegend(); renderAll();
 takeHash();
 /* Εγκατεστημένη εφαρμογή: ζητά από τον browser να μη σβήνει τα δεδομένα όταν χρειάζεται χώρο */
 if(standalone()&&navigator.storage&&navigator.storage.persist){ try{ navigator.storage.persist().catch(function(){}); }catch(e){} }
-if("serviceWorker" in navigator){
-  window.addEventListener("load",function(){ navigator.serviceWorker.register("/ergaleia/programma-sw.js",{scope:PAGE}).catch(function(){}); });
+if(navigator.serviceWorker&&navigator.serviceWorker.register){
+  window.addEventListener("load",function(){ try{ navigator.serviceWorker.register("/ergaleia/programma-sw.js",{scope:PAGE}).catch(function(){}); }catch(e){} });
 }
 function onBreakpoint(){ renderWeek(); reserveClearWidth(); }
 if(phoneMQ.addEventListener) phoneMQ.addEventListener("change",onBreakpoint); else if(phoneMQ.addListener) phoneMQ.addListener(onBreakpoint);
