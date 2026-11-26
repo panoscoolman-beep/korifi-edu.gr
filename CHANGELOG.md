@@ -10,11 +10,19 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 Ο Πάνος ζήτησε να δούμε τα email του Search Console (νέα «Δεν βρέθηκε (404)» σε σελίδες του sitemap).
 
-- **Κύρια αιτία (DNS, όχι κώδικας):** στις 18/11 το Hostinger ενεργοποίησε μόνο του CDN για το korifi-edu.gr
-  (email 12/11) και ξανάγραψε τις εγγραφές A/AAAA. Από τότε το domain έδειχνε στο Hostinger αντί για τη Vercel
-  (www → `*.cdn.hstgr.net`): σφάλμα SSL στο live test του Google, 404 σε σελίδες του νέου site, παλιά URLs του
-  WordPress ξανά ορατά. Διόρθωση στο hPanel: CDN off, A `@` → Vercel, χωρίς AAAA, CNAME `www` → `cname.vercel-dns.com`.
-  Έλεγχος στο μέλλον: Vercel `get_domain_config` (αν `misconfigured: true`, φταίει το DNS).
+- **Κύρια αιτία (DNS, όχι κώδικας):** στις 21/11 το Hostinger ενεργοποίησε μόνο του «Hosting CDN» για το
+  korifi-edu.gr (είχε προειδοποιήσει με email 12/11): αντικατέστησε το A `@` 216.198.79.1 με ALIAS `@` →
+  `korifi-edu.gr.cdn.hstgr.net` και το CNAME `www` με `www.korifi-edu.gr.cdn.hstgr.net`. Από τότε το domain δεν
+  έφτανε στη Vercel: σφάλμα SSL/5xx στο Google (η αρχική βγήκε από το ευρετήριο), 404 σε σελίδες του νέου site, και
+  τα `revalidate` δεν έφταναν (γι' αυτό το /blog δεν έδειχνε το άρθρο της 24/11).
+- **Διόρθωση στο hPanel (26/11, με σύνδεση του Πάνου):** korifi-edu.gr στο «Opt out of automatic CDN» + CDN
+  Disable. Το Disable έβαλε δικές του εγγραφές hosting του Hostinger (A 82.198.230.69, AAAA 2a02:4780:…), οπότε
+  διορθώθηκαν με το χέρι: A `@` → 216.198.79.1 (TTL 300), διαγραφή AAAA `@`, CNAME `www` →
+  `110c29ab26688085.vercel-dns-017.com`. Οι εγγραφές email (MX, SPF, DMARC, DKIM, autodiscover/autoconfig) δεν
+  πειράχτηκαν. Έλεγχος: Vercel `get_domain_config` → `misconfigured: false` και για τα δύο, dns.google → 216.198.79.1,
+  live test Search Console για την αρχική ✓, αίτημα ευρετηρίου για την αρχική, νέα υποβολή `sitemap.xml`.
+  Έλεγχος στο μέλλον: Vercel `get_domain_config` (αν `misconfigured: true`, φταίει το DNS) και η καρτέλα
+  «DNS history» στο hPanel, που δείχνει κάθε αλλαγή που κάνει το Hostinger.
 - **`sitemap.xml` → `force-dynamic`:** με `revalidate = 3600` έμενε στα δεδομένα του deploy της 16/10 (έλειπαν
   τα 5 άρθρα από 20/10 και μετά· έδειχνε ακόμη τα `panellinies-odigies-epiviosis-gia-to` και
   `i-koyrtina-toy-agchoys` που πλέον κάνουν redirect στο `agchos-exetaseon-odigos`).
