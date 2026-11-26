@@ -6,6 +6,26 @@ Chronological log όλων των αλλαγών — διαβάζεται από
 
 ---
 
+## 2026-11-26 (Search Console 404: domain εκτός Vercel λόγω Hostinger CDN, «παγωμένο» sitemap, παλιά URLs)
+
+Ο Πάνος ζήτησε να δούμε τα email του Search Console (νέα «Δεν βρέθηκε (404)» σε σελίδες του sitemap).
+
+- **Κύρια αιτία (DNS, όχι κώδικας):** στις 18/11 το Hostinger ενεργοποίησε μόνο του CDN για το korifi-edu.gr
+  (email 12/11) και ξανάγραψε τις εγγραφές A/AAAA. Από τότε το domain έδειχνε στο Hostinger αντί για τη Vercel
+  (www → `*.cdn.hstgr.net`): σφάλμα SSL στο live test του Google, 404 σε σελίδες του νέου site, παλιά URLs του
+  WordPress ξανά ορατά. Διόρθωση στο hPanel: CDN off, A `@` → Vercel, χωρίς AAAA, CNAME `www` → `cname.vercel-dns.com`.
+  Έλεγχος στο μέλλον: Vercel `get_domain_config` (αν `misconfigured: true`, φταίει το DNS).
+- **`sitemap.xml` → `force-dynamic`:** με `revalidate = 3600` έμενε στα δεδομένα του deploy της 16/10 (έλειπαν
+  τα 5 άρθρα από 20/10 και μετά· έδειχνε ακόμη τα `panellinies-odigies-epiviosis-gia-to` και
+  `i-koyrtina-toy-agchoys` που πλέον κάνουν redirect στο `agchos-exetaseon-odigos`).
+- **Νέα 308 redirects** (`legacy-redirects.ts`): `/home` → `/`, `/συνεργάτες` → `/synergates`,
+  `/upologismos-morion` → `/blog/pos-ypologizontai-ta-moria`, `/instructor/*` → `/gia-emas`,
+  `/account` & `/membership-account` → `/login`. Test: `src/lib/__tests__/legacy-redirects.test.ts`.
+- Τα υπόλοιπα του Search Console είναι σκόπιμα: noindex/robots σε login και κλειδωμένα μαθήματα, 403 στα παλιά
+  PDF του WordPress, «διπλότυπα» παλιά PDF.
+
+---
+
 ## 2026-10-16 («Το πρόγραμμά μου»: έλεγχος κουμπιών — εκτύπωση σε iPhone app / Instagram, WhatsApp, μικρότερα)
 
 Ο Πάνος ανέφερε ότι «το κουμπί της εκτύπωσης και ίσως και άλλα κουμπιά δεν δουλεύουν». Έλεγχος όλου του εργαλείου

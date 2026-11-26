@@ -82,6 +82,16 @@ const WP_DEMO_EVENT_SLUGS = [
   "summer-school-2015",
 ].join("|");
 
+// Μεμονωμένες παλιές σελίδες WP → η αντίστοιχη σελίδα του νέου site
+const WP_PAGE_REDIRECTS: ReadonlyArray<readonly [string, string]> = [
+  ["/home", "/"],
+  ["/%CF%83%CF%85%CE%BD%CE%B5%CF%81%CE%B3%CE%AC%CF%84%CE%B5%CF%82", "/synergates"], // /συνεργάτες
+  ["/upologismos-morion", "/blog/pos-ypologizontai-ta-moria"],
+  ["/instructor/:name", "/gia-emas"],
+  ["/account", "/login"],
+  ["/membership-account", "/login"],
+];
+
 export const legacyRedirects: Redirect[] = [
   ...WP_ARTICLE_SLUGS.map(([oldSlugEncoded, newSlug]) => ({
     source: `/${oldSlugEncoded}`,
@@ -103,4 +113,10 @@ export const legacyRedirects: Redirect[] = [
     destination: "/events",
     permanent: true,
   },
+  // Παλιές σελίδες WP που το Google ακόμη επισκέπτεται (Search Console, 11/2026)
+  ...WP_PAGE_REDIRECTS.map(([source, destination]) => ({
+    source,
+    destination,
+    permanent: true,
+  })),
 ];

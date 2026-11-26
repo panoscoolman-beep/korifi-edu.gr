@@ -24,7 +24,11 @@ const RESERVED_SLUGS = new Set([
  */
 const STATIC_LASTMOD = new Date("2026-10-10");
 
-export const revalidate = 3600;
+// Χτίζεται σε κάθε αίτημα. Με `revalidate = 3600` το sitemap.xml έμενε «παγωμένο»
+// στα δεδομένα του τελευταίου deploy (26/11/2026: έλειπαν τα 5 άρθρα από 20/10 και
+// μετά και έδειχνε ακόμη παλιά άρθρα που πλέον κάνουν redirect → 404 στο Search
+// Console). Είναι μόνο δύο μικρά queries· το Google το διαβάζει λίγες φορές τη μέρα.
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Top-level static routes (high priority)
