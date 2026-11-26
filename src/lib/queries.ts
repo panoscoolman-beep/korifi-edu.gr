@@ -116,8 +116,8 @@ export const getAllPublishedArticleSlugs = unstable_cache(
 );
 
 /* -------------------- Sitemap (slug + real lastmod) -------------------- */
-// ΧΩΡΙΣ unstable_cache: το sitemap.xml είναι ήδη ISR (revalidate 3600), οπότε
-// χτυπάει τη βάση το πολύ μία φορά την ώρα. Με unstable_cache το sitemap έμενε
+// ΧΩΡΙΣ unstable_cache: το sitemap.xml είναι force-dynamic (βλ. src/app/sitemap.ts),
+// οπότε διαβάζει πάντα την τρέχουσα βάση. Με unstable_cache το sitemap έμενε
 // «κολλημένο» — τα άρθρα που δημοσιεύει το pg_cron (χωρίς revalidateTag) δεν
 // εμφανίζονταν για εβδομάδες (Οκτ 2026: έλειπαν 8 άρθρα από 13/8 και μετά).
 export async function getSitemapPages(): Promise<{ slug: string; updated_at: string }[]> {
